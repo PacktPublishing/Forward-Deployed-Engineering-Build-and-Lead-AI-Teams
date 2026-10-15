@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="41de4cfd08b55f311be07a6a464dcc20dce60d73ed8ee16cb9a2cc77688757a4">
+<title>Capstone Workshop 2 — Design the Team and Decision Model</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Capstone Workshop 2 — Design the Team and Decision Model</h1>
+<h2>Goal</h2>
+<p>Select the cross-functional forward deployed team for the Enterprise AI Claims Assistant and assign explicit decision rights for business scope, architecture, security, protected claim actions, go-live, rollback, and productization.</p>
+<p>Continue in the learner-owned project directory from Workshop 1. The completed course repository remains a reference, not your workspace.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>team_decisions.json</code> — named roles, accountabilities, allocations, and six consequential decision-rights records.</li><li>A staffing rationale tied to the risks and rollout stage.</li><li>The Workshop 2 Git commit in the same capstone repository.</li></ul>
+<h2>Estimated Time</h2>
+<p>35–50 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This workshop runs locally and creates no external services or cost.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m json.tool team_decisions.json</code> succeeds.</li><li>Seven required delivery roles have names, accountabilities, and positive allocations.</li><li>Six enterprise decisions have responsible roles and one accountable role.</li><li>Customer authority over protected claim actions and go-live remains explicit.</li><li>Metadata matches <code>problem_value.json</code> exactly.</li><li>Git is clean after the Workshop 2 commit.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Completed Workshop 1 files in the same project directory</li><li>Familiarity with forward deployed roles, staffing allocations, RACI, escalation, and customer authority</li></ul>
+<h2>Where This Workshop Fits</h2>
+<p>This workshop combines <strong>Select the Forward Deployed Team</strong> and <strong>Assign Ownership and Decision Rights</strong>. It converts the problem and value case into an operating model capable of making and executing the required decisions.</p>
+<h2>Step 1 — Create the Team and Decision Artifact</h2>
+<p>Create <code>team_decisions.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_11&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;candidate&quot;: &quot;claims-assistant-1.0.0&quot;,
+    &quot;review_date&quot;: &quot;2026-08-17&quot;,
+    &quot;decision_stage&quot;: &quot;phased production rollout&quot;
+  },
+  &quot;forward_deployed_team&quot;: [
+    {
+      &quot;role&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;name&quot;: &quot;Jordan Kim&quot;,
+      &quot;accountability&quot;: &quot;Integrated outcome, plan, decisions, risks, cutover, and handoff&quot;,
+      &quot;allocation_fte&quot;: 1.0
+    },
+    {
+      &quot;role&quot;: &quot;Forward Deployed Engineer&quot;,
+      &quot;name&quot;: &quot;Sam Rivera&quot;,
+      &quot;accountability&quot;: &quot;End-to-end workflow, customer integration, and evidence&quot;,
+      &quot;allocation_fte&quot;: 2.0
+    },
+    {
+      &quot;role&quot;: &quot;AI Engineer&quot;,
+      &quot;name&quot;: &quot;Avery Chen&quot;,
+      &quot;accountability&quot;: &quot;Retrieval, model behavior, evaluation, and guardrails&quot;,
+      &quot;allocation_fte&quot;: 1.0
+    },
+    {
+      &quot;role&quot;: &quot;Platform Engineer&quot;,
+      &quot;name&quot;: &quot;Morgan Lee&quot;,
+      &quot;accountability&quot;: &quot;Environments, observability, reliability, and rollback&quot;,
+      &quot;allocation_fte&quot;: 1.0
+    },
+    {
+      &quot;role&quot;: &quot;Security Engineer&quot;,
+      &quot;name&quot;: &quot;Dana Brooks&quot;,
+      &quot;accountability&quot;: &quot;Threat model, access, data protection, and security approval&quot;,
+      &quot;allocation_fte&quot;: 0.5
+    },
+    {
+      &quot;role&quot;: &quot;Product Partner&quot;,
+      &quot;name&quot;: &quot;Taylor Reed&quot;,
+      &quot;accountability&quot;: &quot;Adoption, value measurement, and reusable product signals&quot;,
+      &quot;allocation_fte&quot;: 0.5
+    },
+    {
+      &quot;role&quot;: &quot;Claims Subject-Matter Expert&quot;,
+      &quot;name&quot;: &quot;Marcus Green&quot;,
+      &quot;accountability&quot;: &quot;Ground truth, workflow acceptance, training, and quality review&quot;,
+      &quot;allocation_fte&quot;: 0.5
+    }
+  ],
+  &quot;decision_rights&quot;: [
+    {
+      &quot;decision&quot;: &quot;Business outcome and rollout scope&quot;,
+      &quot;responsible&quot;: [
+        &quot;Technical Deployment Lead&quot;,
+        &quot;Product Partner&quot;
+      ],
+      &quot;accountable&quot;: &quot;Business Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;Claims Subject-Matter Expert&quot;,
+        &quot;Finance Partner&quot;
+      ],
+      &quot;informed&quot;: [
+        &quot;Steering Committee&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;Architecture and technical exceptions&quot;,
+      &quot;responsible&quot;: [
+        &quot;Forward Deployed Engineer&quot;,
+        &quot;AI Engineer&quot;,
+        &quot;Platform Engineer&quot;
+      ],
+      &quot;accountable&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;consulted&quot;: [
+        &quot;Security Engineer&quot;
+      ],
+      &quot;informed&quot;: [
+        &quot;Business Owner&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;Security risk acceptance&quot;,
+      &quot;responsible&quot;: [
+        &quot;Security Engineer&quot;
+      ],
+      &quot;accountable&quot;: &quot;Security Approver&quot;,
+      &quot;consulted&quot;: [
+        &quot;Technical Deployment Lead&quot;,
+        &quot;Data Owner&quot;
+      ],
+      &quot;informed&quot;: [
+        &quot;Business Owner&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;Protected claim action&quot;,
+      &quot;responsible&quot;: [
+        &quot;Licensed Claims Adjuster&quot;
+      ],
+      &quot;accountable&quot;: &quot;Claims Operations Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;Claims Subject-Matter Expert&quot;
+      ],
+      &quot;informed&quot;: [
+        &quot;Audit and Compliance&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;Go-live or rollback&quot;,
+      &quot;responsible&quot;: [
+        &quot;Technical Deployment Lead&quot;,
+        &quot;Platform Engineer&quot;
+      ],
+      &quot;accountable&quot;: &quot;Claims Operations Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;Security Approver&quot;,
+        &quot;Business Owner&quot;
+      ],
+      &quot;informed&quot;: [
+        &quot;Pilot Users&quot;,
+        &quot;Support Team&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;Productization investment&quot;,
+      &quot;responsible&quot;: [
+        &quot;Product Partner&quot;
+      ],
+      &quot;accountable&quot;: &quot;Product Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;Technical Deployment Lead&quot;,
+        &quot;Platform Engineer&quot;,
+        &quot;Security Engineer&quot;
+      ],
+      &quot;informed&quot;: [
+        &quot;FDE Portfolio Lead&quot;
+      ]
+    }
+  ]
+}</code></pre>
+<p>The team is selected for this deployment stage, not from a generic org chart. The architecture needs AI, platform, security, product, workflow, and integration capability. The rollout also needs one technical deployment lead who owns the integrated plan and customer outcome.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Seven unique roles have named people, clear accountabilities, and positive FTE allocations.</li><li><strong>Acceptable variation:</strong> Names and allocations may reflect another organization if all seven capabilities remain covered.</li><li><strong>Failure indicator:</strong> A single “AI engineer” owns discovery, security, platform, adoption, and cutover.</li><li><strong>Corrective action:</strong> Separate the capability areas and assign realistic accountable roles and allocations.</li></ul>
+<h2>Step 2 — Challenge the Staffing Model</h2>
+<p>For every team member, connect the allocation to a concrete capstone obligation:</p>
+<table><thead><tr><th>Role</th><th>Obligation that justifies the role</th></tr></thead><tbody><tr><td>Technical Deployment Lead</td><td>Integrated outcome, decisions, delivery risks, cutover, and handoff</td></tr><tr><td>Forward Deployed Engineer</td><td>Customer workflow and end-to-end integration</td></tr><tr><td>AI Engineer</td><td>Retrieval, evaluation, model behavior, and guardrails</td></tr><tr><td>Platform Engineer</td><td>Environments, observability, reliability, and rollback</td></tr><tr><td>Security Engineer</td><td>Threats, access, data protection, and security approval</td></tr><tr><td>Product Partner</td><td>Adoption, value measurement, and reusable capability signals</td></tr><tr><td>Claims Subject-Matter Expert</td><td>Ground truth, workflow acceptance, training, and quality</td></tr></tbody></table>
+<p>Do not maximize staffing. Choose the smallest credible team and expose fractional specialist demand rather than hiding it.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Every role maps to work that would otherwise be unowned or create a delivery bottleneck.</li><li><strong>Acceptable variation:</strong> One person may fill two roles if the accountabilities and available capacity remain explicit.</li><li><strong>Failure indicator:</strong> Allocations are copied from a template without any relationship to scope, risk, or rollout stage.</li><li><strong>Corrective action:</strong> Remove unjustified capacity and add any missing capability required by the actual plan.</li></ul>
+<h2>Step 3 — Test the Decision Rights</h2>
+<p>Review the six decision records. Each must answer:</p>
+<ul><li>Who performs the work?</li><li>Who has final accountability?</li><li>Which customer authority cannot be delegated to the vendor or model?</li><li>Who must be consulted before the decision?</li><li>Who needs timely notification after the decision?</li></ul>
+<p>Pay particular attention to two boundaries:</p>
+<ol><li>A licensed claims adjuster remains responsible for a protected claim action, with the Claims Operations Owner accountable.</li><li>The Claims Operations Owner remains accountable for go-live or rollback even though the technical team prepares and executes the plan.</li></ol>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Each decision has at least one responsible role and exactly one accountable role expressed as a single value.</li><li><strong>Acceptable variation:</strong> Consulted and informed groups may change with the organization.</li><li><strong>Failure indicator:</strong> Two roles both have final accountability, or the model/vendor owns a protected customer decision.</li><li><strong>Corrective action:</strong> Name one accountable role and restore customer authority for consequential business actions.</li></ul>
+<h2>Step 4 — Validate Cross-Workshop Consistency and Commit</h2>
+<pre><code class="language-bash">python3 -m json.tool team_decisions.json
+python3 -c &quot;import json; a=json.load(open(&#x27;problem_value.json&#x27;)); b=json.load(open(&#x27;team_decisions.json&#x27;)); assert a[&#x27;metadata&#x27;]==b[&#x27;metadata&#x27;]; print(&#x27;Metadata aligned&#x27;)&quot;
+git add team_decisions.json
+git commit -m &quot;Design capstone team and decision rights&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Both validation commands succeed, <code>Metadata aligned</code> prints, and Git is clean.</li><li><strong>Acceptable variation:</strong> Equivalent JSON comparison code is acceptable.</li><li><strong>Failure indicator:</strong> The customer, initiative, candidate, or review stage differs between workshop artifacts.</li><li><strong>Corrective action:</strong> Copy the complete metadata object from <code>problem_value.json</code>, validate again, and commit.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<table><thead><tr><th>Input</th><th>Decision</th><th>Output</th></tr></thead><tbody><tr><td>Problem, scope, and assumptions</td><td>Which capabilities are required?</td><td>Seven-role deployment team</td></tr><tr><td>Delivery stage and risk</td><td>How much capacity is credible?</td><td>Explicit FTE allocations</td></tr><tr><td>Consequential decisions</td><td>Who works, decides, advises, and learns?</td><td>Six decision-rights records</td></tr><tr><td>Protected actions</td><td>Which authority stays with the customer?</td><td>Licensed-adjuster and Claims Operations ownership</td></tr></tbody></table>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody><tr><td>Metadata comparison fails</td><td>An artifact uses a different case version</td><td>Copy metadata from Workshop 1 without editing it.</td></tr><tr><td>One role owns everything</td><td>Staffing was organized around a hero</td><td>Split accountabilities across the required capabilities.</td></tr><tr><td>Decision has multiple accountable parties</td><td>Consensus was confused with accountability</td><td>Select one final accountable role and keep others consulted.</td></tr><tr><td>Customer authority is unclear</td><td>Technical execution and business authority were combined</td><td>Name the licensed adjuster or Claims Operations Owner explicitly.</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>This workshop creates no external resources. Keep all files for Workshop 3.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> Seven required delivery capabilities are staffed.</li><li class="check-item"><span class="box">☐</span> Every team member has a named accountability and allocation.</li><li class="check-item"><span class="box">☐</span> Six consequential decisions have responsible and accountable roles.</li><li class="check-item"><span class="box">☐</span> Protected actions and go-live preserve customer authority.</li><li class="check-item"><span class="box">☐</span> Workshop metadata is aligned.</li><li class="check-item"><span class="box">☐</span> My Workshop 2 commit is clean.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which role becomes the first bottleneck if the rollout doubles in size?</li><li>Which decision is most dangerous to leave ambiguous during cutover?</li><li>Where could one person fill two roles safely, and where would that create a conflict?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

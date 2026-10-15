@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "lab_id": "lab_11",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "candidate": "claims-assistant-1.0.0",
+    "review_date": "2026-08-17",
+    "decision_stage": "phased production rollout"
+  },
+  "reusable_capabilities": [
+    {
+      "capability": "Prompt-injection evaluation pack",
+      "decision": "PRODUCT",
+      "owner": "AI Quality Product Owner",
+      "boundary": "Versioned test contract with deployment-specific fixtures"
+    },
+    {
+      "capability": "Effective-policy retrieval pattern",
+      "decision": "PRODUCT",
+      "owner": "Knowledge Platform Product Owner",
+      "boundary": "Shared retrieval contract with configured jurisdiction and source connectors"
+    },
+    {
+      "capability": "Protected-action audit schema",
+      "decision": "PRODUCT",
+      "owner": "Security Product Owner",
+      "boundary": "Shared identity, evidence, approval, action, and result schema"
+    },
+    {
+      "capability": "Enterprise identity adapter framework",
+      "decision": "PLATFORM",
+      "owner": "Identity Platform Owner",
+      "boundary": "Shared adapter interface with customer-specific identity configuration"
+    },
+    {
+      "capability": "Tenant claim-field mapping",
+      "decision": "CONFIGURATION",
+      "owner": "Implementation Configuration Owner",
+      "boundary": "Declarative mapping that cannot fork shared source"
+    },
+    {
+      "capability": "Northstar legacy mainframe adapter",
+      "decision": "CUSTOM_EXTENSION",
+      "owner": "Northstar Integration Owner",
+      "boundary": "Customer-funded isolated extension with review date 2027-03-31"
+    }
+  ],
+  "adoption_and_outcome_scorecard": {
+    "baselines": {
+      "average_handling_minutes": 42,
+      "rework_rate_percent": 14,
+      "quality_score_percent": 86
+    },
+    "targets": [
+      {
+        "metric": "active_adoption_percent",
+        "operator": "min",
+        "threshold": 80,
+        "owner": "Claims Operations Lead"
+      },
+      {
+        "metric": "assisted_claim_rate_percent",
+        "operator": "min",
+        "threshold": 70,
+        "owner": "Claims Operations Lead"
+      },
+      {
+        "metric": "recommendation_acceptance_percent",
+        "operator": "min",
+        "threshold": 75,
+        "owner": "Claims Quality Lead"
+      },
+      {
+        "metric": "handling_time_reduction_percent",
+        "operator": "min",
+        "threshold": 25,
+        "owner": "Business Owner"
+      },
+      {
+        "metric": "rework_reduction_percent",
+        "operator": "min",
+        "threshold": 25,
+        "owner": "Claims Quality Lead"
+      },
+      {
+        "metric": "quality_score_percent",
+        "operator": "min",
+        "threshold": 92,
+        "owner": "Claims Quality Lead"
+      },
+      {
+        "metric": "citation_completeness_percent",
+        "operator": "min",
+        "threshold": 95,
+        "owner": "Claims Quality Lead"
+      },
+      {
+        "metric": "p95_latency_seconds",
+        "operator": "max",
+        "threshold": 12,
+        "owner": "Site Reliability Lead"
+      },
+      {
+        "metric": "benefit_cost_ratio",
+        "operator": "min",
+        "threshold": 3,
+        "owner": "Finance Partner"
+      },
+      {
+        "metric": "unauthorized_protected_actions",
+        "operator": "max",
+        "threshold": 0,
+        "owner": "Security Approver"
+      },
+      {
+        "metric": "audit_completeness_percent",
+        "operator": "min",
+        "threshold": 100,
+        "owner": "Security Operations"
+      }
+    ],
+    "review_cadence": "Weekly during rollout with a formal day-30 continue, repair, pause, or expand decision"
+  },
+  "decision_policy": {
+    "approve": "All scorecard gates pass, safety evidence passes, blocking readiness controls pass, approvals are complete, and no risk is OPEN.",
+    "hold": "Safety passes but a value, adoption, readiness, approval, or delivery condition fails.",
+    "pause": "Any unauthorized protected action, quality below the safety floor, cross-tenant exposure, or missing protected-action audit occurs."
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "lab_id": "lab_11",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "candidate": "claims-assistant-1.0.0",
+    "review_date": "2026-08-17",
+    "decision_stage": "phased production rollout"
+  },
+  "customer_problem": {
+    "primary_user": "Licensed Claims Adjuster",
+    "problem_statement": "Adjusters spend too much time assembling evidence-linked claim summaries across fragmented systems, causing slow handling, rework, and incomplete audit evidence.",
+    "baseline": {
+      "average_handling_minutes": 42,
+      "rework_rate_percent": 14,
+      "quality_score_percent": 86
+    },
+    "business_outcome": "Reduce handling time and rework while improving quality and citation completeness without allowing unauthorized protected actions.",
+    "scope": "Retrieve effective policy evidence, produce a cited summary, and recommend request_evidence, continue_review, or escalate.",
+    "non_goals": [
+      "Autonomously approve or deny a claim",
+      "Authorize payment or change reserves",
+      "Send customer communication or update the claims system without human approval"
+    ]
+  },
+  "discovery_and_value": {
+    "evidence": [
+      "Workflow interviews with licensed adjusters",
+      "Four-week bounded pilot with 25 adjusters",
+      "Reviewed evaluation set segmented by claim type and failure mode",
+      "Security, recovery, and human-approval drills"
+    ],
+    "assumptions": [
+      {
+        "assumption": "Effective-date and jurisdiction metadata remain complete for each rollout wave.",
+        "owner": "Claims Data Lead",
+        "test": "Block a jurisdiction when policy metadata coverage is below 100 percent."
+      },
+      {
+        "assumption": "Licensed adjusters retain decision authority and review cited evidence.",
+        "owner": "Claims Operations Lead",
+        "test": "Monitor acceptance, overrides, approval identity, and audit completeness weekly."
+      }
+    ],
+    "value_hypothesis": {
+      "statement": "If adjusters receive a source-linked summary and a bounded recommendation inside their workflow, then average handling time and rework will fall without reducing quality or safety.",
+      "benefit_formula": "time_saved_hours * loaded_adjuster_hourly_cost_usd + avoided_rework_count * avoided_rework_value_usd",
+      "loaded_adjuster_hourly_cost_usd": 85,
+      "avoided_rework_value_usd": 120
+    }
+  }
+}

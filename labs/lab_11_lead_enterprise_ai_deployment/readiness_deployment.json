@@ -1,0 +1,167 @@
+{
+  "metadata": {
+    "lab_id": "lab_11",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "candidate": "claims-assistant-1.0.0",
+    "review_date": "2026-08-17",
+    "decision_stage": "phased production rollout"
+  },
+  "security_and_readiness": {
+    "controls": [
+      {
+        "id": "C-01",
+        "category": "identity_access",
+        "owner": "Identity Engineering",
+        "evidence": "Cross-tenant, wrong-role, and expired-session tests fail closed",
+        "status": "PASS"
+      },
+      {
+        "id": "C-02",
+        "category": "data_protection",
+        "owner": "Data Protection",
+        "evidence": "Private boundary, minimization, retention, and PII log scan approved",
+        "status": "PASS"
+      },
+      {
+        "id": "C-03",
+        "category": "model_guardrail",
+        "owner": "AI Security",
+        "evidence": "Direct and indirect prompt-injection suite blocked protected actions",
+        "status": "PASS"
+      },
+      {
+        "id": "C-04",
+        "category": "human_approval",
+        "owner": "Claims Platform",
+        "evidence": "Bypass, replay, expired-token, and wrong-approver tests fail closed",
+        "status": "PASS"
+      },
+      {
+        "id": "C-05",
+        "category": "observability_audit",
+        "owner": "Security Operations",
+        "evidence": "Audit completeness and immutability tests pass",
+        "status": "PASS"
+      },
+      {
+        "id": "C-06",
+        "category": "reliability_recovery",
+        "owner": "Site Reliability Engineering",
+        "evidence": "Load, dependency-failure, idempotency, and rollback drills pass",
+        "status": "PASS"
+      },
+      {
+        "id": "C-07",
+        "category": "operations",
+        "owner": "Operations Owner",
+        "evidence": "Runbook tabletop and primary/backup on-call review complete",
+        "status": "PASS"
+      }
+    ],
+    "approvals": [
+      {
+        "role": "Business Owner",
+        "name": "Elena Ruiz",
+        "approved": true
+      },
+      {
+        "role": "Technical Owner",
+        "name": "Jordan Kim",
+        "approved": true
+      },
+      {
+        "role": "Security Approver",
+        "name": "Dana Brooks",
+        "approved": true
+      },
+      {
+        "role": "Operations Owner",
+        "name": "Morgan Lee",
+        "approved": true
+      }
+    ],
+    "open_exceptions": [],
+    "rollback_action": "Disable claims_ai_assist_rollout, preserve evidence, reconcile uncertain writes, notify accountable owners, and continue the manual claims workflow."
+  },
+  "deployment_plan": {
+    "rollout_boundary": {
+      "wave": "Wave 1 production rollout",
+      "cohort": "75 trained licensed claims adjusters",
+      "maximum_claims": 1500,
+      "duration_days": 30,
+      "feature_flag": "claims_ai_assist_rollout",
+      "manual_workflow_available": true
+    },
+    "milestones": [
+      {
+        "id": "M-01",
+        "name": "Outcome and scope sign-off",
+        "owner": "Business Owner",
+        "depends_on": [],
+        "exit_evidence": "Signed outcome, scope, non-goals, and rollout boundary"
+      },
+      {
+        "id": "M-02",
+        "name": "Architecture and data readiness",
+        "owner": "Technical Deployment Lead",
+        "depends_on": [
+          "M-01"
+        ],
+        "exit_evidence": "Approved design, effective-policy coverage, and version manifest"
+      },
+      {
+        "id": "M-03",
+        "name": "Evaluation and security approval",
+        "owner": "Security Approver",
+        "depends_on": [
+          "M-02"
+        ],
+        "exit_evidence": "All release gates and readiness controls pass"
+      },
+      {
+        "id": "M-04",
+        "name": "Cutover readiness review",
+        "owner": "Claims Operations Owner",
+        "depends_on": [
+          "M-03"
+        ],
+        "exit_evidence": "Training, on-call, rollback, communications, and support evidence complete"
+      },
+      {
+        "id": "M-05",
+        "name": "Wave 1 go-live",
+        "owner": "Technical Deployment Lead",
+        "depends_on": [
+          "M-04"
+        ],
+        "exit_evidence": "Feature flag enabled only for the approved cohort"
+      },
+      {
+        "id": "M-06",
+        "name": "Hypercare and outcome review",
+        "owner": "Product Partner",
+        "depends_on": [
+          "M-05"
+        ],
+        "exit_evidence": "Thirty-day scorecard, incidents, adoption, value, and next-wave decision"
+      },
+      {
+        "id": "M-07",
+        "name": "Operational handoff",
+        "owner": "Operations Owner",
+        "depends_on": [
+          "M-06"
+        ],
+        "exit_evidence": "Runbooks, dashboards, support ownership, and backlog accepted"
+      }
+    ],
+    "cutover_checks": [
+      "Approved version manifest is pinned",
+      "Only trained users are in the feature-flag cohort",
+      "Primary and backup on-call owners are confirmed",
+      "Rollback drill completed in under 10 minutes",
+      "Manual claims workflow remains available"
+    ]
+  }
+}

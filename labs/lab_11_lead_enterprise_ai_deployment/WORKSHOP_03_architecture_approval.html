@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="a16d2de579c36f898e4be72af50b8db5a4fd33e62cd09721ed6bd11349f924b6">
+<title>Capstone Workshop 3 — Design Architecture, Evaluation, and Human Approval</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Capstone Workshop 3 — Design Architecture, Evaluation, and Human Approval</h1>
+<h2>Goal</h2>
+<p>Design the production AI workflow for the Enterprise AI Claims Assistant and define the evaluation and human-approval evidence required before the candidate can perform any protected action.</p>
+<p>Continue in the same learner-owned capstone directory. Use the completed course repository only for comparison or recovery.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>architecture_approval.json</code> — components, trust boundaries, request flow, evaluation segments, release gates, latest results, protected actions, and approval evidence.</li><li>An authority trace showing approval before execution and audit after the result.</li><li>The Workshop 3 Git commit.</li></ul>
+<h2>Estimated Time</h2>
+<p>45–60 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This workshop models architecture and evidence locally. It calls no model endpoint and creates no infrastructure.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m json.tool architecture_approval.json</code> succeeds.</li><li>The design separates probabilistic AI from deterministic controls.</li><li>Four trust boundaries and the complete seven-stage workflow are explicit.</li><li>Nine representative and adversarial evaluation segments are required.</li><li>Six release gates have matching results and owners.</li><li>A licensed claims adjuster approves every protected action before execution.</li><li>Git is clean after the Workshop 3 commit.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Completed Workshops 1–2 in the same project directory</li><li>Familiarity with production AI architecture, trust boundaries, evaluation gates, and human approval</li></ul>
+<h2>Where This Workshop Fits</h2>
+<p>This workshop combines <strong>Design the Production AI Architecture</strong> and <strong>Create the Evaluation and Human-Approval Strategy</strong>. It turns the business and ownership contracts into enforceable technical and evidence boundaries.</p>
+<h2>Step 1 — Create the Architecture and Approval Artifact</h2>
+<p>Create <code>architecture_approval.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_11&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;candidate&quot;: &quot;claims-assistant-1.0.0&quot;,
+    &quot;review_date&quot;: &quot;2026-08-17&quot;,
+    &quot;decision_stage&quot;: &quot;phased production rollout&quot;
+  },
+  &quot;architecture&quot;: {
+    &quot;principle&quot;: &quot;Probabilistic AI prepares a cited recommendation; deterministic services enforce identity, policy, approval, execution, and audit.&quot;,
+    &quot;components&quot;: [
+      {
+        &quot;name&quot;: &quot;Adjuster Workspace&quot;,
+        &quot;type&quot;: &quot;human_interface&quot;,
+        &quot;owner&quot;: &quot;Claims Operations&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Identity and Tenant Gateway&quot;,
+        &quot;type&quot;: &quot;deterministic_control&quot;,
+        &quot;owner&quot;: &quot;Identity Engineering&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Effective Policy Retrieval&quot;,
+        &quot;type&quot;: &quot;deterministic_control&quot;,
+        &quot;owner&quot;: &quot;Claims Data&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Claims Summary Model&quot;,
+        &quot;type&quot;: &quot;probabilistic_ai&quot;,
+        &quot;owner&quot;: &quot;AI Engineering&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Recommendation Policy Gate&quot;,
+        &quot;type&quot;: &quot;deterministic_control&quot;,
+        &quot;owner&quot;: &quot;FDE Team&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Human Approval Service&quot;,
+        &quot;type&quot;: &quot;deterministic_control&quot;,
+        &quot;owner&quot;: &quot;Claims Platform&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Claims-System Adapter&quot;,
+        &quot;type&quot;: &quot;protected_action&quot;,
+        &quot;owner&quot;: &quot;Claims Platform&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Immutable Audit Stream&quot;,
+        &quot;type&quot;: &quot;deterministic_control&quot;,
+        &quot;owner&quot;: &quot;Security Operations&quot;
+      }
+    ],
+    &quot;trust_boundaries&quot;: [
+      &quot;Northstar user session to assistant service&quot;,
+      &quot;Assistant service to approved managed model endpoint&quot;,
+      &quot;Assistant service to claims and policy systems&quot;,
+      &quot;Protected action service to immutable audit store&quot;
+    ],
+    &quot;workflow&quot;: [
+      &quot;Authenticate the adjuster and enforce tenant and role scope.&quot;,
+      &quot;Retrieve only effective policy evidence for the authorized claim.&quot;,
+      &quot;Generate a schema-constrained cited summary and one allowed recommendation.&quot;,
+      &quot;Apply deterministic recommendation and protected-action policy.&quot;,
+      &quot;Require an explicit licensed-adjuster approval for every protected action.&quot;,
+      &quot;Execute with an approver-bound token and idempotency key.&quot;,
+      &quot;Write identity, evidence, versions, recommendation, approval, action, and result to the audit stream.&quot;
+    ]
+  },
+  &quot;evaluation_and_human_approval&quot;: {
+    &quot;evaluation_dataset&quot;: &quot;claims-pilot-eval-v1&quot;,
+    &quot;required_segments&quot;: [
+      &quot;standard&quot;,
+      &quot;missing_evidence&quot;,
+      &quot;effective_date&quot;,
+      &quot;high_severity&quot;,
+      &quot;scanned_document&quot;,
+      &quot;prompt_injection&quot;,
+      &quot;jurisdiction&quot;,
+      &quot;duplicate_submission&quot;,
+      &quot;protected_action&quot;
+    ],
+    &quot;release_gates&quot;: [
+      {
+        &quot;metric&quot;: &quot;recommendation_agreement_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 90,
+        &quot;owner&quot;: &quot;Claims Quality Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;citation_completeness_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 95,
+        &quot;owner&quot;: &quot;Claims Quality Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;prompt_injection_block_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 100,
+        &quot;owner&quot;: &quot;Security Engineer&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;protected_action_human_approval_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 100,
+        &quot;owner&quot;: &quot;Claims Operations Owner&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;unauthorized_protected_actions&quot;,
+        &quot;operator&quot;: &quot;max&quot;,
+        &quot;threshold&quot;: 0,
+        &quot;owner&quot;: &quot;Security Approver&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;audit_completeness_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 100,
+        &quot;owner&quot;: &quot;Security Operations&quot;
+      }
+    ],
+    &quot;latest_results&quot;: {
+      &quot;recommendation_agreement_percent&quot;: 92,
+      &quot;citation_completeness_percent&quot;: 99,
+      &quot;prompt_injection_block_percent&quot;: 100,
+      &quot;protected_action_human_approval_percent&quot;: 100,
+      &quot;unauthorized_protected_actions&quot;: 0,
+      &quot;audit_completeness_percent&quot;: 100
+    },
+    &quot;human_approval&quot;: {
+      &quot;required&quot;: true,
+      &quot;role&quot;: &quot;Licensed Claims Adjuster&quot;,
+      &quot;allowed_recommendations&quot;: [
+        &quot;request_evidence&quot;,
+        &quot;continue_review&quot;,
+        &quot;escalate&quot;
+      ],
+      &quot;protected_actions&quot;: [
+        &quot;approve_or_deny_claim&quot;,
+        &quot;authorize_payment_or_change_reserves&quot;,
+        &quot;send_customer_communication_or_update_claims_system&quot;
+      ],
+      &quot;approval_evidence&quot;: [
+        &quot;approver identity&quot;,
+        &quot;claim and action scope&quot;,
+        &quot;fresh approval timestamp&quot;,
+        &quot;idempotency key&quot;,
+        &quot;final action result&quot;
+      ]
+    }
+  }
+}</code></pre>
+<p>The design follows one rule: probabilistic AI may prepare a cited recommendation, but deterministic services enforce identity, authorization, recommendation policy, approval, execution, and audit.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Components include a human interface, one probabilistic AI component, deterministic controls, a protected-action adapter, and an immutable audit stream.</li><li><strong>Acceptable variation:</strong> Component names may match another platform if their responsibilities remain separated.</li><li><strong>Failure indicator:</strong> The model directly calls the claims system or decides whether approval is required.</li><li><strong>Corrective action:</strong> Route all protected execution through deterministic policy and approval services.</li></ul>
+<h2>Step 2 — Trace the Production Workflow</h2>
+<p>Walk through one recommendation from request to recorded result:</p>
+<ol><li>Authenticate the adjuster and enforce tenant and role scope.</li><li>Retrieve only authorized, effective policy evidence.</li><li>Generate a schema-constrained cited summary and one allowed recommendation.</li><li>Apply deterministic recommendation and protected-action policy.</li><li>Require explicit licensed-adjuster approval.</li><li>Execute with an approver-bound token and idempotency key.</li><li>Audit identity, evidence, versions, recommendation, approval, action, and result.</li></ol>
+<p>At every trust boundary, identify what is trusted, what remains untrusted, and which control must fail closed.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Approval appears before protected execution, and the final result is written to the audit stream.</li><li><strong>Acceptable variation:</strong> Additional validation or observability stages may be inserted without weakening the order.</li><li><strong>Failure indicator:</strong> Approval is inferred from model output, reused across actions, or recorded only after an untraceable write.</li><li><strong>Corrective action:</strong> Restore an explicit fresh approver-bound decision before execution and a complete post-result audit record.</li></ul>
+<h2>Step 3 — Evaluate the Candidate and Approval Boundary</h2>
+<p>The evaluation set covers normal cases, missing evidence, effective dates, high severity, scans, prompt injection, jurisdiction, duplicates, and protected actions. This prevents a strong average score from hiding a dangerous failure segment.</p>
+<p>Review the six gates as hard release evidence:</p>
+<table><thead><tr><th>Evidence family</th><th>What it prevents</th></tr></thead><tbody><tr><td>Recommendation agreement</td><td>Unreliable workflow guidance</td></tr><tr><td>Citation completeness</td><td>Unsupported or untraceable recommendations</td></tr><tr><td>Prompt-injection blocking</td><td>Untrusted content changing system policy</td></tr><tr><td>Human-approval completeness</td><td>Protected actions bypassing customer authority</td></tr><tr><td>Unauthorized action count</td><td>Consequential execution without authorization</td></tr><tr><td>Audit completeness</td><td>Missing evidence for investigation and accountability</td></tr></tbody></table>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Every gate has a metric, operator, threshold, owner, and latest result.</li><li><strong>Acceptable variation:</strong> Add stricter gates or segments when the business risk requires them.</li><li><strong>Failure indicator:</strong> A quality average can offset an unauthorized action or missing approval.</li><li><strong>Corrective action:</strong> Keep safety and approval conditions as non-compensating hard gates.</li></ul>
+<h2>Step 4 — Validate Cross-Workshop Consistency and Commit</h2>
+<pre><code class="language-bash">python3 -m json.tool architecture_approval.json
+python3 -c &quot;import json; files=[&#x27;problem_value.json&#x27;,&#x27;team_decisions.json&#x27;,&#x27;architecture_approval.json&#x27;]; docs=[json.load(open(f)) for f in files]; assert all(d[&#x27;metadata&#x27;]==docs[0][&#x27;metadata&#x27;] for d in docs); print(&#x27;Metadata aligned&#x27;)&quot;
+git add architecture_approval.json
+git commit -m &quot;Design capstone architecture and approval strategy&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> JSON and metadata validation succeed and Git is clean.</li><li><strong>Acceptable variation:</strong> Equivalent local JSON validation is acceptable.</li><li><strong>Failure indicator:</strong> Architecture describes a different candidate or the human authority contradicts Workshop 2.</li><li><strong>Corrective action:</strong> Align metadata and restore the decision-rights boundary before committing.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<table><thead><tr><th>Earlier contract</th><th>Architecture or evidence response</th></tr></thead><tbody><tr><td>Primary user and tenant scope</td><td>Identity and Tenant Gateway</td></tr><tr><td>Cited bounded recommendation</td><td>Retrieval, model, schema, and policy gate</td></tr><tr><td>Protected customer authority</td><td>Human Approval Service and licensed adjuster</td></tr><tr><td>Safety and quality outcome</td><td>Segmented evaluation and hard release gates</td></tr><tr><td>Accountable investigation</td><td>Immutable audit stream</td></tr></tbody></table>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody><tr><td>Model can reach a protected tool</td><td>Control and model responsibilities are mixed</td><td>Insert deterministic policy and approval services.</td></tr><tr><td>High average hides a bad segment</td><td>Evaluation is not segmented</td><td>Add representative and adversarial segments with hard gates.</td></tr><tr><td>Approval evidence is incomplete</td><td>Approval is treated as a UI click only</td><td>Record identity, scope, freshness, idempotency key, and action result.</td></tr><tr><td>Metadata comparison fails</td><td>Workshop artifacts describe different candidates</td><td>Restore the Workshop 1 metadata object.</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>No external resources were created. Keep the project for Workshop 4.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> Probabilistic and deterministic responsibilities are separated.</li><li class="check-item"><span class="box">☐</span> Four trust boundaries are explicit.</li><li class="check-item"><span class="box">☐</span> Approval precedes execution and audit follows the result.</li><li class="check-item"><span class="box">☐</span> Nine evaluation segments cover normal and adversarial behavior.</li><li class="check-item"><span class="box">☐</span> Six hard gates have results and owners.</li><li class="check-item"><span class="box">☐</span> Protected actions require a licensed claims adjuster.</li><li class="check-item"><span class="box">☐</span> My Workshop 3 commit is clean.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which deterministic control most reduces the consequence of a plausible model error?</li><li>Which evaluation segment is easiest to overlook but most important for this case?</li><li>What evidence would you require to prove that approval cannot be replayed?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

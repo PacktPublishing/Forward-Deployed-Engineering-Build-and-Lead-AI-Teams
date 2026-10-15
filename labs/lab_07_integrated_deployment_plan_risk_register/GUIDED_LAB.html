@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="f7dccc7c7e879197c8e62a9a035833e36146aca66c3f91228e0dd0ff91c1d0bf">
+<title>Lab 07 — Build an Integrated Deployment Plan and Risk Register</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 07 — Build an Integrated Deployment Plan and Risk Register</h1>
+<h2>Goal</h2>
+<p>Build an integrated delivery plan for Northstar Mutual's Enterprise AI Claims Assistant that connects scope, workstreams, milestones, dependencies, decision rights, cutover, hypercare, operational handoff, and an owned risk register. Then run an executable review that fails closed when the plan or risk evidence is incomplete.</p>
+<p>Create this lab in your own new project directory. Use the completed reference repository only for comparison when you are stuck; do not edit it to perform the exercise.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>deployment_plan.json</code> — the integrated workstream, milestone, governance, cutover, hypercare, and handoff plan.</li><li><code>risk_register.csv</code> — an eight-risk register with scoring, owners, triggers, responses, contingencies, and status.</li><li><code>delivery_review.py</code> — the executable plan and risk review.</li><li><code>deployment_review.md</code> — the generated delivery-readiness record.</li><li><code>.gitignore</code> — Git hygiene for the Python workflow.</li></ul>
+<h2>Estimated Time</h2>
+<p>75–100 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This lab uses local JSON, CSV, and Python standard-library code only. It creates no cloud resources, makes no network calls, and requires no paid services.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m py_compile delivery_review.py</code> succeeds.</li><li><code>python3 delivery_review.py</code> prints <code>LAB 07 PASSED</code> and <code>PLAN_READY_FOR_EXECUTION</code>.</li><li>Seven milestones have dependencies, DRIs, dates, and exit evidence.</li><li>Six workstreams connect customer and internal owners to the delivery path.</li><li>Eight risks have valid probability × impact scores and actionable contingencies.</li><li>Cutover, rollback, hypercare, decision rights, and handoff acceptance are explicit.</li><li><code>deployment_review.md</code> is generated and reviewed.</li><li>Your Git repository is clean on <code>main</code>.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later</li><li>Git</li><li>A text editor</li><li>Familiarity with delivery milestones, RACI/DRI concepts, risk scoring, and production cutover</li><li>The approved case boundary from earlier labs: a 25-adjuster, 500-claim, 14-day feature-flagged pilot with human control over protected actions.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This lab begins the customer-delivery stage after production readiness. You will connect the approved technical release to customer actions, milestones, dependencies, decision rights, risk responses, cutover, hypercare, and operational handoff. The output is the execution plan that produces the pilot evidence analyzed in Lab 08.</p>
+<h2>Step 1 — Create Your Project</h2>
+<p>Create and enter a new directory:</p>
+<pre><code class="language-bash">mkdir lab_07_integrated_deployment_plan_risk_register
+cd lab_07_integrated_deployment_plan_risk_register</code></pre>
+<p>Create <code>.gitignore</code>:</p>
+<pre><code class="language-gitignore">__pycache__/
+*.py[cod]
+.DS_Store</code></pre>
+<p>Why this matters: the learner project and completed reference must have the same small, runnable shape.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Your directory contains only <code>.gitignore</code>.</li><li><strong>Acceptable variation:</strong> You may use another directory name.</li><li><strong>Failure indicator:</strong> You are editing Lab 06 or the completed Lab 07 reference repository.</li><li><strong>Corrective action:</strong> Create a separate learner-owned directory and continue there.</li></ul>
+<h2>Step 2 — Build the Integrated Deployment Plan</h2>
+<p>Create <code>deployment_plan.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_07&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;plan_stage&quot;: &quot;bounded pilot delivery&quot;,
+    &quot;prepared_date&quot;: &quot;2026-08-16&quot;,
+    &quot;target_go_live&quot;: &quot;2026-09-21&quot;
+  },
+  &quot;scope&quot;: {
+    &quot;objective&quot;: &quot;Deliver a controlled claims-assistant pilot to 25 licensed adjusters with measurable exit evidence and an operational handoff.&quot;,
+    &quot;in_scope&quot;: [
+      &quot;Policy retrieval and cited claim summaries&quot;,
+      &quot;Allowed recommendations: request_evidence continue_review or escalate&quot;,
+      &quot;Human-approved claims-system action path&quot;,
+      &quot;Pilot observability support training and rollback&quot;
+    ],
+    &quot;out_of_scope&quot;: [
+      &quot;Autonomous claim approval or denial&quot;,
+      &quot;Autonomous payments reserve changes or customer communication&quot;,
+      &quot;Enterprise-wide rollout beyond the approved pilot cohort&quot;
+    ]
+  },
+  &quot;workstreams&quot;: [
+    {
+      &quot;id&quot;: &quot;W-01&quot;,
+      &quot;name&quot;: &quot;Solution and integration&quot;,
+      &quot;owner&quot;: &quot;FDE Lead&quot;,
+      &quot;milestone_ids&quot;: [
+        &quot;M-01&quot;,
+        &quot;M-03&quot;,
+        &quot;M-05&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;W-02&quot;,
+      &quot;name&quot;: &quot;Data and policy readiness&quot;,
+      &quot;owner&quot;: &quot;Claims Data Lead&quot;,
+      &quot;milestone_ids&quot;: [
+        &quot;M-01&quot;,
+        &quot;M-02&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;W-03&quot;,
+      &quot;name&quot;: &quot;Security and production controls&quot;,
+      &quot;owner&quot;: &quot;Security Lead&quot;,
+      &quot;milestone_ids&quot;: [
+        &quot;M-02&quot;,
+        &quot;M-04&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;W-04&quot;,
+      &quot;name&quot;: &quot;Evaluation and release evidence&quot;,
+      &quot;owner&quot;: &quot;AI Quality Lead&quot;,
+      &quot;milestone_ids&quot;: [
+        &quot;M-03&quot;,
+        &quot;M-04&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;W-05&quot;,
+      &quot;name&quot;: &quot;Adoption and change&quot;,
+      &quot;owner&quot;: &quot;Claims Operations Lead&quot;,
+      &quot;milestone_ids&quot;: [
+        &quot;M-05&quot;,
+        &quot;M-06&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;W-06&quot;,
+      &quot;name&quot;: &quot;Go-live and operational transition&quot;,
+      &quot;owner&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;milestone_ids&quot;: [
+        &quot;M-06&quot;,
+        &quot;M-07&quot;
+      ]
+    }
+  ],
+  &quot;milestones&quot;: [
+    {
+      &quot;id&quot;: &quot;M-01&quot;,
+      &quot;name&quot;: &quot;Scope and interfaces baselined&quot;,
+      &quot;target_date&quot;: &quot;2026-08-21&quot;,
+      &quot;depends_on&quot;: [],
+      &quot;dri&quot;: &quot;FDE Lead&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Signed scope boundary&quot;,
+        &quot;Interface inventory&quot;,
+        &quot;Named customer and internal owners&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;M-02&quot;,
+      &quot;name&quot;: &quot;Data and security controls approved&quot;,
+      &quot;target_date&quot;: &quot;2026-08-28&quot;,
+      &quot;depends_on&quot;: [
+        &quot;M-01&quot;
+      ],
+      &quot;dri&quot;: &quot;Security Lead&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Approved data-flow review&quot;,
+        &quot;Tenant and role authorization tests&quot;,
+        &quot;Threat-model control evidence&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;M-03&quot;,
+      &quot;name&quot;: &quot;End-to-end staging slice complete&quot;,
+      &quot;target_date&quot;: &quot;2026-09-04&quot;,
+      &quot;depends_on&quot;: [
+        &quot;M-01&quot;,
+        &quot;M-02&quot;
+      ],
+      &quot;dri&quot;: &quot;FDE Lead&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Staging workflow demo&quot;,
+        &quot;Version manifest&quot;,
+        &quot;Integration failure-path evidence&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;M-04&quot;,
+      &quot;name&quot;: &quot;Production-readiness gates passed&quot;,
+      &quot;target_date&quot;: &quot;2026-09-10&quot;,
+      &quot;depends_on&quot;: [
+        &quot;M-03&quot;
+      ],
+      &quot;dri&quot;: &quot;AI Quality Lead&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Evaluation decision&quot;,
+        &quot;Production-readiness report&quot;,
+        &quot;Business technical security and operations approvals&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;M-05&quot;,
+      &quot;name&quot;: &quot;Pilot users and operations prepared&quot;,
+      &quot;target_date&quot;: &quot;2026-09-14&quot;,
+      &quot;depends_on&quot;: [
+        &quot;M-03&quot;
+      ],
+      &quot;dri&quot;: &quot;Claims Operations Lead&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Named 25-adjuster cohort&quot;,
+        &quot;Training completion&quot;,
+        &quot;Support and escalation roster&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;M-06&quot;,
+      &quot;name&quot;: &quot;Cutover rehearsal accepted&quot;,
+      &quot;target_date&quot;: &quot;2026-09-18&quot;,
+      &quot;depends_on&quot;: [
+        &quot;M-04&quot;,
+        &quot;M-05&quot;
+      ],
+      &quot;dri&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Timed cutover rehearsal&quot;,
+        &quot;Rollback under 10 minutes&quot;,
+        &quot;Reconciled test actions&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;M-07&quot;,
+      &quot;name&quot;: &quot;Go-live decision recorded&quot;,
+      &quot;target_date&quot;: &quot;2026-09-21&quot;,
+      &quot;depends_on&quot;: [
+        &quot;M-06&quot;
+      ],
+      &quot;dri&quot;: &quot;Executive Sponsor&quot;,
+      &quot;exit_evidence&quot;: [
+        &quot;Signed go-live record&quot;,
+        &quot;Feature flag and cohort confirmed&quot;,
+        &quot;Hypercare owners on duty&quot;
+      ]
+    }
+  ],
+  &quot;critical_path&quot;: [
+    &quot;M-01&quot;,
+    &quot;M-02&quot;,
+    &quot;M-03&quot;,
+    &quot;M-04&quot;,
+    &quot;M-06&quot;,
+    &quot;M-07&quot;
+  ],
+  &quot;decision_rights&quot;: [
+    {
+      &quot;decision&quot;: &quot;scope&quot;,
+      &quot;dri&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;approver&quot;: &quot;Business Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;FDE Lead&quot;,
+        &quot;Claims Operations Lead&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;architecture&quot;,
+      &quot;dri&quot;: &quot;FDE Lead&quot;,
+      &quot;approver&quot;: &quot;Technical Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;Security Lead&quot;,
+        &quot;Claims Platform Lead&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;security&quot;,
+      &quot;dri&quot;: &quot;Security Lead&quot;,
+      &quot;approver&quot;: &quot;Security Approver&quot;,
+      &quot;consulted&quot;: [
+        &quot;Data Protection Officer&quot;,
+        &quot;FDE Lead&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;go_live&quot;,
+      &quot;dri&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;approver&quot;: &quot;Executive Sponsor&quot;,
+      &quot;consulted&quot;: [
+        &quot;Business Owner&quot;,
+        &quot;Technical Owner&quot;,
+        &quot;Security Approver&quot;,
+        &quot;Operations Owner&quot;
+      ]
+    },
+    {
+      &quot;decision&quot;: &quot;incident&quot;,
+      &quot;dri&quot;: &quot;Operations Owner&quot;,
+      &quot;approver&quot;: &quot;Business Owner&quot;,
+      &quot;consulted&quot;: [
+        &quot;Security Lead&quot;,
+        &quot;Claims Platform Lead&quot;,
+        &quot;FDE Lead&quot;
+      ]
+    }
+  ],
+  &quot;delivery_cadence&quot;: [
+    {
+      &quot;meeting&quot;: &quot;Delivery review&quot;,
+      &quot;frequency&quot;: &quot;twice weekly&quot;,
+      &quot;purpose&quot;: &quot;Milestones dependencies blockers and customer actions&quot;,
+      &quot;owner&quot;: &quot;Technical Deployment Lead&quot;
+    },
+    {
+      &quot;meeting&quot;: &quot;Technical review&quot;,
+      &quot;frequency&quot;: &quot;weekly&quot;,
+      &quot;purpose&quot;: &quot;Architecture evaluation security reliability and cost evidence&quot;,
+      &quot;owner&quot;: &quot;FDE Lead&quot;
+    },
+    {
+      &quot;meeting&quot;: &quot;Executive checkpoint&quot;,
+      &quot;frequency&quot;: &quot;weekly during cutover&quot;,
+      &quot;purpose&quot;: &quot;Scope risk decisions and go-live recommendation&quot;,
+      &quot;owner&quot;: &quot;Executive Sponsor&quot;
+    }
+  ],
+  &quot;cutover&quot;: {
+    &quot;change_window&quot;: &quot;2026-09-21 07:00-09:00 CT&quot;,
+    &quot;steps&quot;: [
+      &quot;Confirm signed release record and on-call roster&quot;,
+      &quot;Enable claims_ai_assist_pilot for the named cohort&quot;,
+      &quot;Run synthetic smoke claim and verify audit evidence&quot;,
+      &quot;Release the cohort and monitor first ten assisted claims&quot;
+    ],
+    &quot;abort_conditions&quot;: [
+      &quot;Any unauthorized protected action&quot;,
+      &quot;Cross-tenant or approved-boundary data exposure&quot;,
+      &quot;Missing audit evidence&quot;,
+      &quot;Smoke claim fails a blocking control&quot;
+    ],
+    &quot;rollback_action&quot;: &quot;Disable the feature flag preserve evidence reconcile uncertain writes and continue the manual workflow.&quot;
+  },
+  &quot;hypercare&quot;: {
+    &quot;duration_days&quot;: 14,
+    &quot;coverage&quot;: &quot;Business-hours command center with 24x7 severity-one escalation&quot;,
+    &quot;daily_review&quot;: [
+      &quot;Adoption and assisted-claim volume&quot;,
+      &quot;Quality safety latency cost and incident metrics&quot;,
+      &quot;Open support cases and rollback triggers&quot;
+    ],
+    &quot;exit_criteria&quot;: [
+      &quot;No open severity-one or severity-two incident&quot;,
+      &quot;All uncertain writes reconciled&quot;,
+      &quot;SLOs met for five consecutive business days&quot;,
+      &quot;Operations accepts runbook dashboard and support ownership&quot;
+    ]
+  },
+  &quot;handoff&quot;: {
+    &quot;receiving_owner&quot;: &quot;Claims AI Operations&quot;,
+    &quot;deliverables&quot;: [
+      &quot;Architecture and version manifest&quot;,
+      &quot;Runbook dashboard alerts and audit queries&quot;,
+      &quot;Known issues risk register and accepted exceptions&quot;,
+      &quot;Support model training record and escalation tree&quot;
+    ],
+    &quot;acceptance_criteria&quot;: [
+      &quot;Receiving owner completes an observed operating shift&quot;,
+      &quot;Rollback and reconciliation drills pass&quot;,
+      &quot;Artifact links and accountable owners are current&quot;
+    ],
+    &quot;engagement_exit_rule&quot;: &quot;FDE remains escalation support only after written operational acceptance.&quot;
+  }
+}</code></pre>
+<p>Why this matters: delivery leadership connects technical work to customer actions, evidence-based exit criteria, accountable decisions, and an accepted operating model. A list of engineering tasks alone is not an integrated deployment plan.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The plan contains 6 workstreams, 7 milestones, a critical path, five decision domains, delivery cadences, cutover, hypercare, and operational handoff.</li><li><strong>Acceptable variation:</strong> Dates and owner titles may reflect another organization if every dependency and decision remains owned.</li><li><strong>Failure indicator:</strong> Milestones lack exit evidence, customer actions are absent, or go-live and incident decisions have no approver.</li><li><strong>Corrective action:</strong> Add the missing DRI, dependency, accountable decision, or measurable evidence before continuing.</li></ul>
+<h2>Step 3 — Create the Risk Register</h2>
+<p>Create <code>risk_register.csv</code>:</p>
+<pre><code class="language-csv">risk_id,category,description,probability,impact,score,owner,response,trigger,contingency,status
+R-01,dependency,Claims-system write API misses the cutover window,4,5,20,Claims Platform Lead,MITIGATE,API certification slips beyond M-03,Launch read-only assistance and defer protected writes,MITIGATED
+R-02,security,Cross-tenant authorization defect appears in staging,4,4,16,Security Lead,MITIGATE,Any negative authorization test succeeds,Hold promotion and repair tenant enforcement,MITIGATED
+R-03,data,Policy metadata is incomplete for a pilot jurisdiction,3,5,15,Claims Data Lead,MITIGATE,Coverage falls below 100 percent for pilot policies,Remove affected jurisdiction from cohort and repair metadata,MONITORED
+R-04,adoption,Adjuster training completion falls below 90 percent,3,4,12,Claims Operations Lead,MITIGATE,Completion below target three days before cutover,Reduce cohort to trained adjusters and add office hours,MONITORED
+R-05,reliability,p95 latency exceeds 12 seconds in staging load test,3,4,12,Site Reliability Lead,MITIGATE,Two consecutive windows exceed the SLO,Tune retrieval limit concurrency and timeouts,MITIGATED
+R-06,scope,Executive sponsor requests enterprise rollout before pilot evidence,3,4,12,Technical Deployment Lead,AVOID,Request exceeds cohort volume or duration boundary,Require a new scope decision and release review,MONITORED
+R-07,operations,On-call coverage is incomplete for the first weekend,2,5,10,Operations Owner,MITIGATE,Any severity-one slot lacks primary and backup,Delay go-live or add approved coverage,MITIGATED
+R-08,vendor,Managed model endpoint has a regional service disruption,2,4,8,AI Platform Lead,TRANSFER,Provider health alert or circuit breaker opens,Disable AI assistance and continue manual claims handling,MONITORED</code></pre>
+<p>Score each risk as probability × impact on a 1–5 scale. Treat scores of 15 or higher as blocking unless the risk is actively mitigated or monitored with a trigger and contingency.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Eight unique risks cover dependency, security, data, adoption, reliability, scope, operations, and vendor exposure.</li><li><strong>Acceptable variation:</strong> You may add risks, but keep the exact schema and do not delete uncomfortable risks to improve the summary.</li><li><strong>Failure indicator:</strong> A high risk is open, unowned, missing a trigger, or has a score that does not equal probability × impact.</li><li><strong>Corrective action:</strong> Assign an owner, choose a valid response, define an observable trigger and contingency, and correct the score.</li></ul>
+<h2>Step 4 — Create the Executable Delivery Review</h2>
+<p>Create <code>delivery_review.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Validate an integrated deployment plan and generate its delivery review.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import json
+from datetime import date
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+PLAN_FILE = ROOT / &quot;deployment_plan.json&quot;
+RISK_FILE = ROOT / &quot;risk_register.csv&quot;
+REPORT_FILE = ROOT / &quot;deployment_review.md&quot;
+
+
+def load_json(path: Path) -&gt; dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding=&quot;utf-8&quot;))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def load_risks(path: Path) -&gt; list[dict[str, str]]:
+    try:
+        with path.open(encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as handle:
+            return list(csv.DictReader(handle))
+    except OSError as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def validate(plan: dict[str, Any], risks: list[dict[str, str]]) -&gt; list[str]:
+    errors: list[str] = []
+    required_sections = {
+        &quot;metadata&quot;, &quot;scope&quot;, &quot;workstreams&quot;, &quot;milestones&quot;, &quot;critical_path&quot;,
+        &quot;decision_rights&quot;, &quot;delivery_cadence&quot;, &quot;cutover&quot;, &quot;hypercare&quot;, &quot;handoff&quot;,
+    }
+    missing = required_sections - set(plan)
+    if missing:
+        errors.append(&quot;Missing plan sections: &quot; + &quot;, &quot;.join(sorted(missing)))
+
+    milestones = plan.get(&quot;milestones&quot;, [])
+    milestone_ids = [item.get(&quot;id&quot;) for item in milestones]
+    if not milestone_ids or len(milestone_ids) != len(set(milestone_ids)):
+        errors.append(&quot;Milestone IDs must be present and unique&quot;)
+    milestone_index = {item[&quot;id&quot;]: item for item in milestones if item.get(&quot;id&quot;)}
+    positions = {milestone_id: index for index, milestone_id in enumerate(milestone_ids)}
+    for milestone in milestones:
+        try:
+            date.fromisoformat(milestone[&quot;target_date&quot;])
+        except (KeyError, TypeError, ValueError):
+            errors.append(f&quot;{milestone.get(&#x27;id&#x27;)} has an invalid target date&quot;)
+        if not milestone.get(&quot;dri&quot;) or not milestone.get(&quot;exit_evidence&quot;):
+            errors.append(f&quot;{milestone.get(&#x27;id&#x27;)} needs a DRI and exit evidence&quot;)
+        for dependency in milestone.get(&quot;depends_on&quot;, []):
+            if dependency not in milestone_index:
+                errors.append(f&quot;{milestone.get(&#x27;id&#x27;)} references unknown dependency {dependency}&quot;)
+            elif positions[dependency] &gt;= positions[milestone[&quot;id&quot;]]:
+                errors.append(f&quot;{milestone[&#x27;id&#x27;]} dependency {dependency} is not earlier&quot;)
+
+    workstreams = plan.get(&quot;workstreams&quot;, [])
+    for workstream in workstreams:
+        if not workstream.get(&quot;owner&quot;):
+            errors.append(f&quot;{workstream.get(&#x27;id&#x27;)} has no owner&quot;)
+        unknown = set(workstream.get(&quot;milestone_ids&quot;, [])) - set(milestone_ids)
+        if unknown:
+            errors.append(f&quot;{workstream.get(&#x27;id&#x27;)} references unknown milestones&quot;)
+
+    critical_path = plan.get(&quot;critical_path&quot;, [])
+    if not critical_path or set(critical_path) - set(milestone_ids):
+        errors.append(&quot;Critical path must use known milestones&quot;)
+
+    required_decisions = {&quot;scope&quot;, &quot;architecture&quot;, &quot;security&quot;, &quot;go_live&quot;, &quot;incident&quot;}
+    decisions = {item.get(&quot;decision&quot;) for item in plan.get(&quot;decision_rights&quot;, [])}
+    if decisions != required_decisions:
+        errors.append(&quot;Decision rights must cover scope architecture security go_live and incident&quot;)
+
+    cutover = plan.get(&quot;cutover&quot;, {})
+    if not cutover.get(&quot;steps&quot;) or not cutover.get(&quot;abort_conditions&quot;) or not cutover.get(&quot;rollback_action&quot;):
+        errors.append(&quot;Cutover requires steps abort conditions and rollback&quot;)
+    handoff = plan.get(&quot;handoff&quot;, {})
+    if not handoff.get(&quot;receiving_owner&quot;) or not handoff.get(&quot;acceptance_criteria&quot;):
+        errors.append(&quot;Handoff requires a receiving owner and acceptance criteria&quot;)
+
+    required_risk_fields = {
+        &quot;risk_id&quot;, &quot;category&quot;, &quot;description&quot;, &quot;probability&quot;, &quot;impact&quot;, &quot;score&quot;,
+        &quot;owner&quot;, &quot;response&quot;, &quot;trigger&quot;, &quot;contingency&quot;, &quot;status&quot;,
+    }
+    if risks and set(risks[0]) != required_risk_fields:
+        errors.append(&quot;Risk-register columns do not match the required schema&quot;)
+    risk_ids = [item.get(&quot;risk_id&quot;) for item in risks]
+    if not risk_ids or len(risk_ids) != len(set(risk_ids)):
+        errors.append(&quot;Risk IDs must be present and unique&quot;)
+    for risk in risks:
+        try:
+            probability = int(risk[&quot;probability&quot;])
+            impact = int(risk[&quot;impact&quot;])
+            score = int(risk[&quot;score&quot;])
+        except (KeyError, TypeError, ValueError):
+            errors.append(f&quot;{risk.get(&#x27;risk_id&#x27;)} has invalid numeric scoring&quot;)
+            continue
+        if probability not in range(1, 6) or impact not in range(1, 6):
+            errors.append(f&quot;{risk[&#x27;risk_id&#x27;]} probability and impact must be 1 through 5&quot;)
+        if score != probability * impact:
+            errors.append(f&quot;{risk[&#x27;risk_id&#x27;]} score does not equal probability times impact&quot;)
+        if not risk.get(&quot;owner&quot;) or not risk.get(&quot;trigger&quot;) or not risk.get(&quot;contingency&quot;):
+            errors.append(f&quot;{risk[&#x27;risk_id&#x27;]} lacks ownership trigger or contingency&quot;)
+        if risk.get(&quot;response&quot;) not in {&quot;AVOID&quot;, &quot;MITIGATE&quot;, &quot;TRANSFER&quot;, &quot;ACCEPT&quot;}:
+            errors.append(f&quot;{risk[&#x27;risk_id&#x27;]} has an invalid response&quot;)
+        if score &gt;= 15 and risk.get(&quot;status&quot;) == &quot;OPEN&quot;:
+            errors.append(f&quot;{risk[&#x27;risk_id&#x27;]} is an unresolved blocking risk&quot;)
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+    return [risk[&quot;risk_id&quot;] for risk in risks if int(risk[&quot;score&quot;]) &gt;= 15 and risk[&quot;status&quot;] == &quot;OPEN&quot;]
+
+
+def build_report(plan: dict[str, Any], risks: list[dict[str, str]], decision: str) -&gt; str:
+    lines = [
+        &quot;# Enterprise AI Claims Assistant — Integrated Deployment Review&quot;, &quot;&quot;,
+        f&quot;- **Decision:** {decision}&quot;,
+        f&quot;- **Target go-live:** {plan[&#x27;metadata&#x27;][&#x27;target_go_live&#x27;]}&quot;,
+        f&quot;- **Objective:** {plan[&#x27;scope&#x27;][&#x27;objective&#x27;]}&quot;, &quot;&quot;,
+        &quot;## Workstreams&quot;, &quot;&quot;,
+        &quot;| Workstream | Owner | Milestones |&quot;, &quot;| --- | --- | --- |&quot;,
+    ]
+    for item in plan[&quot;workstreams&quot;]:
+        lines.append(f&quot;| {item[&#x27;name&#x27;]} | {item[&#x27;owner&#x27;]} | {&#x27;, &#x27;.join(item[&#x27;milestone_ids&#x27;])} |&quot;)
+    lines.extend([&quot;&quot;, &quot;## Milestones&quot;, &quot;&quot;, &quot;| ID | Milestone | Target | DRI | Dependencies |&quot;, &quot;| --- | --- | --- | --- | --- |&quot;])
+    for item in plan[&quot;milestones&quot;]:
+        dependencies = &quot;, &quot;.join(item[&quot;depends_on&quot;]) or &quot;None&quot;
+        lines.append(f&quot;| {item[&#x27;id&#x27;]} | {item[&#x27;name&#x27;]} | {item[&#x27;target_date&#x27;]} | {item[&#x27;dri&#x27;]} | {dependencies} |&quot;)
+    lines.extend([&quot;&quot;, &quot;## Critical Path&quot;, &quot;&quot;, &quot; → &quot;.join(plan[&quot;critical_path&quot;]), &quot;&quot;, &quot;## Risk Register&quot;, &quot;&quot;, &quot;| Risk | Score | Owner | Response | Status | Contingency |&quot;, &quot;| --- | ---: | --- | --- | --- | --- |&quot;])
+    for risk in sorted(risks, key=lambda item: int(item[&quot;score&quot;]), reverse=True):
+        lines.append(f&quot;| {risk[&#x27;risk_id&#x27;]} | {risk[&#x27;score&#x27;]} | {risk[&#x27;owner&#x27;]} | {risk[&#x27;response&#x27;]} | {risk[&#x27;status&#x27;]} | {risk[&#x27;contingency&#x27;]} |&quot;)
+    lines.extend([&quot;&quot;, &quot;## Cutover and Rollback&quot;, &quot;&quot;])
+    lines.extend(f&quot;{index}. {step}&quot; for index, step in enumerate(plan[&quot;cutover&quot;][&quot;steps&quot;], start=1))
+    lines.extend([&quot;&quot;, &quot;**Abort conditions:**&quot;, &quot;&quot;])
+    lines.extend(f&quot;- {item}&quot; for item in plan[&quot;cutover&quot;][&quot;abort_conditions&quot;])
+    lines.extend([&quot;&quot;, f&quot;**Rollback:** {plan[&#x27;cutover&#x27;][&#x27;rollback_action&#x27;]}&quot;, &quot;&quot;, &quot;## Handoff&quot;, &quot;&quot;, f&quot;- Receiving owner: {plan[&#x27;handoff&#x27;][&#x27;receiving_owner&#x27;]}&quot;])
+    lines.extend(f&quot;- Acceptance: {item}&quot; for item in plan[&quot;handoff&quot;][&quot;acceptance_criteria&quot;])
+    lines.append(&quot;&quot;)
+    return &quot;\n&quot;.join(lines)
+
+
+def main() -&gt; int:
+    try:
+        plan = load_json(PLAN_FILE)
+        risks = load_risks(RISK_FILE)
+        blocking = validate(plan, risks)
+        decision = &quot;PLAN_READY_FOR_EXECUTION&quot; if not blocking else &quot;HOLD_FOR_REMEDIATION&quot;
+        REPORT_FILE.write_text(build_report(plan, risks, decision), encoding=&quot;utf-8&quot;)
+    except (KeyError, TypeError, ValueError) as exc:
+        print(f&quot;LAB 07 FAILED\n{exc}&quot;)
+        return 1
+
+    print(&quot;LAB 07 PASSED&quot;)
+    print(f&quot;- Decision: {decision}&quot;)
+    print(f&quot;- Milestones: {len(plan[&#x27;milestones&#x27;])}&quot;)
+    print(f&quot;- Workstreams: {len(plan[&#x27;workstreams&#x27;])}&quot;)
+    print(f&quot;- Risks: {len(risks)}&quot;)
+    print(f&quot;- Unresolved blocking risks: {len(blocking)}&quot;)
+    print(f&quot;- Report: {REPORT_FILE.name}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>The program validates plan structure, milestone ordering, workstream references, decision rights, cutover and handoff completeness, risk schema, scoring, ownership, and unresolved blocking risk. It then generates the review record from the evidence.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>delivery_review.py</code> reads both learner-created inputs and produces <code>deployment_review.md</code>.</li><li><strong>Acceptable variation:</strong> You may split the code into taught learner-built modules.</li><li><strong>Failure indicator:</strong> The script ignores unknown milestone references or approves an open risk scored 15 or higher.</li><li><strong>Corrective action:</strong> Restore fail-closed reference validation and blocking-risk logic.</li></ul>
+<h2>Step 5 — Run and Inspect the Plan</h2>
+<p>Compile and execute:</p>
+<pre><code class="language-bash">python3 -m py_compile delivery_review.py
+python3 delivery_review.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 07 PASSED
+- Decision: PLAN_READY_FOR_EXECUTION
+- Milestones: 7
+- Workstreams: 6
+- Risks: 8
+- Unresolved blocking risks: 0
+- Report: deployment_review.md</code></pre>
+<p>Inspect the generated record:</p>
+<pre><code class="language-bash">sed -n &#x27;1,260p&#x27; deployment_review.md</code></pre>
+<p>On Windows PowerShell:</p>
+<pre><code class="language-powershell">Get-Content deployment_review.md</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The command exits successfully and the report shows the critical path, risk ranking, cutover controls, rollback, and handoff owner.</li><li><strong>Acceptable variation:</strong> A real engagement may correctly return a hold after you add blocking conditions.</li><li><strong>Failure indicator:</strong> The script prints <code>LAB 07 FAILED</code>, the report is stale, or a critical dependency is absent.</li><li><strong>Corrective action:</strong> Repair the exact named plan or risk evidence and rerun both commands.</li></ul>
+<h2>Step 6 — Conduct the Delivery Review</h2>
+<p>Use the generated report to answer:</p>
+<ol><li>Which customer-owned dependency can move the critical path?</li><li>Which risk requires a scope reduction rather than schedule pressure?</li><li>Who can approve go-live, and who can abort it?</li><li>What evidence proves operations can own the system after hypercare?</li><li>Can the manual workflow continue during rollback?</li></ol>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Each answer cites a milestone, risk, decision right, or acceptance criterion.</li><li><strong>Acceptable variation:</strong> You may recommend a narrower pilot when evidence supports it.</li><li><strong>Failure indicator:</strong> The review depends on informal ownership or unrecorded promises.</li><li><strong>Corrective action:</strong> Put the decision, owner, evidence, and trigger into the plan or risk register.</li></ul>
+<h2>Step 7 — Commit Your Evidence</h2>
+<pre><code class="language-bash">git init -b main
+git add .gitignore deployment_plan.json risk_register.csv delivery_review.py deployment_review.md
+git commit -m &quot;Complete integrated deployment plan and risk register&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git reports <code>main</code> with no uncommitted changes.</li><li><strong>Acceptable variation:</strong> Another clear commit message is acceptable.</li><li><strong>Failure indicator:</strong> The generated report is missing or caches are tracked.</li><li><strong>Corrective action:</strong> Rerun the review, confirm <code>.gitignore</code>, stage the five project files, and commit.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>Bound the pilot scope and protected actions.</li><li>Organize customer and internal work into owned workstreams.</li><li>Sequence milestones using dependencies and evidence-based exits.</li><li>Identify the critical path and decision rights.</li><li>Score delivery risks and define observable triggers and contingencies.</li><li>Rehearse cutover, rollback, hypercare, and handoff.</li><li>Generate an auditable execution-readiness record.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>Cannot load a file</td><td>Wrong directory or malformed JSON/CSV</td><td>Run from the project root and repair the named file</td></tr><tr><td>Unknown dependency</td><td>A milestone references a missing or later milestone</td><td>Correct the ID or sequence</td></tr><tr><td>Decision-right failure</td><td>A required decision lacks DRI or approver coverage</td><td>Add scope architecture security go-live and incident rights</td></tr><tr><td>Invalid score</td><td>Score differs from probability × impact</td><td>Recalculate using integers 1 through 5</td></tr><tr><td>Blocking risk</td><td>A score of 15+ remains OPEN</td><td>Mitigate monitor narrow scope or hold execution</td></tr><tr><td>Stale report</td><td>Inputs changed after the last run</td><td>Run <code>python3 delivery_review.py</code> again</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>This lab creates no external resources. Remove only Python caches:</p>
+<pre><code class="language-bash">python3 -c &quot;import shutil; shutil.rmtree(&#x27;__pycache__&#x27;, ignore_errors=True)&quot;</code></pre>
+<p>Keep the four learner-built artifacts, <code>.gitignore</code>, and Git history as portfolio evidence.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I bounded the pilot scope and protected actions.</li><li class="check-item"><span class="box">☐</span> I created six owned workstreams.</li><li class="check-item"><span class="box">☐</span> I sequenced seven milestones with exit evidence.</li><li class="check-item"><span class="box">☐</span> I identified the critical path and five decision domains.</li><li class="check-item"><span class="box">☐</span> I scored and assigned all eight risks.</li><li class="check-item"><span class="box">☐</span> I defined cutover abort and rollback conditions.</li><li class="check-item"><span class="box">☐</span> I defined hypercare and operational handoff acceptance.</li><li class="check-item"><span class="box">☐</span> I generated and reviewed <code>deployment_review.md</code>.</li><li class="check-item"><span class="box">☐</span> I committed the project on a clean <code>main</code> branch.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which risk would you escalate with options rather than merely report?</li><li>What evidence would justify moving the target go-live date?</li><li>Which handoff criterion best prevents permanent customer dependency?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

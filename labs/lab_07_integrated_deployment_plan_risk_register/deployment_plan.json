@@ -1,0 +1,305 @@
+{
+  "metadata": {
+    "lab_id": "lab_07",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "plan_stage": "bounded pilot delivery",
+    "prepared_date": "2026-08-16",
+    "target_go_live": "2026-09-21"
+  },
+  "scope": {
+    "objective": "Deliver a controlled claims-assistant pilot to 25 licensed adjusters with measurable exit evidence and an operational handoff.",
+    "in_scope": [
+      "Policy retrieval and cited claim summaries",
+      "Allowed recommendations: request_evidence continue_review or escalate",
+      "Human-approved claims-system action path",
+      "Pilot observability support training and rollback"
+    ],
+    "out_of_scope": [
+      "Autonomous claim approval or denial",
+      "Autonomous payments reserve changes or customer communication",
+      "Enterprise-wide rollout beyond the approved pilot cohort"
+    ]
+  },
+  "workstreams": [
+    {
+      "id": "W-01",
+      "name": "Solution and integration",
+      "owner": "FDE Lead",
+      "milestone_ids": [
+        "M-01",
+        "M-03",
+        "M-05"
+      ]
+    },
+    {
+      "id": "W-02",
+      "name": "Data and policy readiness",
+      "owner": "Claims Data Lead",
+      "milestone_ids": [
+        "M-01",
+        "M-02"
+      ]
+    },
+    {
+      "id": "W-03",
+      "name": "Security and production controls",
+      "owner": "Security Lead",
+      "milestone_ids": [
+        "M-02",
+        "M-04"
+      ]
+    },
+    {
+      "id": "W-04",
+      "name": "Evaluation and release evidence",
+      "owner": "AI Quality Lead",
+      "milestone_ids": [
+        "M-03",
+        "M-04"
+      ]
+    },
+    {
+      "id": "W-05",
+      "name": "Adoption and change",
+      "owner": "Claims Operations Lead",
+      "milestone_ids": [
+        "M-05",
+        "M-06"
+      ]
+    },
+    {
+      "id": "W-06",
+      "name": "Go-live and operational transition",
+      "owner": "Technical Deployment Lead",
+      "milestone_ids": [
+        "M-06",
+        "M-07"
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M-01",
+      "name": "Scope and interfaces baselined",
+      "target_date": "2026-08-21",
+      "depends_on": [],
+      "dri": "FDE Lead",
+      "exit_evidence": [
+        "Signed scope boundary",
+        "Interface inventory",
+        "Named customer and internal owners"
+      ]
+    },
+    {
+      "id": "M-02",
+      "name": "Data and security controls approved",
+      "target_date": "2026-08-28",
+      "depends_on": [
+        "M-01"
+      ],
+      "dri": "Security Lead",
+      "exit_evidence": [
+        "Approved data-flow review",
+        "Tenant and role authorization tests",
+        "Threat-model control evidence"
+      ]
+    },
+    {
+      "id": "M-03",
+      "name": "End-to-end staging slice complete",
+      "target_date": "2026-09-04",
+      "depends_on": [
+        "M-01",
+        "M-02"
+      ],
+      "dri": "FDE Lead",
+      "exit_evidence": [
+        "Staging workflow demo",
+        "Version manifest",
+        "Integration failure-path evidence"
+      ]
+    },
+    {
+      "id": "M-04",
+      "name": "Production-readiness gates passed",
+      "target_date": "2026-09-10",
+      "depends_on": [
+        "M-03"
+      ],
+      "dri": "AI Quality Lead",
+      "exit_evidence": [
+        "Evaluation decision",
+        "Production-readiness report",
+        "Business technical security and operations approvals"
+      ]
+    },
+    {
+      "id": "M-05",
+      "name": "Pilot users and operations prepared",
+      "target_date": "2026-09-14",
+      "depends_on": [
+        "M-03"
+      ],
+      "dri": "Claims Operations Lead",
+      "exit_evidence": [
+        "Named 25-adjuster cohort",
+        "Training completion",
+        "Support and escalation roster"
+      ]
+    },
+    {
+      "id": "M-06",
+      "name": "Cutover rehearsal accepted",
+      "target_date": "2026-09-18",
+      "depends_on": [
+        "M-04",
+        "M-05"
+      ],
+      "dri": "Technical Deployment Lead",
+      "exit_evidence": [
+        "Timed cutover rehearsal",
+        "Rollback under 10 minutes",
+        "Reconciled test actions"
+      ]
+    },
+    {
+      "id": "M-07",
+      "name": "Go-live decision recorded",
+      "target_date": "2026-09-21",
+      "depends_on": [
+        "M-06"
+      ],
+      "dri": "Executive Sponsor",
+      "exit_evidence": [
+        "Signed go-live record",
+        "Feature flag and cohort confirmed",
+        "Hypercare owners on duty"
+      ]
+    }
+  ],
+  "critical_path": [
+    "M-01",
+    "M-02",
+    "M-03",
+    "M-04",
+    "M-06",
+    "M-07"
+  ],
+  "decision_rights": [
+    {
+      "decision": "scope",
+      "dri": "Technical Deployment Lead",
+      "approver": "Business Owner",
+      "consulted": [
+        "FDE Lead",
+        "Claims Operations Lead"
+      ]
+    },
+    {
+      "decision": "architecture",
+      "dri": "FDE Lead",
+      "approver": "Technical Owner",
+      "consulted": [
+        "Security Lead",
+        "Claims Platform Lead"
+      ]
+    },
+    {
+      "decision": "security",
+      "dri": "Security Lead",
+      "approver": "Security Approver",
+      "consulted": [
+        "Data Protection Officer",
+        "FDE Lead"
+      ]
+    },
+    {
+      "decision": "go_live",
+      "dri": "Technical Deployment Lead",
+      "approver": "Executive Sponsor",
+      "consulted": [
+        "Business Owner",
+        "Technical Owner",
+        "Security Approver",
+        "Operations Owner"
+      ]
+    },
+    {
+      "decision": "incident",
+      "dri": "Operations Owner",
+      "approver": "Business Owner",
+      "consulted": [
+        "Security Lead",
+        "Claims Platform Lead",
+        "FDE Lead"
+      ]
+    }
+  ],
+  "delivery_cadence": [
+    {
+      "meeting": "Delivery review",
+      "frequency": "twice weekly",
+      "purpose": "Milestones dependencies blockers and customer actions",
+      "owner": "Technical Deployment Lead"
+    },
+    {
+      "meeting": "Technical review",
+      "frequency": "weekly",
+      "purpose": "Architecture evaluation security reliability and cost evidence",
+      "owner": "FDE Lead"
+    },
+    {
+      "meeting": "Executive checkpoint",
+      "frequency": "weekly during cutover",
+      "purpose": "Scope risk decisions and go-live recommendation",
+      "owner": "Executive Sponsor"
+    }
+  ],
+  "cutover": {
+    "change_window": "2026-09-21 07:00-09:00 CT",
+    "steps": [
+      "Confirm signed release record and on-call roster",
+      "Enable claims_ai_assist_pilot for the named cohort",
+      "Run synthetic smoke claim and verify audit evidence",
+      "Release the cohort and monitor first ten assisted claims"
+    ],
+    "abort_conditions": [
+      "Any unauthorized protected action",
+      "Cross-tenant or approved-boundary data exposure",
+      "Missing audit evidence",
+      "Smoke claim fails a blocking control"
+    ],
+    "rollback_action": "Disable the feature flag preserve evidence reconcile uncertain writes and continue the manual workflow."
+  },
+  "hypercare": {
+    "duration_days": 14,
+    "coverage": "Business-hours command center with 24x7 severity-one escalation",
+    "daily_review": [
+      "Adoption and assisted-claim volume",
+      "Quality safety latency cost and incident metrics",
+      "Open support cases and rollback triggers"
+    ],
+    "exit_criteria": [
+      "No open severity-one or severity-two incident",
+      "All uncertain writes reconciled",
+      "SLOs met for five consecutive business days",
+      "Operations accepts runbook dashboard and support ownership"
+    ]
+  },
+  "handoff": {
+    "receiving_owner": "Claims AI Operations",
+    "deliverables": [
+      "Architecture and version manifest",
+      "Runbook dashboard alerts and audit queries",
+      "Known issues risk register and accepted exceptions",
+      "Support model training record and escalation tree"
+    ],
+    "acceptance_criteria": [
+      "Receiving owner completes an observed operating shift",
+      "Rollback and reconciliation drills pass",
+      "Artifact links and accountable owners are current"
+    ],
+    "engagement_exit_rule": "FDE remains escalation support only after written operational acceptance."
+  }
+}

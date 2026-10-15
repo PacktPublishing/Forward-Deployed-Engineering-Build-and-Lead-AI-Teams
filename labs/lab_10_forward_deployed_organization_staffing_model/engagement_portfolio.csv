@@ -1,0 +1,5 @@
+engagement_id,customer,phase,priority,complexity,risk,region,dri,backup_dri,fde_fte,ai_fte,architect_fte,platform_fte,security_fte,product_fte,delivery_fte
+E-01,Northstar Mutual Claims Assistant,go_live,1,5,5,US,Sam Rivera,Alex Morgan,2.0,1.0,0.5,1.0,0.5,0.5,0.5
+E-02,Summit Bank Knowledge Agent,design,2,5,5,US and EU,Nora Patel,Diego Lee,1.0,1.0,1.0,0.5,1.0,0.5,0.5
+E-03,Meridian Pharma Compliance Assistant,discovery,3,4,5,US and EU,Jamie Chen,Riley Brooks,1.0,0.5,0.5,0.0,0.5,0.5,0.5
+E-04,Harbor Retail Service Copilot,pilot,4,3,3,US,Taylor Singh,Casey Grant,2.0,1.5,0.5,1.0,0.5,0.5,0.5

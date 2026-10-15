@@ -1,0 +1,144 @@
+{
+  "metadata": {
+    "lab_id": "lab_11",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "candidate": "claims-assistant-1.0.0",
+    "review_date": "2026-08-17",
+    "decision_stage": "phased production rollout"
+  },
+  "forward_deployed_team": [
+    {
+      "role": "Technical Deployment Lead",
+      "name": "Jordan Kim",
+      "accountability": "Integrated outcome, plan, decisions, risks, cutover, and handoff",
+      "allocation_fte": 1.0
+    },
+    {
+      "role": "Forward Deployed Engineer",
+      "name": "Sam Rivera",
+      "accountability": "End-to-end workflow, customer integration, and evidence",
+      "allocation_fte": 2.0
+    },
+    {
+      "role": "AI Engineer",
+      "name": "Avery Chen",
+      "accountability": "Retrieval, model behavior, evaluation, and guardrails",
+      "allocation_fte": 1.0
+    },
+    {
+      "role": "Platform Engineer",
+      "name": "Morgan Lee",
+      "accountability": "Environments, observability, reliability, and rollback",
+      "allocation_fte": 1.0
+    },
+    {
+      "role": "Security Engineer",
+      "name": "Dana Brooks",
+      "accountability": "Threat model, access, data protection, and security approval",
+      "allocation_fte": 0.5
+    },
+    {
+      "role": "Product Partner",
+      "name": "Taylor Reed",
+      "accountability": "Adoption, value measurement, and reusable product signals",
+      "allocation_fte": 0.5
+    },
+    {
+      "role": "Claims Subject-Matter Expert",
+      "name": "Marcus Green",
+      "accountability": "Ground truth, workflow acceptance, training, and quality review",
+      "allocation_fte": 0.5
+    }
+  ],
+  "decision_rights": [
+    {
+      "decision": "Business outcome and rollout scope",
+      "responsible": [
+        "Technical Deployment Lead",
+        "Product Partner"
+      ],
+      "accountable": "Business Owner",
+      "consulted": [
+        "Claims Subject-Matter Expert",
+        "Finance Partner"
+      ],
+      "informed": [
+        "Steering Committee"
+      ]
+    },
+    {
+      "decision": "Architecture and technical exceptions",
+      "responsible": [
+        "Forward Deployed Engineer",
+        "AI Engineer",
+        "Platform Engineer"
+      ],
+      "accountable": "Technical Deployment Lead",
+      "consulted": [
+        "Security Engineer"
+      ],
+      "informed": [
+        "Business Owner"
+      ]
+    },
+    {
+      "decision": "Security risk acceptance",
+      "responsible": [
+        "Security Engineer"
+      ],
+      "accountable": "Security Approver",
+      "consulted": [
+        "Technical Deployment Lead",
+        "Data Owner"
+      ],
+      "informed": [
+        "Business Owner"
+      ]
+    },
+    {
+      "decision": "Protected claim action",
+      "responsible": [
+        "Licensed Claims Adjuster"
+      ],
+      "accountable": "Claims Operations Owner",
+      "consulted": [
+        "Claims Subject-Matter Expert"
+      ],
+      "informed": [
+        "Audit and Compliance"
+      ]
+    },
+    {
+      "decision": "Go-live or rollback",
+      "responsible": [
+        "Technical Deployment Lead",
+        "Platform Engineer"
+      ],
+      "accountable": "Claims Operations Owner",
+      "consulted": [
+        "Security Approver",
+        "Business Owner"
+      ],
+      "informed": [
+        "Pilot Users",
+        "Support Team"
+      ]
+    },
+    {
+      "decision": "Productization investment",
+      "responsible": [
+        "Product Partner"
+      ],
+      "accountable": "Product Owner",
+      "consulted": [
+        "Technical Deployment Lead",
+        "Platform Engineer",
+        "Security Engineer"
+      ],
+      "informed": [
+        "FDE Portfolio Lead"
+      ]
+    }
+  ]
+}

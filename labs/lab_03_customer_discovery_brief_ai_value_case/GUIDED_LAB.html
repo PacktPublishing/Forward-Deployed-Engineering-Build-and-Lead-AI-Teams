@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="04b06a52a83047e8b0d06ca6148df18ecaa55a88f55a690621eec9812d114548">
+<title>Lab 03 — Create a Customer Discovery Brief and AI Value Case</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 03 — Create a Customer Discovery Brief and AI Value Case</h1>
+<h2>Goal</h2>
+<p>Assess the Enterprise AI Claims Assistant as a measurable, bounded opportunity and recommend whether Northstar Mutual should pilot, prototype, pause, or stop.</p>
+<h2>What You'll Build or Produce</h2>
+<p>In your own project directory, you will create:</p>
+<ul><li><code>claims_assistant_discovery_packet.md</code> — the verified discovery evidence, stakeholders, data readiness, and constraints.</li><li><code>discovery_brief.json</code> — the qualified problem, AI fit, bounded pilot, governance, risks, exit criteria, and recommendation.</li><li><code>value_hypothesis.csv</code> — baselines, targets, sources, owners, and decision use.</li><li><code>run_lab.py</code> — the learner-built validator that checks the completed value case and prints the pilot decision evidence.</li></ul>
+<p>The completed course repository contains the finished version of these same four project files. Use it only when stuck or comparing your result.</p>
+<h2>Estimated Time</h2>
+<p>45–60 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This lab runs locally and costs $0. Do not upload claim data, call a model API, use customer credentials, or provision cloud resources.</p>
+<h2>Completion Evidence</h2>
+<p>You are finished when <code>run_lab.py</code> compiles and passes, the brief clearly separates facts from assumptions, the recommendation is a bounded pilot with named prerequisites, human approval remains 100%, and your own Git working tree is clean.</p>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later for local JSON and CSV checks.</li><li>Git, a terminal, and a text editor.</li><li>Basic JSON and CSV familiarity.</li><li>An understanding of discovery, AI fit, data readiness, ownership, and human approval.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This lab uses the problem framing from Lab 01 and the ownership boundaries from Lab 02. You will test assumptions, assess AI and data readiness, define measurable value, and recommend a bounded next step. Its output becomes the decision evidence used by the architecture lab.</p>
+<h2>Step 1 — Create Your Independent Project</h2>
+<pre><code class="language-bash">mkdir fde_lab_03
+cd fde_lab_03</code></pre>
+<p>Do not edit the completed reference repository. Build the project from this guide and consult the reference only if needed.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You are inside an empty <code>fde_lab_03</code> directory.</li><li><strong>Acceptable variation:</strong> Another directory name is acceptable.</li><li><strong>Failure indicator:</strong> You are changing files inside <code>lab_03_customer_discovery_brief_ai_value_case</code>.</li><li><strong>Corrective action:</strong> Leave the reference repository and create your own directory.</li></ul>
+<h2>Step 2 — Create the Discovery Packet</h2>
+<p>Create <code>claims_assistant_discovery_packet.md</code>:</p>
+<pre><code class="language-markdown"># Enterprise AI Claims Assistant — Discovery Packet
+
+Northstar Mutual processes property claims from email, scanned forms, policy systems, and a claims platform. Intake specialists manually summarize each submission, locate policy evidence, identify missing information, and assign the claim to an adjuster queue. Leadership has asked whether an AI assistant can improve this workflow.
+
+## Current baseline
+
+| Metric | Baseline | Source |
+| --- | ---: | --- |
+| Median intake-to-assignment time | 18 hours | Claims platform |
+| Claims returned for missing or incorrect intake information | 22% | Quality review |
+| Audit records with complete source citations | 71% | Audit log |
+| Claim denials or payments receiving human approval | 100% | Claims platform |
+| Weekly active adjusters using an AI assistant | 0% | Not yet deployed |
+
+Northstar receives about 12,000 property claims per month. Claims Operations estimates that intake specialists spend 28 minutes per claim assembling evidence and writing the first summary, but this estimate has not yet been validated through a time study.
+
+## People and ownership
+
+- **Business owner:** Elena Ruiz, VP of Claims Operations
+- **User representative:** Marcus Lee, Senior Claims Adjuster
+- **Data owner:** Priya Shah, Director of Claims Data
+- **Technical owner:** Jordan Kim, Forward Deployed Engineering Lead
+- **Security approver:** Dana Brooks, Information Security Director
+- **Human approval role:** Licensed Claims Adjuster
+
+## Candidate workflow
+
+The assistant could summarize submissions, retrieve policy evidence, identify missing information, recommend a routing queue, and draft an adjuster work note.
+
+The assistant must not approve or deny a claim, authorize payment, change a policy record, send a customer-facing decision, or update the claims system without human approval.
+
+## Available data
+
+| Source | Owner | Readiness | Known issue |
+| --- | --- | --- | --- |
+| Claim intake forms | Claims Data | Ready with conditions | Structured fields are 97% complete |
+| Policy documents | Policy Administration | Needs remediation | Version and effective-date labels are inconsistent |
+| Adjuster notes | Claims Operations | Needs review | Free text contains abbreviations and sensitive information |
+| Fraud indicators | Special Investigations | Restricted | Not approved for the first pilot |
+
+Claim data contains personally identifiable information. It must remain inside Northstar&#x27;s approved environment. Every source retrieval, recommendation, human decision, and downstream action must be auditable.
+
+## Pilot boundary
+
+Leadership will fund an eight-week pilot covering three adjuster teams and no more than 1,500 claims. The pilot may recommend **request evidence**, **continue review**, or **escalate**. It must not automate a protected claim action.
+
+## Decision needed
+
+The discovery team must recommend one of four outcomes:
+
+1. Proceed to a bounded pilot.
+2. Run a smaller prototype to close evidence gaps.
+3. Pause until named prerequisites are resolved.
+4. Do not proceed with AI.
+
+The steering committee will approve or reject the recommendation. Progression beyond the pilot requires evidence for quality, safety, adoption, cycle time, rework, and auditability.</code></pre>
+<p>Why this matters: discovery begins with evidence. The 28-minute effort estimate is explicitly unvalidated and must not be presented as confirmed ROI.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The packet contains five baseline rows, five named owners, four data sources, a bounded pilot, and protected actions.</li><li><strong>Acceptable variation:</strong> Markdown formatting may differ; evidence and uncertainty labels must not.</li><li><strong>Failure indicator:</strong> Assumptions are presented as verified facts or protected actions become automated.</li><li><strong>Corrective action:</strong> Restore evidence sources, ownership, uncertainty, and the human approval boundary.</li></ul>
+<h2>Step 3 — Build the Discovery Brief</h2>
+<p>Create <code>discovery_brief.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;engagement&quot;: {
+    &quot;lab_id&quot;: &quot;lab_03&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;prepared_by&quot;: &quot;FDE Discovery Team&quot;,
+    &quot;decision_date&quot;: &quot;2026-08-16&quot;
+  },
+  &quot;problem&quot;: {
+    &quot;problem_statement&quot;: &quot;Licensed claims adjusters wait too long for complete, evidence-linked intake summaries, contributing to an 18-hour median intake-to-assignment time, 22% intake rework, and incomplete audit evidence.&quot;,
+    &quot;primary_user&quot;: &quot;Licensed Claims Adjuster&quot;,
+    &quot;business_owner&quot;: &quot;Elena Ruiz, VP of Claims Operations&quot;,
+    &quot;current_workflow&quot;: [
+      &quot;Receive claim intake forms and supporting documents.&quot;,
+      &quot;Verify policy, claimant, and loss details across systems.&quot;,
+      &quot;Read documents and assemble a source-linked evidence summary.&quot;,
+      &quot;Identify missing information and select a routing queue.&quot;,
+      &quot;Record the rationale and assign the claim for adjuster review.&quot;
+    ],
+    &quot;frictions&quot;: [
+      &quot;Evidence is fragmented across email, scans, policy systems, and the claims platform.&quot;,
+      &quot;Intake summaries are written manually and vary by specialist.&quot;,
+      &quot;Incorrect or missing intake information causes 22% rework.&quot;,
+      &quot;Only 71% of audit records contain complete source citations.&quot;
+    ],
+    &quot;non_goals&quot;: [
+      &quot;Autonomously approve or deny a claim.&quot;,
+      &quot;Authorize payment or change reserves.&quot;,
+      &quot;Send customer communications or update the system of record without human approval.&quot;
+    ]
+  },
+  &quot;decision_contract&quot;: {
+    &quot;user&quot;: &quot;Licensed Claims Adjuster&quot;,
+    &quot;decision&quot;: &quot;Choose whether to request evidence, continue review, or escalate the claim.&quot;,
+    &quot;assistant_action&quot;: &quot;Present a source-linked summary, identify missing information, and recommend one allowed workflow action.&quot;,
+    &quot;expected_outcome&quot;: &quot;Reduce intake delay and avoidable rework while improving citation completeness.&quot;,
+    &quot;human_authority&quot;: &quot;A licensed claims adjuster approves, changes, or rejects every recommendation before any downstream action.&quot;
+  },
+  &quot;ai_fit&quot;: {
+    &quot;is_ai_appropriate&quot;: true,
+    &quot;reasons&quot;: [
+      &quot;The workflow requires summarizing variable free text and semi-structured documents.&quot;,
+      &quot;Recommendations can be evaluated against reviewed historical claims and cited sources.&quot;,
+      &quot;A licensed adjuster remains accountable for the final claim decision and action.&quot;
+    ],
+    &quot;deterministic_alternatives&quot;: [
+      &quot;Use field-level rules for completeness checks on structured intake forms.&quot;,
+      &quot;Fix policy-document version metadata and improve the existing intake checklist.&quot;
+    ]
+  },
+  &quot;data_readiness&quot;: {
+    &quot;sources&quot;: [
+      {
+        &quot;name&quot;: &quot;Claim intake forms&quot;,
+        &quot;owner&quot;: &quot;Claims Data&quot;,
+        &quot;readiness&quot;: &quot;conditional&quot;,
+        &quot;constraint&quot;: &quot;Profile the 3% missing structured fields by claim type.&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Policy documents&quot;,
+        &quot;owner&quot;: &quot;Policy Administration&quot;,
+        &quot;readiness&quot;: &quot;not_ready&quot;,
+        &quot;constraint&quot;: &quot;Normalize version and effective-date labels before retrieval evaluation.&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Adjuster notes&quot;,
+        &quot;owner&quot;: &quot;Claims Operations&quot;,
+        &quot;readiness&quot;: &quot;conditional&quot;,
+        &quot;constraint&quot;: &quot;Review abbreviations, sensitive text, and access rules.&quot;
+      }
+    ],
+    &quot;gaps&quot;: [
+      &quot;Create a reviewed evaluation set representing claim types, missing evidence, and escalation conditions.&quot;,
+      &quot;Resolve policy-document version and effective-date metadata before pilot ingestion.&quot;
+    ],
+    &quot;security_constraints&quot;: [
+      &quot;Keep personally identifiable information inside Northstar&#x27;s approved environment.&quot;,
+      &quot;Exclude restricted fraud indicators from the first pilot.&quot;,
+      &quot;Audit source retrieval, recommendation, human decision, and downstream action.&quot;
+    ]
+  },
+  &quot;pilot&quot;: {
+    &quot;duration_weeks&quot;: 8,
+    &quot;teams&quot;: 3,
+    &quot;maximum_claims&quot;: 1500,
+    &quot;included_actions&quot;: [
+      &quot;Recommend request evidence.&quot;,
+      &quot;Recommend continue review.&quot;,
+      &quot;Recommend escalate.&quot;
+    ],
+    &quot;excluded_actions&quot;: [
+      &quot;Approve or deny a claim.&quot;,
+      &quot;Authorize payment or change reserves.&quot;,
+      &quot;Send customer communications or update the claims system.&quot;
+    ]
+  },
+  &quot;governance&quot;: {
+    &quot;owners&quot;: {
+      &quot;business_owner&quot;: &quot;Elena Ruiz, VP of Claims Operations&quot;,
+      &quot;user_representative&quot;: &quot;Marcus Lee, Senior Claims Adjuster&quot;,
+      &quot;data_owner&quot;: &quot;Priya Shah, Director of Claims Data&quot;,
+      &quot;technical_owner&quot;: &quot;Jordan Kim, Forward Deployed Engineering Lead&quot;,
+      &quot;security_approver&quot;: &quot;Dana Brooks, Information Security Director&quot;
+    },
+    &quot;human_approval&quot;: {
+      &quot;required&quot;: true,
+      &quot;role&quot;: &quot;Licensed Claims Adjuster&quot;,
+      &quot;protected_actions&quot;: [
+        &quot;Approve or deny a claim.&quot;,
+        &quot;Authorize payment or change reserves.&quot;,
+        &quot;Send customer communications or update the claims system of record.&quot;
+      ]
+    },
+    &quot;scale_gate&quot;: {
+      &quot;status&quot;: &quot;pending&quot;,
+      &quot;owner&quot;: &quot;Elena Ruiz, VP of Claims Operations&quot;,
+      &quot;evidence_required&quot;: [
+        &quot;Quality results by claim type on a reviewed evaluation set.&quot;,
+        &quot;Zero unauthorized protected actions and complete audit records.&quot;,
+        &quot;Pilot targets for cycle time, rework, citations, and adoption.&quot;
+      ]
+    }
+  },
+  &quot;risks&quot;: [
+    {
+      &quot;risk&quot;: &quot;The assistant cites the wrong policy version.&quot;,
+      &quot;owner&quot;: &quot;Priya Shah&quot;,
+      &quot;mitigation&quot;: &quot;Normalize effective-date metadata and test retrieval by policy version.&quot;
+    },
+    {
+      &quot;risk&quot;: &quot;Users over-trust a plausible summary.&quot;,
+      &quot;owner&quot;: &quot;Marcus Lee&quot;,
+      &quot;mitigation&quot;: &quot;Display source links, require an explicit adjuster decision, and review overrides.&quot;
+    },
+    {
+      &quot;risk&quot;: &quot;PII leaves the approved boundary.&quot;,
+      &quot;owner&quot;: &quot;Dana Brooks&quot;,
+      &quot;mitigation&quot;: &quot;Use approved hosting, least privilege, redaction tests, and audit logging.&quot;
+    },
+    {
+      &quot;risk&quot;: &quot;Pilot results overrepresent simple claims.&quot;,
+      &quot;owner&quot;: &quot;Jordan Kim&quot;,
+      &quot;mitigation&quot;: &quot;Stratify evaluation and pilot samples by claim type and complexity.&quot;
+    }
+  ],
+  &quot;discovery_exit_criteria&quot;: [
+    {
+      &quot;criterion&quot;: &quot;Business owner confirms the problem, baseline, and pilot scope.&quot;,
+      &quot;owner&quot;: &quot;Elena Ruiz&quot;,
+      &quot;status&quot;: &quot;met&quot;
+    },
+    {
+      &quot;criterion&quot;: &quot;User representative confirms the workflow and human approval boundary.&quot;,
+      &quot;owner&quot;: &quot;Marcus Lee&quot;,
+      &quot;status&quot;: &quot;met&quot;
+    },
+    {
+      &quot;criterion&quot;: &quot;Data owner accepts the source inventory and remediation plan.&quot;,
+      &quot;owner&quot;: &quot;Priya Shah&quot;,
+      &quot;status&quot;: &quot;met&quot;
+    },
+    {
+      &quot;criterion&quot;: &quot;Security approver accepts the pilot data boundary and audit requirements.&quot;,
+      &quot;owner&quot;: &quot;Dana Brooks&quot;,
+      &quot;status&quot;: &quot;pending&quot;
+    },
+    {
+      &quot;criterion&quot;: &quot;Steering committee accepts measurable pilot targets and stop conditions.&quot;,
+      &quot;owner&quot;: &quot;Elena Ruiz&quot;,
+      &quot;status&quot;: &quot;pending&quot;
+    }
+  ],
+  &quot;recommendation&quot;: {
+    &quot;decision&quot;: &quot;pilot&quot;,
+    &quot;rationale&quot;: &quot;Proceed only with a bounded, human-approved pilot after policy-version metadata and the representative evaluation set are ready; do not authorize autonomous claim decisions or production scale-up during discovery.&quot;,
+    &quot;prerequisites&quot;: [
+      &quot;Normalize policy version and effective-date metadata.&quot;,
+      &quot;Build and approve a representative evaluation set.&quot;,
+      &quot;Obtain Security approval for the pilot data boundary and audit design.&quot;
+    ]
+  }
+}</code></pre>
+<p>Why this matters: the brief turns raw discovery into a decision contract, AI-fit assessment, data-remediation plan, bounded experiment, governance model, and recommendation.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The brief defines the user, decision, assistant action, expected outcome, human authority, AI-fit rationale, deterministic alternatives, data gaps, pilot boundary, owners, risks, exit criteria, and recommendation.</li><li><strong>Acceptable variation:</strong> A prototype or pause recommendation is acceptable only if the evidence and prerequisites support it.</li><li><strong>Failure indicator:</strong> The recommendation has no prerequisites, owners are missing, or AI is assumed to be the answer without alternatives.</li><li><strong>Corrective action:</strong> Connect the recommendation to verified evidence, unresolved gaps, accountable owners, and explicit exit criteria.</li></ul>
+<h2>Step 4 — Build the Value Hypothesis</h2>
+<p>Create <code>value_hypothesis.csv</code>:</p>
+<pre><code class="language-csv">metric_id,metric_name,baseline,target,direction,unit,source,owner,decision_use
+median_intake_to_assignment_hours,Median intake-to-assignment time,18,6,lower,hours,Claims platform,Elena Ruiz,Scale gate
+intake_rework_rate_percent,Intake rework rate,22,10,lower,percent,Quality review,Marcus Lee,Scale gate
+citation_completeness_percent,Citation completeness,71,95,higher,percent,Audit log,Dana Brooks,Scale gate
+human_approval_rate_percent,Human approval for protected actions,100,100,equal,percent,Claims platform,Elena Ruiz,Safety stop
+weekly_active_adjusters_percent,Weekly active adjusters,0,75,higher,percent,Usage telemetry,Marcus Lee,Adoption review</code></pre>
+<p>Why this matters: model quality is not the business outcome. This artifact ties cycle time, rework, evidence quality, safety, and adoption to baselines, targets, sources, owners, and decisions.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Five metrics are present and human approval remains 100% from baseline through target.</li><li><strong>Acceptable variation:</strong> You may add a metric if its source, owner, and decision use are explicit.</li><li><strong>Failure indicator:</strong> A metric has no baseline or source, or a speed/adoption target weakens the safety boundary.</li><li><strong>Corrective action:</strong> Restore complete measurement contracts and 100% approval for protected actions.</li></ul>
+<h2>Step 5 — Build the Project Validator</h2>
+<p>Why this matters: discovery claims become decision-ready only when the artifacts can be checked consistently. You will build the same validator contained in the completed reference repository.</p>
+<p>Create <code>run_lab.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Run Lab 03: validate the discovery brief and AI value hypothesis.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+OWNER_ROLES = {
+    &quot;business_owner&quot;, &quot;user_representative&quot;, &quot;data_owner&quot;,
+    &quot;technical_owner&quot;, &quot;security_approver&quot;,
+}
+METRICS = {
+    &quot;median_intake_to_assignment_hours&quot;,
+    &quot;intake_rework_rate_percent&quot;,
+    &quot;citation_completeness_percent&quot;,
+    &quot;human_approval_rate_percent&quot;,
+    &quot;weekly_active_adjusters_percent&quot;,
+}
+
+
+def incomplete(value: Any) -&gt; bool:
+    if isinstance(value, str):
+        return not value.strip() or any(token in value.lower() for token in (&quot;todo&quot;, &quot;tbd&quot;))
+    if isinstance(value, list):
+        return not value or any(incomplete(item) for item in value)
+    if isinstance(value, dict):
+        return not value or any(incomplete(item) for item in value.values())
+    return value is None
+
+
+def main() -&gt; int:
+    brief = json.loads((ROOT / &quot;discovery_brief.json&quot;).read_text(encoding=&quot;utf-8&quot;))
+    with (ROOT / &quot;value_hypothesis.csv&quot;).open(newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as handle:
+        rows = list(csv.DictReader(handle))
+
+    errors: list[str] = []
+    required = (
+        &quot;engagement&quot;, &quot;problem&quot;, &quot;decision_contract&quot;, &quot;ai_fit&quot;, &quot;data_readiness&quot;,
+        &quot;pilot&quot;, &quot;governance&quot;, &quot;risks&quot;, &quot;discovery_exit_criteria&quot;, &quot;recommendation&quot;,
+    )
+    for section in required:
+        if section not in brief or incomplete(brief[section]):
+            errors.append(f&quot;Discovery section is incomplete: {section}&quot;)
+
+    owners = brief.get(&quot;governance&quot;, {}).get(&quot;owners&quot;, {})
+    if set(owners) != OWNER_ROLES:
+        errors.append(&quot;All five governance owners are required&quot;)
+    approval = brief.get(&quot;governance&quot;, {}).get(&quot;human_approval&quot;, {})
+    if approval.get(&quot;required&quot;) is not True:
+        errors.append(&quot;Human approval must remain required&quot;)
+    protected = &quot; &quot;.join(approval.get(&quot;protected_actions&quot;, [])).lower()
+    if &quot;approve or deny&quot; not in protected or &quot;payment&quot; not in protected:
+        errors.append(&quot;Protected claim decisions and payment must remain human-controlled&quot;)
+
+    ids = {row.get(&quot;metric_id&quot;, &quot;&quot;) for row in rows}
+    if ids != METRICS:
+        errors.append(&quot;The value hypothesis must contain the five required metrics&quot;)
+    human = next((row for row in rows if row.get(&quot;metric_id&quot;) == &quot;human_approval_rate_percent&quot;), {})
+    if human.get(&quot;baseline&quot;) != &quot;100&quot; or human.get(&quot;target&quot;) != &quot;100&quot;:
+        errors.append(&quot;Human approval baseline and target must both be 100 percent&quot;)
+    for row in rows:
+        try:
+            baseline = float(row[&quot;baseline&quot;])
+            target = float(row[&quot;target&quot;])
+        except (KeyError, ValueError):
+            errors.append(f&quot;{row.get(&#x27;metric_id&#x27;, &#x27;metric&#x27;)}: baseline and target must be numeric&quot;)
+            continue
+        direction = row.get(&quot;direction&quot;)
+        if direction == &quot;lower&quot; and target &gt;= baseline:
+            errors.append(f&quot;{row[&#x27;metric_id&#x27;]}: target must be lower than baseline&quot;)
+        if direction == &quot;higher&quot; and target &lt;= baseline:
+            errors.append(f&quot;{row[&#x27;metric_id&#x27;]}: target must be higher than baseline&quot;)
+        if direction == &quot;equal&quot; and target != baseline:
+            errors.append(f&quot;{row[&#x27;metric_id&#x27;]}: target must equal baseline&quot;)
+
+    if errors:
+        print(f&quot;LAB 03 FAILED — {len(errors)} issue(s)&quot;)
+        for error in errors:
+            print(f&quot;- {error}&quot;)
+        return 1
+
+    print(&quot;LAB 03 PASSED&quot;)
+    print(f&quot;- Recommendation: {brief[&#x27;recommendation&#x27;][&#x27;decision&#x27;]}&quot;)
+    print(f&quot;- Metrics: {len(rows)}&quot;)
+    print(f&quot;- Risks: {len(brief[&#x27;risks&#x27;])}&quot;)
+    print(f&quot;- Pilot: {brief[&#x27;pilot&#x27;][&#x27;duration_weeks&#x27;]} weeks, {brief[&#x27;pilot&#x27;][&#x27;teams&#x27;]} teams, {brief[&#x27;pilot&#x27;][&#x27;maximum_claims&#x27;]} claims maximum&quot;)
+    print(&quot;- Human approval for protected actions: 100%&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>run_lab.py</code> contains the complete validator above.</li><li><strong>Acceptable variation:</strong> Comments or formatting may differ if validation behavior and printed evidence remain equivalent.</li><li><strong>Failure indicator:</strong> The file is missing, truncated, or references different artifact names.</li><li><strong>Corrective action:</strong> Replace it with the complete source above and save it beside the three project artifacts.</li></ul>
+<h2>Step 6 — Compile and Run the Completed Project</h2>
+<p>Why this matters: compilation catches Python syntax errors; the main run verifies the discovery brief, value hypothesis, approval boundary, pilot scope, and recommendation together.</p>
+<p>Run:</p>
+<pre><code class="language-bash">python3 -m py_compile run_lab.py
+python3 run_lab.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 03 PASSED
+- Recommendation: pilot
+- Metrics: 5
+- Risks: 4
+- Pilot: 8 weeks, 3 teams, 1500 claims maximum
+- Human approval for protected actions: 100%</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Compilation is silent and the validator prints <code>LAB 03 PASSED</code> with the five evidence lines.</li><li><strong>Acceptable variation:</strong> Your Python executable may be named <code>python</code> instead of <code>python3</code>.</li><li><strong>Failure indicator:</strong> A traceback, <code>LAB 03 FAILED</code>, missing evidence, or a nonzero exit status.</li><li><strong>Corrective action:</strong> Read the reported error, compare the named field with the guide, repair the artifact or validator, and rerun both commands.</li></ul>
+<h2>Step 7 — Inspect the Pilot Recommendation</h2>
+<p>Why this matters: passing syntax is not enough. A forward deployed leader must be able to explain why the evidence supports a bounded pilot rather than an unrestricted launch.</p>
+<p>Review the generated terminal evidence and confirm:</p>
+<ul><li>the recommendation is <code>pilot</code>;</li><li>the pilot lasts eight weeks;</li><li>three teams and no more than 1,500 claims are in scope;</li><li>the five metrics cover approval safety, quality, speed, rework, and adoption;</li><li>all four risks have owners and mitigations;</li><li>protected actions require 100% human approval.</li></ul>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Every statement above is supported by <code>discovery_brief.json</code>, <code>value_hypothesis.csv</code>, and the validator output.</li><li><strong>Acceptable variation:</strong> You may describe the decision in your own words without changing the numeric boundaries.</li><li><strong>Failure indicator:</strong> A claim lacks a source, an owner, a threshold, or a bounded pilot constraint.</li><li><strong>Corrective action:</strong> Return to the relevant artifact, add evidence-backed detail, and rerun <code>python3 run_lab.py</code>.</li></ul>
+<h2>Step 8 — Commit Your Completed Project</h2>
+<p>Why this matters: a clean commit creates reviewable evidence of the exact discovery decision package you completed.</p>
+<p>Run in your own project directory:</p>
+<pre><code class="language-bash">printf &#x27;__pycache__/\n*.py[cod]\n.DS_Store\n&#x27; &gt; .gitignore
+git init -b main
+git add .gitignore claims_assistant_discovery_packet.md discovery_brief.json value_hypothesis.csv run_lab.py
+git commit -m &quot;Complete customer discovery brief and AI value case&quot;
+git status</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git creates a commit on <code>main</code> and reports a clean working tree.</li><li><strong>Acceptable variation:</strong> An existing repository may already be initialized; commit the same four project files and <code>.gitignore</code>.</li><li><strong>Failure indicator:</strong> A cache or unintended file is staged, or Git reports uncommitted changes.</li><li><strong>Corrective action:</strong> Remove transient files, stage only <code>.gitignore</code> and the four learner-built files, commit, and rerun <code>git status</code>.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>The discovery packet separates verified evidence from assumptions and identifies owners.</li><li>The discovery brief qualifies the problem, AI fit, data readiness, governance, risks, and pilot.</li><li>The value hypothesis defines how safety, quality, speed, rework, and adoption will be measured.</li><li>Your Python validator checks the artifacts and prints the decision evidence.</li><li>The steering committee receives a bounded pilot recommendation with explicit prerequisites.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>JSON line/column error</td><td>Invalid JSON punctuation</td><td>Repair the location reported by <code>json.tool</code></td></tr><tr><td>Missing discovery section</td><td>Required object is absent or empty</td><td>Add the named evidence-supported section</td></tr><tr><td>Validator fails</td><td>Missing field, metric, risk, or pilot boundary</td><td>Use the reported message to repair the named artifact</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>Keep <code>claims_assistant_discovery_packet.md</code>, <code>discovery_brief.json</code>, <code>value_hypothesis.csv</code>, <code>run_lab.py</code>, <code>.gitignore</code>, and your Git history. No additional cleanup is required after the project passes and the working tree is clean.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I created the packet, discovery brief, value hypothesis, and Python validator from this guide.</li><li class="check-item"><span class="box">☐</span> <code>run_lab.py</code> compiles and prints <code>LAB 03 PASSED</code>.</li><li class="check-item"><span class="box">☐</span> The value hypothesis contains five complete metrics.</li><li class="check-item"><span class="box">☐</span> Human approval remains exactly 100% for protected actions.</li><li class="check-item"><span class="box">☐</span> The recommendation is bounded and prerequisite-driven.</li><li class="check-item"><span class="box">☐</span> My own Git working tree is clean.</li></ul>
+<h2>Reflection</h2>
+<p>Which discovery finding would most likely change the recommendation from pilot to prototype or pause, and what evidence would you request?</p>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+{
+  "metadata": {
+    "lab_id": "lab_04",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "architecture_stage": "production-ready bounded pilot",
+    "prepared_by": "Forward Deployed Engineering Team",
+    "decision_date": "2026-08-16"
+  },
+  "decision_contract": {
+    "primary_user": "Licensed Claims Adjuster",
+    "assisted_decision": "Choose whether to request evidence, continue review, or escalate the claim",
+    "allowed_recommendations": [
+      "request_evidence",
+      "continue_review",
+      "escalate"
+    ],
+    "protected_actions": [
+      "approve_or_deny_claim",
+      "authorize_payment_or_change_reserves",
+      "send_customer_communication_or_update_claims_system"
+    ],
+    "human_approval": {
+      "required": true,
+      "role": "Licensed Claims Adjuster",
+      "mechanism": "Explicit approve, change, or reject action in the claims UI",
+      "enforced_by": "approval_service",
+      "approval_recorded_before": "claims_system_adapter"
+    }
+  },
+  "non_functional_requirements": {
+    "citation_completeness_percent_min": 95,
+    "protected_action_human_approval_percent": 100,
+    "p95_response_seconds_max": 12,
+    "monthly_availability_percent_min": 99.5,
+    "cost_usd_per_completed_assist_max": 1.5,
+    "audit_event_completeness_percent": 100,
+    "recovery_time_objective_minutes_max": 60,
+    "recovery_point_objective_minutes_max": 15
+  },
+  "trust_boundaries": {
+    "approved_environment": "Northstar private cloud account",
+    "data_classification": "PII and confidential claim data",
+    "network_egress": "Deny by default; allow only approved model and observability endpoints",
+    "data_residency": "United States",
+    "restricted_data_excluded": [
+      "Special Investigations fraud indicators"
+    ],
+    "retention": {
+      "prompt_and_response_days": 30,
+      "audit_record_years": 7,
+      "raw_documents": "Follow the claims retention policy"
+    }
+  },
+  "components": [
+    {
+      "id": "adjuster_ui",
+      "zone": "user",
+      "owner": "Claims Operations",
+      "responsibility": "Show cited evidence and collect explicit adjuster decisions"
+    },
+    {
+      "id": "api_gateway",
+      "zone": "application",
+      "owner": "Platform Engineering",
+      "responsibility": "Authenticate requests, apply rate limits, and attach trace IDs"
+    },
+    {
+      "id": "identity_policy",
+      "zone": "security",
+      "owner": "Identity and Access Management",
+      "responsibility": "Enforce SSO, role-based access, and claim-level authorization"
+    },
+    {
+      "id": "workflow_orchestrator",
+      "zone": "application",
+      "owner": "FDE Team",
+      "responsibility": "Run the bounded assist workflow and stop on failed controls"
+    },
+    {
+      "id": "retrieval_service",
+      "zone": "data",
+      "owner": "FDE Team",
+      "responsibility": "Retrieve effective policy passages and claim evidence with citations"
+    },
+    {
+      "id": "policy_document_store",
+      "zone": "data",
+      "owner": "Policy Administration",
+      "responsibility": "Store approved policy versions and claim documents encrypted at rest"
+    },
+    {
+      "id": "policy_metadata_index",
+      "zone": "data",
+      "owner": "Claims Data",
+      "responsibility": "Filter policy evidence by product, jurisdiction, and effective date"
+    },
+    {
+      "id": "model_gateway",
+      "zone": "model",
+      "owner": "AI Platform",
+      "responsibility": "Pin approved models, redact logs, enforce quotas, and prevent direct tool access"
+    },
+    {
+      "id": "managed_llm",
+      "zone": "model",
+      "owner": "AI Platform",
+      "responsibility": "Generate a schema-constrained summary and allowed recommendation"
+    },
+    {
+      "id": "input_output_guardrails",
+      "zone": "security",
+      "owner": "Information Security",
+      "responsibility": "Detect injection, validate citations and schema, and block unsafe output"
+    },
+    {
+      "id": "approval_service",
+      "zone": "security",
+      "owner": "Claims Platform",
+      "responsibility": "Verify approver identity and bind approval to action, claim, and version"
+    },
+    {
+      "id": "claims_system_adapter",
+      "zone": "integration",
+      "owner": "Claims Platform",
+      "responsibility": "Execute allowlisted idempotent writes only with a valid approval token"
+    },
+    {
+      "id": "audit_log",
+      "zone": "audit",
+      "owner": "Risk and Compliance",
+      "responsibility": "Store immutable retrieval, model, approval, and action events"
+    },
+    {
+      "id": "telemetry",
+      "zone": "operations",
+      "owner": "Site Reliability Engineering",
+      "responsibility": "Measure quality, safety, latency, availability, cost, and adoption"
+    },
+    {
+      "id": "secrets_manager",
+      "zone": "security",
+      "owner": "Platform Engineering",
+      "responsibility": "Issue and rotate short-lived service credentials"
+    }
+  ],
+  "flows": [
+    {
+      "id": "evidence_assisted_review",
+      "path": [
+        "adjuster_ui",
+        "api_gateway",
+        "identity_policy",
+        "workflow_orchestrator",
+        "retrieval_service",
+        "policy_metadata_index",
+        "policy_document_store",
+        "model_gateway",
+        "managed_llm",
+        "input_output_guardrails",
+        "adjuster_ui",
+        "audit_log"
+      ],
+      "result": "Cited summary plus one allowed recommendation",
+      "writes_system_of_record": false,
+      "approval_required": false
+    },
+    {
+      "id": "protected_action_execution",
+      "path": [
+        "adjuster_ui",
+        "api_gateway",
+        "identity_policy",
+        "approval_service",
+        "claims_system_adapter",
+        "audit_log"
+      ],
+      "result": "Human-approved, idempotent claims-system action",
+      "writes_system_of_record": true,
+      "approval_required": true
+    },
+    {
+      "id": "low_confidence_fallback",
+      "path": [
+        "input_output_guardrails",
+        "workflow_orchestrator",
+        "adjuster_ui",
+        "audit_log"
+      ],
+      "result": "No recommendation; manual review with reason",
+      "writes_system_of_record": false,
+      "approval_required": false
+    },
+    {
+      "id": "audit_failure_stop",
+      "path": [
+        "audit_log",
+        "workflow_orchestrator",
+        "adjuster_ui"
+      ],
+      "result": "Workflow stopped; manual claims process remains available",
+      "writes_system_of_record": false,
+      "approval_required": false
+    }
+  ],
+  "controls": {
+    "identity": {
+      "sso_required": true,
+      "least_privilege": true,
+      "claim_level_authorization": true,
+      "service_credentials": "Short-lived and rotated by secrets_manager"
+    },
+    "data": {
+      "encryption_in_transit": true,
+      "encryption_at_rest": true,
+      "pii_redacted_from_operational_logs": true,
+      "effective_date_filter_required": true
+    },
+    "model": {
+      "approved_model_allowlist": true,
+      "training_on_customer_data": false,
+      "schema_validation": true,
+      "citation_validation": true,
+      "prompt_injection_detection": true
+    },
+    "execution": {
+      "direct_model_tool_access": false,
+      "allowlisted_actions": [
+        "request_evidence",
+        "continue_review",
+        "escalate"
+      ],
+      "idempotency_keys_required": true,
+      "approval_token_required_for_writes": true
+    },
+    "audit": {
+      "immutable": true,
+      "trace_id_end_to_end": true,
+      "record_retrieval_model_approval_action": true,
+      "audit_failure_behavior": "fail_closed"
+    }
+  },
+  "failure_modes": [
+    {
+      "id": "policy_retrieval_timeout",
+      "detection": "Retrieval exceeds 3 seconds or returns no effective policy version",
+      "response": "Retry once, then stop recommendation and route to manual review",
+      "owner": "FDE Team"
+    },
+    {
+      "id": "low_grounding",
+      "detection": "Citation validation fails or support score is below the release threshold",
+      "response": "Return no recommendation and show the missing-evidence reason",
+      "owner": "AI Platform"
+    },
+    {
+      "id": "claims_write_timeout",
+      "detection": "Claims adapter does not confirm the idempotency key",
+      "response": "Do not retry blindly; reconcile action state before resubmission",
+      "owner": "Claims Platform"
+    },
+    {
+      "id": "audit_write_failure",
+      "detection": "Required audit event cannot be durably stored",
+      "response": "Fail closed, stop the AI workflow, and preserve the manual process",
+      "owner": "Risk and Compliance"
+    }
+  ],
+  "environments": [
+    {
+      "name": "dev",
+      "isolated": true,
+      "data": "Synthetic claims only",
+      "promotion_evidence": "Unit, schema, and policy tests pass"
+    },
+    {
+      "name": "test",
+      "isolated": true,
+      "data": "De-identified representative evaluation set",
+      "promotion_evidence": "Quality, safety, injection, and failure tests pass"
+    },
+    {
+      "name": "staging",
+      "isolated": true,
+      "data": "Approved masked production-like data",
+      "promotion_evidence": "Load, recovery, observability, and security review pass"
+    },
+    {
+      "name": "prod",
+      "isolated": true,
+      "data": "Authorized pilot claims",
+      "promotion_evidence": "Business, technical, and security approvers sign the release record"
+    }
+  ],
+  "ownership": {
+    "business_owner": "Elena Ruiz, VP of Claims Operations",
+    "user_representative": "Marcus Lee, Senior Claims Adjuster",
+    "data_owner": "Priya Shah, Director of Claims Data",
+    "technical_owner": "Jordan Kim, Forward Deployed Engineering Lead",
+    "security_approver": "Dana Brooks, Information Security Director"
+  }
+}
+

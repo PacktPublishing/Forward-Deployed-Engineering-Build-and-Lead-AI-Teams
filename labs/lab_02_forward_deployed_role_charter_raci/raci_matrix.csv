@@ -1,0 +1,11 @@
+work_item,fde_lead,ai_fde,platform_fde,security_fde,deployment_strategist,claims_owner,adjuster_lead
+Approve discovery exit,R,C,I,C,C,A,C
+Approve architecture baseline,A,R,C,C,I,C,I
+Create evaluation dataset,C,R,I,C,I,C,A
+Approve AI release criteria,A,R,I,C,I,C,C
+Approve security readiness,A,C,C,R,I,C,I
+Authorize production go-live,R,C,C,C,I,A,C
+Own adoption and workflow change,C,I,I,I,R,A,C
+Lead production incident response,A,C,R,C,I,I,I
+Review business outcomes,C,I,I,I,R,A,C
+

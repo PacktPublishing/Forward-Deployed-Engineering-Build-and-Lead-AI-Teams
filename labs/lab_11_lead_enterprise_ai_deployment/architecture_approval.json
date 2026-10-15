@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "lab_id": "lab_11",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "candidate": "claims-assistant-1.0.0",
+    "review_date": "2026-08-17",
+    "decision_stage": "phased production rollout"
+  },
+  "architecture": {
+    "principle": "Probabilistic AI prepares a cited recommendation; deterministic services enforce identity, policy, approval, execution, and audit.",
+    "components": [
+      {
+        "name": "Adjuster Workspace",
+        "type": "human_interface",
+        "owner": "Claims Operations"
+      },
+      {
+        "name": "Identity and Tenant Gateway",
+        "type": "deterministic_control",
+        "owner": "Identity Engineering"
+      },
+      {
+        "name": "Effective Policy Retrieval",
+        "type": "deterministic_control",
+        "owner": "Claims Data"
+      },
+      {
+        "name": "Claims Summary Model",
+        "type": "probabilistic_ai",
+        "owner": "AI Engineering"
+      },
+      {
+        "name": "Recommendation Policy Gate",
+        "type": "deterministic_control",
+        "owner": "FDE Team"
+      },
+      {
+        "name": "Human Approval Service",
+        "type": "deterministic_control",
+        "owner": "Claims Platform"
+      },
+      {
+        "name": "Claims-System Adapter",
+        "type": "protected_action",
+        "owner": "Claims Platform"
+      },
+      {
+        "name": "Immutable Audit Stream",
+        "type": "deterministic_control",
+        "owner": "Security Operations"
+      }
+    ],
+    "trust_boundaries": [
+      "Northstar user session to assistant service",
+      "Assistant service to approved managed model endpoint",
+      "Assistant service to claims and policy systems",
+      "Protected action service to immutable audit store"
+    ],
+    "workflow": [
+      "Authenticate the adjuster and enforce tenant and role scope.",
+      "Retrieve only effective policy evidence for the authorized claim.",
+      "Generate a schema-constrained cited summary and one allowed recommendation.",
+      "Apply deterministic recommendation and protected-action policy.",
+      "Require an explicit licensed-adjuster approval for every protected action.",
+      "Execute with an approver-bound token and idempotency key.",
+      "Write identity, evidence, versions, recommendation, approval, action, and result to the audit stream."
+    ]
+  },
+  "evaluation_and_human_approval": {
+    "evaluation_dataset": "claims-pilot-eval-v1",
+    "required_segments": [
+      "standard",
+      "missing_evidence",
+      "effective_date",
+      "high_severity",
+      "scanned_document",
+      "prompt_injection",
+      "jurisdiction",
+      "duplicate_submission",
+      "protected_action"
+    ],
+    "release_gates": [
+      {
+        "metric": "recommendation_agreement_percent",
+        "operator": "min",
+        "threshold": 90,
+        "owner": "Claims Quality Lead"
+      },
+      {
+        "metric": "citation_completeness_percent",
+        "operator": "min",
+        "threshold": 95,
+        "owner": "Claims Quality Lead"
+      },
+      {
+        "metric": "prompt_injection_block_percent",
+        "operator": "min",
+        "threshold": 100,
+        "owner": "Security Engineer"
+      },
+      {
+        "metric": "protected_action_human_approval_percent",
+        "operator": "min",
+        "threshold": 100,
+        "owner": "Claims Operations Owner"
+      },
+      {
+        "metric": "unauthorized_protected_actions",
+        "operator": "max",
+        "threshold": 0,
+        "owner": "Security Approver"
+      },
+      {
+        "metric": "audit_completeness_percent",
+        "operator": "min",
+        "threshold": 100,
+        "owner": "Security Operations"
+      }
+    ],
+    "latest_results": {
+      "recommendation_agreement_percent": 92,
+      "citation_completeness_percent": 99,
+      "prompt_injection_block_percent": 100,
+      "protected_action_human_approval_percent": 100,
+      "unauthorized_protected_actions": 0,
+      "audit_completeness_percent": 100
+    },
+    "human_approval": {
+      "required": true,
+      "role": "Licensed Claims Adjuster",
+      "allowed_recommendations": [
+        "request_evidence",
+        "continue_review",
+        "escalate"
+      ],
+      "protected_actions": [
+        "approve_or_deny_claim",
+        "authorize_payment_or_change_reserves",
+        "send_customer_communication_or_update_claims_system"
+      ],
+      "approval_evidence": [
+        "approver identity",
+        "claim and action scope",
+        "fresh approval timestamp",
+        "idempotency key",
+        "final action result"
+      ]
+    }
+  }
+}

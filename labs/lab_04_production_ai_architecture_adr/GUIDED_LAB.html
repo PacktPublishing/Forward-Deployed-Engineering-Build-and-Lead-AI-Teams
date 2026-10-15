@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="1b2f90128ac87d6c6040c2e3eea3def4f819e700835497e4105949bf0a4bcdcc">
+<title>Lab 04 — Create a Production AI Architecture and Architecture Decision Record</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 04 — Create a Production AI Architecture and Architecture Decision Record</h1>
+<h2>Goal</h2>
+<p>Translate the Enterprise AI Claims Assistant’s workflow, data, security, reliability, cost, and human-approval requirements into a production architecture and a defensible Architecture Decision Record (ADR).</p>
+<h2>What You'll Build or Produce</h2>
+<p>In your own project directory, you will create:</p>
+<ul><li><code>architecture_spec.json</code> — the production architecture’s decision contract, measurable requirements, trust boundaries, components, flows, controls, failure modes, environments, and owners.</li><li><code>ADR-001-retrieval-first-human-approved-assistant.md</code> — the selected design, alternatives, consequences, validation evidence, rollback, and revisit triggers.</li><li><code>run_lab.py</code> — the learner-built architecture validator that enforces component, flow, approval, access, audit, and ADR requirements.</li></ul>
+<p>The completed course repository contains the finished version of these same three project files. Use it only when stuck or comparing your result.</p>
+<h2>Estimated Time</h2>
+<p>60–80 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This design lab runs locally and costs $0. Do not provision cloud resources, call a model API, upload claim data, or use customer credentials.</p>
+<h2>Completion Evidence</h2>
+<p>You are finished when <code>run_lab.py</code> compiles and confirms 15 components and four flows, the approval service precedes the claims adapter, direct model tool access is blocked, audit failure is fail-closed, the ADR contains all decision sections, and your own Git working tree is clean.</p>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later for JSON and evidence checks.</li><li>Git, a terminal, and a text editor.</li><li>Basic JSON and Markdown familiarity.</li><li>An understanding of retrieval, deterministic controls, human approval, SLOs, and environment promotion.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This lab translates the approved discovery and value case into a production design. The new skill is separating probabilistic AI assistance from deterministic approval and execution while making reliability, security, cost, ownership, and rollback visible. You are designing the system that Lab 05 will build and evaluate.</p>
+<h2>Step 1 — Create Your Independent Project</h2>
+<pre><code class="language-bash">mkdir fde_lab_04
+cd fde_lab_04</code></pre>
+<p>Do not edit the completed reference repository. Build the architecture and ADR from this guide; compare with the reference only when needed.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You are inside an empty <code>fde_lab_04</code> directory.</li><li><strong>Acceptable variation:</strong> Another directory name is acceptable.</li><li><strong>Failure indicator:</strong> You are changing files inside <code>lab_04_production_ai_architecture_adr</code>.</li><li><strong>Corrective action:</strong> Leave the reference repository and create a separate working directory.</li></ul>
+<h2>Step 2 — Build the Production Architecture Specification</h2>
+<p>Create <code>architecture_spec.json</code> with the complete production design:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_04&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;architecture_stage&quot;: &quot;production-ready bounded pilot&quot;,
+    &quot;prepared_by&quot;: &quot;Forward Deployed Engineering Team&quot;,
+    &quot;decision_date&quot;: &quot;2026-08-16&quot;
+  },
+  &quot;decision_contract&quot;: {
+    &quot;primary_user&quot;: &quot;Licensed Claims Adjuster&quot;,
+    &quot;assisted_decision&quot;: &quot;Choose whether to request evidence, continue review, or escalate the claim&quot;,
+    &quot;allowed_recommendations&quot;: [
+      &quot;request_evidence&quot;,
+      &quot;continue_review&quot;,
+      &quot;escalate&quot;
+    ],
+    &quot;protected_actions&quot;: [
+      &quot;approve_or_deny_claim&quot;,
+      &quot;authorize_payment_or_change_reserves&quot;,
+      &quot;send_customer_communication_or_update_claims_system&quot;
+    ],
+    &quot;human_approval&quot;: {
+      &quot;required&quot;: true,
+      &quot;role&quot;: &quot;Licensed Claims Adjuster&quot;,
+      &quot;mechanism&quot;: &quot;Explicit approve, change, or reject action in the claims UI&quot;,
+      &quot;enforced_by&quot;: &quot;approval_service&quot;,
+      &quot;approval_recorded_before&quot;: &quot;claims_system_adapter&quot;
+    }
+  },
+  &quot;non_functional_requirements&quot;: {
+    &quot;citation_completeness_percent_min&quot;: 95,
+    &quot;protected_action_human_approval_percent&quot;: 100,
+    &quot;p95_response_seconds_max&quot;: 12,
+    &quot;monthly_availability_percent_min&quot;: 99.5,
+    &quot;cost_usd_per_completed_assist_max&quot;: 1.5,
+    &quot;audit_event_completeness_percent&quot;: 100,
+    &quot;recovery_time_objective_minutes_max&quot;: 60,
+    &quot;recovery_point_objective_minutes_max&quot;: 15
+  },
+  &quot;trust_boundaries&quot;: {
+    &quot;approved_environment&quot;: &quot;Northstar private cloud account&quot;,
+    &quot;data_classification&quot;: &quot;PII and confidential claim data&quot;,
+    &quot;network_egress&quot;: &quot;Deny by default; allow only approved model and observability endpoints&quot;,
+    &quot;data_residency&quot;: &quot;United States&quot;,
+    &quot;restricted_data_excluded&quot;: [
+      &quot;Special Investigations fraud indicators&quot;
+    ],
+    &quot;retention&quot;: {
+      &quot;prompt_and_response_days&quot;: 30,
+      &quot;audit_record_years&quot;: 7,
+      &quot;raw_documents&quot;: &quot;Follow the claims retention policy&quot;
+    }
+  },
+  &quot;components&quot;: [
+    {
+      &quot;id&quot;: &quot;adjuster_ui&quot;,
+      &quot;zone&quot;: &quot;user&quot;,
+      &quot;owner&quot;: &quot;Claims Operations&quot;,
+      &quot;responsibility&quot;: &quot;Show cited evidence and collect explicit adjuster decisions&quot;
+    },
+    {
+      &quot;id&quot;: &quot;api_gateway&quot;,
+      &quot;zone&quot;: &quot;application&quot;,
+      &quot;owner&quot;: &quot;Platform Engineering&quot;,
+      &quot;responsibility&quot;: &quot;Authenticate requests, apply rate limits, and attach trace IDs&quot;
+    },
+    {
+      &quot;id&quot;: &quot;identity_policy&quot;,
+      &quot;zone&quot;: &quot;security&quot;,
+      &quot;owner&quot;: &quot;Identity and Access Management&quot;,
+      &quot;responsibility&quot;: &quot;Enforce SSO, role-based access, and claim-level authorization&quot;
+    },
+    {
+      &quot;id&quot;: &quot;workflow_orchestrator&quot;,
+      &quot;zone&quot;: &quot;application&quot;,
+      &quot;owner&quot;: &quot;FDE Team&quot;,
+      &quot;responsibility&quot;: &quot;Run the bounded assist workflow and stop on failed controls&quot;
+    },
+    {
+      &quot;id&quot;: &quot;retrieval_service&quot;,
+      &quot;zone&quot;: &quot;data&quot;,
+      &quot;owner&quot;: &quot;FDE Team&quot;,
+      &quot;responsibility&quot;: &quot;Retrieve effective policy passages and claim evidence with citations&quot;
+    },
+    {
+      &quot;id&quot;: &quot;policy_document_store&quot;,
+      &quot;zone&quot;: &quot;data&quot;,
+      &quot;owner&quot;: &quot;Policy Administration&quot;,
+      &quot;responsibility&quot;: &quot;Store approved policy versions and claim documents encrypted at rest&quot;
+    },
+    {
+      &quot;id&quot;: &quot;policy_metadata_index&quot;,
+      &quot;zone&quot;: &quot;data&quot;,
+      &quot;owner&quot;: &quot;Claims Data&quot;,
+      &quot;responsibility&quot;: &quot;Filter policy evidence by product, jurisdiction, and effective date&quot;
+    },
+    {
+      &quot;id&quot;: &quot;model_gateway&quot;,
+      &quot;zone&quot;: &quot;model&quot;,
+      &quot;owner&quot;: &quot;AI Platform&quot;,
+      &quot;responsibility&quot;: &quot;Pin approved models, redact logs, enforce quotas, and prevent direct tool access&quot;
+    },
+    {
+      &quot;id&quot;: &quot;managed_llm&quot;,
+      &quot;zone&quot;: &quot;model&quot;,
+      &quot;owner&quot;: &quot;AI Platform&quot;,
+      &quot;responsibility&quot;: &quot;Generate a schema-constrained summary and allowed recommendation&quot;
+    },
+    {
+      &quot;id&quot;: &quot;input_output_guardrails&quot;,
+      &quot;zone&quot;: &quot;security&quot;,
+      &quot;owner&quot;: &quot;Information Security&quot;,
+      &quot;responsibility&quot;: &quot;Detect injection, validate citations and schema, and block unsafe output&quot;
+    },
+    {
+      &quot;id&quot;: &quot;approval_service&quot;,
+      &quot;zone&quot;: &quot;security&quot;,
+      &quot;owner&quot;: &quot;Claims Platform&quot;,
+      &quot;responsibility&quot;: &quot;Verify approver identity and bind approval to action, claim, and version&quot;
+    },
+    {
+      &quot;id&quot;: &quot;claims_system_adapter&quot;,
+      &quot;zone&quot;: &quot;integration&quot;,
+      &quot;owner&quot;: &quot;Claims Platform&quot;,
+      &quot;responsibility&quot;: &quot;Execute allowlisted idempotent writes only with a valid approval token&quot;
+    },
+    {
+      &quot;id&quot;: &quot;audit_log&quot;,
+      &quot;zone&quot;: &quot;audit&quot;,
+      &quot;owner&quot;: &quot;Risk and Compliance&quot;,
+      &quot;responsibility&quot;: &quot;Store immutable retrieval, model, approval, and action events&quot;
+    },
+    {
+      &quot;id&quot;: &quot;telemetry&quot;,
+      &quot;zone&quot;: &quot;operations&quot;,
+      &quot;owner&quot;: &quot;Site Reliability Engineering&quot;,
+      &quot;responsibility&quot;: &quot;Measure quality, safety, latency, availability, cost, and adoption&quot;
+    },
+    {
+      &quot;id&quot;: &quot;secrets_manager&quot;,
+      &quot;zone&quot;: &quot;security&quot;,
+      &quot;owner&quot;: &quot;Platform Engineering&quot;,
+      &quot;responsibility&quot;: &quot;Issue and rotate short-lived service credentials&quot;
+    }
+  ],
+  &quot;flows&quot;: [
+    {
+      &quot;id&quot;: &quot;evidence_assisted_review&quot;,
+      &quot;path&quot;: [
+        &quot;adjuster_ui&quot;,
+        &quot;api_gateway&quot;,
+        &quot;identity_policy&quot;,
+        &quot;workflow_orchestrator&quot;,
+        &quot;retrieval_service&quot;,
+        &quot;policy_metadata_index&quot;,
+        &quot;policy_document_store&quot;,
+        &quot;model_gateway&quot;,
+        &quot;managed_llm&quot;,
+        &quot;input_output_guardrails&quot;,
+        &quot;adjuster_ui&quot;,
+        &quot;audit_log&quot;
+      ],
+      &quot;result&quot;: &quot;Cited summary plus one allowed recommendation&quot;,
+      &quot;writes_system_of_record&quot;: false,
+      &quot;approval_required&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;protected_action_execution&quot;,
+      &quot;path&quot;: [
+        &quot;adjuster_ui&quot;,
+        &quot;api_gateway&quot;,
+        &quot;identity_policy&quot;,
+        &quot;approval_service&quot;,
+        &quot;claims_system_adapter&quot;,
+        &quot;audit_log&quot;
+      ],
+      &quot;result&quot;: &quot;Human-approved, idempotent claims-system action&quot;,
+      &quot;writes_system_of_record&quot;: true,
+      &quot;approval_required&quot;: true
+    },
+    {
+      &quot;id&quot;: &quot;low_confidence_fallback&quot;,
+      &quot;path&quot;: [
+        &quot;input_output_guardrails&quot;,
+        &quot;workflow_orchestrator&quot;,
+        &quot;adjuster_ui&quot;,
+        &quot;audit_log&quot;
+      ],
+      &quot;result&quot;: &quot;No recommendation; manual review with reason&quot;,
+      &quot;writes_system_of_record&quot;: false,
+      &quot;approval_required&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;audit_failure_stop&quot;,
+      &quot;path&quot;: [
+        &quot;audit_log&quot;,
+        &quot;workflow_orchestrator&quot;,
+        &quot;adjuster_ui&quot;
+      ],
+      &quot;result&quot;: &quot;Workflow stopped; manual claims process remains available&quot;,
+      &quot;writes_system_of_record&quot;: false,
+      &quot;approval_required&quot;: false
+    }
+  ],
+  &quot;controls&quot;: {
+    &quot;identity&quot;: {
+      &quot;sso_required&quot;: true,
+      &quot;least_privilege&quot;: true,
+      &quot;claim_level_authorization&quot;: true,
+      &quot;service_credentials&quot;: &quot;Short-lived and rotated by secrets_manager&quot;
+    },
+    &quot;data&quot;: {
+      &quot;encryption_in_transit&quot;: true,
+      &quot;encryption_at_rest&quot;: true,
+      &quot;pii_redacted_from_operational_logs&quot;: true,
+      &quot;effective_date_filter_required&quot;: true
+    },
+    &quot;model&quot;: {
+      &quot;approved_model_allowlist&quot;: true,
+      &quot;training_on_customer_data&quot;: false,
+      &quot;schema_validation&quot;: true,
+      &quot;citation_validation&quot;: true,
+      &quot;prompt_injection_detection&quot;: true
+    },
+    &quot;execution&quot;: {
+      &quot;direct_model_tool_access&quot;: false,
+      &quot;allowlisted_actions&quot;: [
+        &quot;request_evidence&quot;,
+        &quot;continue_review&quot;,
+        &quot;escalate&quot;
+      ],
+      &quot;idempotency_keys_required&quot;: true,
+      &quot;approval_token_required_for_writes&quot;: true
+    },
+    &quot;audit&quot;: {
+      &quot;immutable&quot;: true,
+      &quot;trace_id_end_to_end&quot;: true,
+      &quot;record_retrieval_model_approval_action&quot;: true,
+      &quot;audit_failure_behavior&quot;: &quot;fail_closed&quot;
+    }
+  },
+  &quot;failure_modes&quot;: [
+    {
+      &quot;id&quot;: &quot;policy_retrieval_timeout&quot;,
+      &quot;detection&quot;: &quot;Retrieval exceeds 3 seconds or returns no effective policy version&quot;,
+      &quot;response&quot;: &quot;Retry once, then stop recommendation and route to manual review&quot;,
+      &quot;owner&quot;: &quot;FDE Team&quot;
+    },
+    {
+      &quot;id&quot;: &quot;low_grounding&quot;,
+      &quot;detection&quot;: &quot;Citation validation fails or support score is below the release threshold&quot;,
+      &quot;response&quot;: &quot;Return no recommendation and show the missing-evidence reason&quot;,
+      &quot;owner&quot;: &quot;AI Platform&quot;
+    },
+    {
+      &quot;id&quot;: &quot;claims_write_timeout&quot;,
+      &quot;detection&quot;: &quot;Claims adapter does not confirm the idempotency key&quot;,
+      &quot;response&quot;: &quot;Do not retry blindly; reconcile action state before resubmission&quot;,
+      &quot;owner&quot;: &quot;Claims Platform&quot;
+    },
+    {
+      &quot;id&quot;: &quot;audit_write_failure&quot;,
+      &quot;detection&quot;: &quot;Required audit event cannot be durably stored&quot;,
+      &quot;response&quot;: &quot;Fail closed, stop the AI workflow, and preserve the manual process&quot;,
+      &quot;owner&quot;: &quot;Risk and Compliance&quot;
+    }
+  ],
+  &quot;environments&quot;: [
+    {
+      &quot;name&quot;: &quot;dev&quot;,
+      &quot;isolated&quot;: true,
+      &quot;data&quot;: &quot;Synthetic claims only&quot;,
+      &quot;promotion_evidence&quot;: &quot;Unit, schema, and policy tests pass&quot;
+    },
+    {
+      &quot;name&quot;: &quot;test&quot;,
+      &quot;isolated&quot;: true,
+      &quot;data&quot;: &quot;De-identified representative evaluation set&quot;,
+      &quot;promotion_evidence&quot;: &quot;Quality, safety, injection, and failure tests pass&quot;
+    },
+    {
+      &quot;name&quot;: &quot;staging&quot;,
+      &quot;isolated&quot;: true,
+      &quot;data&quot;: &quot;Approved masked production-like data&quot;,
+      &quot;promotion_evidence&quot;: &quot;Load, recovery, observability, and security review pass&quot;
+    },
+    {
+      &quot;name&quot;: &quot;prod&quot;,
+      &quot;isolated&quot;: true,
+      &quot;data&quot;: &quot;Authorized pilot claims&quot;,
+      &quot;promotion_evidence&quot;: &quot;Business, technical, and security approvers sign the release record&quot;
+    }
+  ],
+  &quot;ownership&quot;: {
+    &quot;business_owner&quot;: &quot;Elena Ruiz, VP of Claims Operations&quot;,
+    &quot;user_representative&quot;: &quot;Marcus Lee, Senior Claims Adjuster&quot;,
+    &quot;data_owner&quot;: &quot;Priya Shah, Director of Claims Data&quot;,
+    &quot;technical_owner&quot;: &quot;Jordan Kim, Forward Deployed Engineering Lead&quot;,
+    &quot;security_approver&quot;: &quot;Dana Brooks, Information Security Director&quot;
+  }
+}</code></pre>
+<p>Why this matters: the architecture starts with the user’s decision and authority boundary, then connects measurable requirements to components, ordered flows, controls, safe failure behavior, environments, and owners.</p>
+<p>Review these critical boundaries:</p>
+<table><thead><tr><th>Boundary</th><th>Required design evidence</th></tr></thead><tbody><tr><td>Human authority</td><td>Licensed adjuster approval is required before protected writes</td></tr><tr><td>Probabilistic AI</td><td>The model produces only a cited summary and one allowlisted recommendation</td></tr><tr><td>Deterministic execution</td><td>The approval service precedes the claims-system adapter</td></tr><tr><td>Data</td><td>PII stays in the approved US private-cloud boundary</td></tr><tr><td>Audit</td><td>Missing required evidence fails closed while manual work remains available</td></tr><tr><td>Operations</td><td>Quality, latency, availability, cost, recovery, and ownership are measurable</td></tr></tbody></table>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The specification contains 15 uniquely owned components, four ordered flows, layered controls, four failure modes, four isolated environments, and five accountable owners.</li><li><strong>Acceptable variation:</strong> You may split a component if responsibilities and all flow references remain explicit.</li><li><strong>Failure indicator:</strong> The model can directly call the claims adapter, an unapproved write is possible, or a failure has no safe response and owner.</li><li><strong>Corrective action:</strong> Separate recommendation generation from deterministic approval and execution, then bind every control and failure to an enforcing component and owner.</li></ul>
+<h2>Step 3 — Write the Architecture Decision Record</h2>
+<p>Create <code>ADR-001-retrieval-first-human-approved-assistant.md</code>:</p>
+<pre><code class="language-markdown"># ADR-001 — Retrieval-First, Human-Approved Claims Assistant
+
+- **Status:** Accepted for bounded pilot
+- **Date:** 2026-08-16
+- **Decision owners:** Jordan Kim, Forward Deployed Engineering Lead; Dana Brooks, Information Security Director
+- **Business approver:** Elena Ruiz, VP of Claims Operations
+
+## Context
+
+Northstar Mutual&#x27;s intake specialists assemble evidence from claim forms, policy documents, and adjuster notes. The current median intake-to-assignment time is 18 hours, rework is 22%, and citation completeness is 71%. Policy documents have inconsistent version and effective-date metadata, claim data contains PII, and fraud indicators are excluded from the pilot.
+
+The assistant may summarize evidence and recommend `request_evidence`, `continue_review`, or `escalate`. It must not approve or deny a claim, authorize payment or reserve changes, send customer communications, or update the claims system without a licensed claims adjuster&#x27;s explicit approval.
+
+## Decision
+
+Use a retrieval-first architecture with effective-date filtering, an approved managed language model behind a model gateway, schema and citation guardrails, and a separate deterministic approval and execution path.
+
+The model receives only authorized claim context and retrieved policy passages. It produces a cited summary and one allowlisted recommendation. It has no direct access to the claims-system adapter. A protected write requires an approval token bound to the licensed adjuster, claim, proposed action, and artifact version. The claims adapter verifies that token and an idempotency key before writing.
+
+All retrieval, model, guardrail, human-decision, and downstream-action events use an end-to-end trace ID and are written to the immutable audit log. If a required audit event cannot be stored, the AI workflow fails closed while the manual claims process remains available.
+
+## Decision Drivers
+
+- Preserve 100% human approval for protected claim actions.
+- Raise citation completeness to at least 95% without using the wrong policy version.
+- Keep PII inside Northstar&#x27;s approved environment and exclude restricted fraud data.
+- Meet a 12-second p95 response objective and a $1.50 maximum cost per completed assist.
+- Make model, prompt, retrieval, approval, and action evidence independently auditable.
+- Support rollback to the manual workflow and replacement of the model or retrieval implementation.
+
+## Alternatives Considered
+
+### Autonomous agent with direct claims-system tools
+
+Rejected for the pilot. It weakens separation of duties, expands the prompt-injection blast radius, and could execute a protected action without an independently verified approval token.
+
+### Fine-tune a model before fixing policy metadata
+
+Rejected. Fine-tuning would not reliably solve effective-date retrieval and would make current policy evidence harder to inspect. Metadata remediation and retrieval evaluation are required first.
+
+### Deterministic rules and templates only
+
+Not selected as the complete solution. Rules remain appropriate for field completeness, authorization, routing constraints, and write enforcement, but they do not adequately summarize variable claim documents. This remains the fallback if AI quality gates are not met.
+
+## Consequences
+
+### Positive
+
+- Citations and effective-date filters make recommendations inspectable.
+- The model gateway, guardrails, approval service, and adapter create independent control layers.
+- Model and retrieval implementations can change without changing claims-system authorization.
+- Fail-closed audit behavior preserves evidence for regulated actions.
+
+### Negative
+
+- More components increase latency, operational ownership, and integration testing.
+- Policy metadata must be remediated before production promotion.
+- Human approval limits full automation and requires careful UI design.
+- Immutable audit retention and representative evaluations add operating cost.
+
+## Validation and Rollback
+
+Promote only after representative quality, citation, injection, authorization, load, recovery, and audit tests pass. Monitor citation completeness, protected-action approval, p95 latency, availability, cost, rework, and adoption by claim type.
+
+Disable the AI assist feature flag and continue the manual claims workflow if citation completeness drops below 95%, any unauthorized protected action occurs, required audit evidence is missing, or PII crosses the approved boundary. Reconcile any uncertain adapter write by idempotency key before retrying.
+
+## Revisit Triggers
+
+Revisit this decision if policy metadata becomes reliably normalized, a model or retrieval change materially alters quality or cost, regulations or residency requirements change, a new protected action is proposed, or pilot evidence supports expansion beyond the three approved recommendations.</code></pre>
+<p>Why this matters: the specification records what will exist. The ADR preserves why the team selected it, which alternatives were rejected, what consequences were accepted, and when the decision must be revisited.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The ADR records accepted status, context, decision, drivers, three alternatives, positive and negative consequences, validation and rollback, and revisit triggers.</li><li><strong>Acceptable variation:</strong> A different architecture is acceptable only if it satisfies the hard safety and data boundaries and is defended with equivalent evidence.</li><li><strong>Failure indicator:</strong> The ADR merely lists components or omits alternatives, negative consequences, rollback, or revisit conditions.</li><li><strong>Corrective action:</strong> Document the decision logic and operational trade-offs, not only the diagram.</li></ul>
+<h2>Step 4 — Build the Architecture Validator</h2>
+<p>Why this matters: an architecture decision is only actionable when its safety, flow, ownership, and rollback constraints can be checked. You will build the same validator contained in the completed reference repository.</p>
+<p>Create <code>run_lab.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Validate Lab 04 production architecture and ADR evidence.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+ARCHITECTURE_FILE = ROOT / &quot;architecture_spec.json&quot;
+ADR_FILE = ROOT / &quot;ADR-001-retrieval-first-human-approved-assistant.md&quot;
+
+REQUIRED_COMPONENTS = {
+    &quot;adjuster_ui&quot;,
+    &quot;api_gateway&quot;,
+    &quot;identity_policy&quot;,
+    &quot;workflow_orchestrator&quot;,
+    &quot;retrieval_service&quot;,
+    &quot;policy_document_store&quot;,
+    &quot;policy_metadata_index&quot;,
+    &quot;model_gateway&quot;,
+    &quot;managed_llm&quot;,
+    &quot;input_output_guardrails&quot;,
+    &quot;approval_service&quot;,
+    &quot;claims_system_adapter&quot;,
+    &quot;audit_log&quot;,
+    &quot;telemetry&quot;,
+    &quot;secrets_manager&quot;,
+}
+EXPECTED_ACTIONS = {&quot;request_evidence&quot;, &quot;continue_review&quot;, &quot;escalate&quot;}
+EXPECTED_ENVIRONMENTS = {&quot;dev&quot;, &quot;test&quot;, &quot;staging&quot;, &quot;prod&quot;}
+REQUIRED_OWNERS = {
+    &quot;business_owner&quot;,
+    &quot;user_representative&quot;,
+    &quot;data_owner&quot;,
+    &quot;technical_owner&quot;,
+    &quot;security_approver&quot;,
+}
+REQUIRED_FAILURES = {
+    &quot;policy_retrieval_timeout&quot;,
+    &quot;low_grounding&quot;,
+    &quot;claims_write_timeout&quot;,
+    &quot;audit_write_failure&quot;,
+}
+ADR_HEADINGS = {
+    &quot;Context&quot;,
+    &quot;Decision&quot;,
+    &quot;Decision Drivers&quot;,
+    &quot;Alternatives Considered&quot;,
+    &quot;Consequences&quot;,
+    &quot;Validation and Rollback&quot;,
+    &quot;Revisit Triggers&quot;,
+}
+
+
+def incomplete(value: Any) -&gt; bool:
+    &quot;&quot;&quot;Return True when a required artifact contains blanks or placeholders.&quot;&quot;&quot;
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        return not normalized or any(token in normalized for token in (&quot;todo&quot;, &quot;tbd&quot;, &quot;fixme&quot;))
+    if isinstance(value, list):
+        return not value or any(incomplete(item) for item in value)
+    if isinstance(value, dict):
+        return not value or any(incomplete(item) for item in value.values())
+    return value is None
+
+
+def validate_architecture(spec: dict[str, Any]) -&gt; list[str]:
+    errors: list[str] = []
+    required_sections = {
+        &quot;metadata&quot;,
+        &quot;decision_contract&quot;,
+        &quot;non_functional_requirements&quot;,
+        &quot;trust_boundaries&quot;,
+        &quot;components&quot;,
+        &quot;flows&quot;,
+        &quot;controls&quot;,
+        &quot;failure_modes&quot;,
+        &quot;environments&quot;,
+        &quot;ownership&quot;,
+    }
+    missing_sections = required_sections - set(spec)
+    if missing_sections:
+        errors.append(&quot;Missing architecture sections: &quot; + &quot;, &quot;.join(sorted(missing_sections)))
+        return errors
+
+    for section in required_sections:
+        if incomplete(spec[section]):
+            errors.append(f&quot;Architecture section is incomplete: {section}&quot;)
+
+    contract = spec[&quot;decision_contract&quot;]
+    if set(contract.get(&quot;allowed_recommendations&quot;, [])) != EXPECTED_ACTIONS:
+        errors.append(&quot;Allowed recommendations must remain request_evidence, continue_review, and escalate&quot;)
+
+    approval = contract.get(&quot;human_approval&quot;, {})
+    if approval.get(&quot;required&quot;) is not True:
+        errors.append(&quot;Protected claim actions must require explicit adjuster approval&quot;)
+    if approval.get(&quot;role&quot;) != &quot;Licensed Claims Adjuster&quot;:
+        errors.append(&quot;The approval role must remain Licensed Claims Adjuster&quot;)
+    if approval.get(&quot;enforced_by&quot;) != &quot;approval_service&quot;:
+        errors.append(&quot;The approval_service must enforce human approval&quot;)
+    if approval.get(&quot;approval_recorded_before&quot;) != &quot;claims_system_adapter&quot;:
+        errors.append(&quot;Approval must be recorded before the claims_system_adapter&quot;)
+
+    nfr = spec[&quot;non_functional_requirements&quot;]
+    exact_thresholds = {
+        &quot;citation_completeness_percent_min&quot;: 95,
+        &quot;protected_action_human_approval_percent&quot;: 100,
+        &quot;audit_event_completeness_percent&quot;: 100,
+    }
+    for key, expected in exact_thresholds.items():
+        if nfr.get(key) != expected:
+            errors.append(f&quot;{key} must be {expected}&quot;)
+    if nfr.get(&quot;p95_response_seconds_max&quot;, 999) &gt; 12:
+        errors.append(&quot;p95 response objective cannot exceed 12 seconds&quot;)
+    if nfr.get(&quot;monthly_availability_percent_min&quot;, 0) &lt; 99.5:
+        errors.append(&quot;Monthly availability objective cannot be below 99.5 percent&quot;)
+    if nfr.get(&quot;cost_usd_per_completed_assist_max&quot;, 999) &gt; 1.5:
+        errors.append(&quot;Cost objective cannot exceed $1.50 per completed assist&quot;)
+
+    components = spec[&quot;components&quot;]
+    component_ids = [item.get(&quot;id&quot;) for item in components]
+    if len(component_ids) != len(set(component_ids)):
+        errors.append(&quot;Component IDs must be unique&quot;)
+    missing_components = REQUIRED_COMPONENTS - set(component_ids)
+    if missing_components:
+        errors.append(&quot;Missing required components: &quot; + &quot;, &quot;.join(sorted(missing_components)))
+    for component in components:
+        for field in (&quot;id&quot;, &quot;zone&quot;, &quot;owner&quot;, &quot;responsibility&quot;):
+            if incomplete(component.get(field)):
+                errors.append(f&quot;Component {component.get(&#x27;id&#x27;, &#x27;&lt;unknown&gt;&#x27;)} is missing {field}&quot;)
+
+    flows = {flow.get(&quot;id&quot;): flow for flow in spec[&quot;flows&quot;]}
+    known_components = set(component_ids)
+    for flow_id, flow in flows.items():
+        unknown = set(flow.get(&quot;path&quot;, [])) - known_components
+        if unknown:
+            errors.append(f&quot;Flow {flow_id} references unknown components: {&#x27;, &#x27;.join(sorted(unknown))}&quot;)
+
+    protected_flow = flows.get(&quot;protected_action_execution&quot;, {})
+    protected_path = protected_flow.get(&quot;path&quot;, [])
+    if protected_flow.get(&quot;approval_required&quot;) is not True:
+        errors.append(&quot;The protected action flow must require approval&quot;)
+    if protected_flow.get(&quot;writes_system_of_record&quot;) is not True:
+        errors.append(&quot;The protected action flow must identify its system-of-record write&quot;)
+    if &quot;approval_service&quot; not in protected_path or &quot;claims_system_adapter&quot; not in protected_path:
+        errors.append(&quot;The protected action flow must include approval_service and claims_system_adapter&quot;)
+    elif protected_path.index(&quot;approval_service&quot;) &gt; protected_path.index(&quot;claims_system_adapter&quot;):
+        errors.append(&quot;approval_service must precede claims_system_adapter&quot;)
+
+    assist_flow = flows.get(&quot;evidence_assisted_review&quot;, {})
+    if assist_flow.get(&quot;writes_system_of_record&quot;) is not False:
+        errors.append(&quot;The evidence-assisted review flow must not write to the system of record&quot;)
+
+    controls = spec[&quot;controls&quot;]
+    if controls.get(&quot;execution&quot;, {}).get(&quot;direct_model_tool_access&quot;) is not False:
+        errors.append(&quot;The model must not have direct tool access&quot;)
+    if set(controls.get(&quot;execution&quot;, {}).get(&quot;allowlisted_actions&quot;, [])) != EXPECTED_ACTIONS:
+        errors.append(&quot;Execution allowlist must match the three approved recommendations&quot;)
+    if controls.get(&quot;execution&quot;, {}).get(&quot;approval_token_required_for_writes&quot;) is not True:
+        errors.append(&quot;System-of-record writes must require an approval token&quot;)
+    if controls.get(&quot;audit&quot;, {}).get(&quot;audit_failure_behavior&quot;) != &quot;fail_closed&quot;:
+        errors.append(&quot;Audit failure behavior must remain fail_closed&quot;)
+    if controls.get(&quot;model&quot;, {}).get(&quot;training_on_customer_data&quot;) is not False:
+        errors.append(&quot;Customer data must not be used for model training&quot;)
+
+    failures = {item.get(&quot;id&quot;): item for item in spec[&quot;failure_modes&quot;]}
+    missing_failures = REQUIRED_FAILURES - set(failures)
+    if missing_failures:
+        errors.append(&quot;Missing failure modes: &quot; + &quot;, &quot;.join(sorted(missing_failures)))
+    audit_response = failures.get(&quot;audit_write_failure&quot;, {}).get(&quot;response&quot;, &quot;&quot;).lower()
+    if &quot;fail closed&quot; not in audit_response or &quot;manual&quot; not in audit_response:
+        errors.append(&quot;Audit failure must fail closed while preserving the manual workflow&quot;)
+
+    environments = spec[&quot;environments&quot;]
+    environment_names = {item.get(&quot;name&quot;) for item in environments}
+    if environment_names != EXPECTED_ENVIRONMENTS:
+        errors.append(&quot;Environments must be dev, test, staging, and prod&quot;)
+    if not all(item.get(&quot;isolated&quot;) is True for item in environments):
+        errors.append(&quot;Every environment must be isolated&quot;)
+
+    if set(spec[&quot;ownership&quot;]) != REQUIRED_OWNERS:
+        errors.append(&quot;All five accountable owner roles are required&quot;)
+
+    boundaries = spec[&quot;trust_boundaries&quot;]
+    if &quot;fraud&quot; not in &quot; &quot;.join(boundaries.get(&quot;restricted_data_excluded&quot;, [])).lower():
+        errors.append(&quot;Restricted fraud indicators must remain excluded from the pilot&quot;)
+    if &quot;deny by default&quot; not in boundaries.get(&quot;network_egress&quot;, &quot;&quot;).lower():
+        errors.append(&quot;Network egress must be deny by default&quot;)
+
+    return errors
+
+
+def validate_adr(text: str) -&gt; list[str]:
+    errors: list[str] = []
+    headings = set(re.findall(r&quot;^## (.+)$&quot;, text, flags=re.MULTILINE))
+    missing = ADR_HEADINGS - headings
+    if missing:
+        errors.append(&quot;ADR is missing headings: &quot; + &quot;, &quot;.join(sorted(missing)))
+
+    required_evidence = {
+        &quot;accepted status&quot;: &quot;**Status:** Accepted for bounded pilot&quot;,
+        &quot;retrieval-first decision&quot;: &quot;retrieval-first architecture&quot;,
+        &quot;separate approval path&quot;: &quot;separate deterministic approval and execution path&quot;,
+        &quot;no direct model tools&quot;: &quot;no direct access to the claims-system adapter&quot;,
+        &quot;fail-closed behavior&quot;: &quot;fails closed&quot;,
+        &quot;manual fallback&quot;: &quot;manual claims process remains available&quot;,
+        &quot;rollback trigger&quot;: &quot;unauthorized protected action&quot;,
+        &quot;trade-off&quot;: &quot;More components increase latency&quot;,
+    }
+    lower_text = text.lower()
+    for label, phrase in required_evidence.items():
+        if phrase.lower() not in lower_text:
+            errors.append(f&quot;ADR is missing {label}: {phrase}&quot;)
+
+    alternatives = re.findall(r&quot;^### (.+)$&quot;, text, flags=re.MULTILINE)
+    if len(alternatives) &lt; 3:
+        errors.append(&quot;ADR must compare at least three alternatives&quot;)
+    return errors
+
+
+def main() -&gt; int:
+    try:
+        spec = json.loads(ARCHITECTURE_FILE.read_text(encoding=&quot;utf-8&quot;))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f&quot;LAB 04 FAILED — cannot load architecture_spec.json: {exc}&quot;)
+        return 1
+
+    try:
+        adr = ADR_FILE.read_text(encoding=&quot;utf-8&quot;)
+    except OSError as exc:
+        print(f&quot;LAB 04 FAILED — cannot load ADR: {exc}&quot;)
+        return 1
+
+    errors = validate_architecture(spec) + validate_adr(adr)
+    if errors:
+        print(f&quot;LAB 04 FAILED — {len(errors)} issue(s)&quot;)
+        for error in errors:
+            print(f&quot;- {error}&quot;)
+        return 1
+
+    print(&quot;LAB 04 PASSED&quot;)
+    print(f&quot;- Architecture stage: {spec[&#x27;metadata&#x27;][&#x27;architecture_stage&#x27;]}&quot;)
+    print(f&quot;- Components: {len(spec[&#x27;components&#x27;])}; flows: {len(spec[&#x27;flows&#x27;])}&quot;)
+    print(&quot;- Human approval for protected actions: 100%&quot;)
+    print(&quot;- Model direct claims-system access: blocked&quot;)
+    print(f&quot;- Audit failure behavior: {spec[&#x27;controls&#x27;][&#x27;audit&#x27;][&#x27;audit_failure_behavior&#x27;]}&quot;)
+    print(&quot;- ADR status: Accepted for bounded pilot&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>run_lab.py</code> contains the complete validator above.</li><li><strong>Acceptable variation:</strong> Comments or formatting may differ if validation behavior and printed evidence remain equivalent.</li><li><strong>Failure indicator:</strong> The file is missing, truncated, or references different architecture or ADR filenames.</li><li><strong>Corrective action:</strong> Replace it with the complete source above and save it beside the architecture specification and ADR.</li></ul>
+<h2>Step 5 — Compile and Run the Completed Project</h2>
+<p>Why this matters: compilation catches Python syntax errors; the main run validates the architecture contract and ADR as one production-readiness decision.</p>
+<p>Run:</p>
+<pre><code class="language-bash">python3 -m py_compile run_lab.py
+python3 run_lab.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 04 PASSED
+- Architecture stage: production-ready bounded pilot
+- Components: 15; flows: 4
+- Human approval for protected actions: 100%
+- Model direct claims-system access: blocked
+- Audit failure behavior: fail_closed
+- ADR status: Accepted for bounded pilot</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Compilation is silent and the validator prints <code>LAB 04 PASSED</code> with the six architecture evidence lines.</li><li><strong>Acceptable variation:</strong> Your Python executable may be named <code>python</code> instead of <code>python3</code>.</li><li><strong>Failure indicator:</strong> A traceback, <code>LAB 04 FAILED</code>, missing evidence, or a nonzero exit status.</li><li><strong>Corrective action:</strong> Read the reported error, repair the named architecture or ADR requirement, and rerun both commands.</li></ul>
+<h2>Step 6 — Inspect the Design as an Operational Contract</h2>
+<p>Why this matters: a production architecture must show exactly where evidence, approval, execution, and audit responsibilities change hands.</p>
+<p>Use the two project artifacts and validator output to answer:</p>
+<ol><li>Which component retrieves governed evidence?</li><li>Which component has authority to approve a protected action?</li><li>Why must the approval service appear before the claims-system adapter?</li><li>What happens when audit persistence fails?</li><li>Which evidence would justify promoting beyond the bounded pilot?</li></ol>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Your answers identify governed retrieval, human approval authority, ordered execution, fail-closed audit behavior, and promotion evidence.</li><li><strong>Acceptable variation:</strong> Component descriptions may use your own words while preserving the architecture boundaries.</li><li><strong>Failure indicator:</strong> The model appears to have direct execution authority, audit failure is fail-open, or promotion lacks measurable gates.</li><li><strong>Corrective action:</strong> Trace the relevant component, flow, control, failure mode, and ADR section, then correct the artifact and rerun <code>python3 run_lab.py</code>.</li></ul>
+<h2>Step 7 — Commit Your Completed Project</h2>
+<p>Why this matters: a clean commit records the exact architecture decision package reviewers can inspect and compare.</p>
+<p>Run in your own project directory:</p>
+<pre><code class="language-bash">printf &#x27;__pycache__/\n*.py[cod]\n.DS_Store\n&#x27; &gt; .gitignore
+git init -b main
+git add .gitignore architecture_spec.json ADR-001-retrieval-first-human-approved-assistant.md run_lab.py
+git commit -m &quot;Complete production AI architecture and ADR&quot;
+git status</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git creates a commit on <code>main</code> and reports a clean working tree.</li><li><strong>Acceptable variation:</strong> An existing repository may already be initialized; commit the same three project files and <code>.gitignore</code>.</li><li><strong>Failure indicator:</strong> A cache or unintended file is staged, or Git reports uncommitted changes.</li><li><strong>Corrective action:</strong> Remove transient files, stage only <code>.gitignore</code> and the three learner-built files, commit, and rerun <code>git status</code>.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>The decision contract defines the user, allowed recommendations, protected actions, and human authority.</li><li>Measurable requirements and trust boundaries constrain design options.</li><li>Components and ordered flows separate evidence retrieval, recommendation, approval, execution, and audit.</li><li>The Python validator enforces the architecture and ADR constraints.</li><li>Layered controls and failure modes preserve safe manual fallback.</li><li>Environment promotion requires quality, safety, reliability, and approval evidence.</li><li>The ADR records why retrieval-first, human-approved architecture was selected and when it should change.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>JSON line/column error</td><td>Missing comma, quote, brace, or bracket</td><td>Repair the location reported by <code>json.tool</code></td></tr><tr><td>Approval assertion fails</td><td>Human approval is disabled or path is incomplete</td><td>Restore required approval and the approval service</td></tr><tr><td>Execution-order failure</td><td>Adapter precedes approval service</td><td>Reorder the protected path</td></tr><tr><td>Direct-access failure</td><td>Model tool access was enabled</td><td>Restore <code>direct_model_tool_access: false</code></td></tr><tr><td>Validator or ADR check fails</td><td>Required architecture evidence, decision section, or status is absent</td><td>Repair the item named by the validator</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>Keep <code>architecture_spec.json</code>, <code>ADR-001-retrieval-first-human-approved-assistant.md</code>, <code>run_lab.py</code>, <code>.gitignore</code>, and your Git history. No additional cleanup is required after the project passes and the working tree is clean.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I created the architecture specification, ADR, and Python validator from this guide.</li><li class="check-item"><span class="box">☐</span> <code>run_lab.py</code> compiles and prints <code>LAB 04 PASSED</code>.</li><li class="check-item"><span class="box">☐</span> The approval service precedes the claims-system adapter.</li><li class="check-item"><span class="box">☐</span> Direct model tool access remains blocked.</li><li class="check-item"><span class="box">☐</span> Audit failure remains fail-closed with manual fallback.</li><li class="check-item"><span class="box">☐</span> The ADR records alternatives, consequences, rollback, and revisit triggers.</li><li class="check-item"><span class="box">☐</span> My own Git working tree is clean.</li></ul>
+<h2>Reflection</h2>
+<p>Which architecture boundary most reduces the risk of a plausible model output becoming an unauthorized customer action, and what evidence proves that boundary is enforced?</p>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

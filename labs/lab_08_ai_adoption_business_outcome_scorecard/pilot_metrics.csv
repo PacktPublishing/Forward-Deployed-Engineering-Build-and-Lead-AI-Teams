@@ -1,0 +1,5 @@
+week,eligible_adjusters,active_adjusters,eligible_claims,assisted_claims,recommendations_shown,recommendations_accepted,average_handling_minutes,rework_rate_percent,quality_score_percent,model_cost_usd,unauthorized_protected_actions
+1,25,14,100,48,45,30,38,12.5,88.5,80,0
+2,25,18,110,70,65,51,34,10.5,91.0,105,0
+3,25,21,115,90,85,70,31,9.2,93.2,135,0
+4,25,22,120,105,100,82,29,8.5,94.5,165,0

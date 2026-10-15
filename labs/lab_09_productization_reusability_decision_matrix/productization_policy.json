@@ -1,0 +1,76 @@
+{
+  "metadata": {
+    "lab_id": "lab_09",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "portfolio_scope": "Claims deployment assets reviewed for cross-customer reuse",
+    "review_date": "2026-08-16"
+  },
+  "scales": {
+    "reuse_demand": "1 single customer to 5 repeated demand",
+    "standardization": "1 unique implementation to 5 stable shared contract",
+    "strategic_fit": "1 peripheral to 5 core differentiation",
+    "customer_coupling": "1 independent to 5 deeply customer-specific",
+    "security_variance": "1 uniform control to 5 materially different boundaries",
+    "maintenance_burden": "1 low to 5 high"
+  },
+  "scoring_formula": "2*reuse_demand + 2*standardization + strategic_fit - customer_coupling - security_variance - maintenance_burden",
+  "decision_thresholds": [
+    {
+      "decision": "PRODUCT",
+      "minimum_score": 12,
+      "maximum_score": 25
+    },
+    {
+      "decision": "PLATFORM",
+      "minimum_score": 8,
+      "maximum_score": 11
+    },
+    {
+      "decision": "CONFIGURATION",
+      "minimum_score": 4,
+      "maximum_score": 7
+    },
+    {
+      "decision": "CUSTOM_EXTENSION",
+      "minimum_score": -20,
+      "maximum_score": 3
+    }
+  ],
+  "overrides": {
+    "RETIRE": "Use when lifecycle_status is retire regardless of score"
+  },
+  "decision_definitions": {
+    "PRODUCT": "Versioned supported capability with a standard customer-facing contract and roadmap owner.",
+    "PLATFORM": "Shared internal service or framework used by multiple deployments with platform ownership.",
+    "CONFIGURATION": "Supported declarative variation that does not fork shared code.",
+    "CUSTOM_EXTENSION": "Isolated customer-specific component with funding owner review date and no shared-core fork.",
+    "RETIRE": "Remove or archive because value and reuse do not justify ongoing maintenance."
+  },
+  "portfolio_rules": [
+    "No permanent customer-specific fork of shared product or platform code.",
+    "Product and platform decisions require repeated demand and a named owner.",
+    "Configuration must use a supported contract rather than copied source.",
+    "Custom extensions require customer funding an isolation boundary and a dated review.",
+    "Retirement must identify the dependency check and removal action."
+  ],
+  "review_cadence": "Quarterly portfolio review using deployment evidence support cost adoption and repeated demand",
+  "accountable_roles": [
+    {
+      "role": "Forward Deployed Product Manager",
+      "name": "Avery Chen"
+    },
+    {
+      "role": "Platform Owner",
+      "name": "Jordan Kim"
+    },
+    {
+      "role": "Security Owner",
+      "name": "Dana Brooks"
+    },
+    {
+      "role": "Claims Solution Owner",
+      "name": "Elena Ruiz"
+    }
+  ]
+}

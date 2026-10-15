@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="81b65a3dea8330850214f1dc9112098ec4f6d2ebce64729ae18aa2d87aedb615">
+<title>Lab 02 — Build a Forward Deployed Role Charter and RACI Matrix</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 02 — Build a Forward Deployed Role Charter and RACI Matrix</h1>
+<h2>Goal</h2>
+<p>Define a clear Forward Deployed Lead operating contract and assign accountable ownership for the Enterprise AI Claims Assistant without taking over customer business-policy authority.</p>
+<h2>What You'll Build or Produce</h2>
+<p>In your own project directory, you will create:</p>
+<ul><li><code>claims_assistant_brief.md</code> — the engagement evidence and operating boundaries.</li><li><code>role_charter.json</code> — the Forward Deployed Lead’s mission, outcomes, decision rights, escalation paths, metrics, and limits.</li><li><code>raci_matrix.csv</code> — responsibility and accountability across nine delivery decisions.</li><li><code>run_lab.py</code> — the learner-built charter and RACI validator.</li></ul>
+<p>The completed course repository contains the finished version of these same four project files. Consult it only when stuck or comparing your result.</p>
+<h2>Estimated Time</h2>
+<p>40–55 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This local analysis lab costs $0. It uses no cloud resources, credentials, model calls, or third-party packages.</p>
+<h2>Completion Evidence</h2>
+<p>You are finished when <code>run_lab.py</code> compiles, the JSON and CSV parse successfully, the charter preserves customer authority, every RACI row has exactly one Accountable role and at least one Responsible role, Claims Operations owns go-live, and your own Git working tree is clean.</p>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later for local JSON and CSV checks.</li><li>Git, a terminal, and a text editor.</li><li>Basic JSON, CSV, and RACI familiarity.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This lab builds on Lab 01's lifecycle map. You are not redesigning the customer problem; you are defining who owns delivery decisions, who holds customer business authority, and when escalation is required. Clear ownership must exist before discovery, architecture, and release work becomes complex.</p>
+<h2>Step 1 — Create Your Independent Project</h2>
+<pre><code class="language-bash">mkdir fde_lab_02
+cd fde_lab_02</code></pre>
+<p>Do not edit the completed course repository. Your directory should become the project you build from this guide.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You are inside an empty <code>fde_lab_02</code> directory.</li><li><strong>Acceptable variation:</strong> Another directory name is fine.</li><li><strong>Failure indicator:</strong> You are changing files inside <code>lab_02_forward_deployed_role_charter_raci</code>.</li><li><strong>Corrective action:</strong> Leave the reference repository and create a separate working directory.</li></ul>
+<h2>Step 2 — Create the Engagement Brief</h2>
+<p>Create <code>claims_assistant_brief.md</code>:</p>
+<pre><code class="language-markdown"># Enterprise AI Claims Assistant — Engagement Brief
+
+Northstar Mutual processes property claims through email, scanned forms, policy systems, and a claims platform. Intake specialists manually summarize each submission, find policy evidence, identify missing information, and assign the claim to an adjuster queue.
+
+## Current baseline
+
+- Median intake-to-assignment time: 18 hours
+- Claims returned for missing or incorrect intake information: 22%
+- Audit records containing complete source citations: 71%
+- Claim denials or payments requiring human approval: 100%
+
+## Pilot scope
+
+The assistant may summarize submissions, retrieve policy evidence, identify missing information, recommend a routing queue, and draft an adjuster work note. It may not approve or deny a claim, authorize payment, change a policy record, or send a customer-facing decision without human approval.
+
+## Target outcomes
+
+- Reduce median intake-to-assignment time to 6 hours or less
+- Reduce intake rework to 10% or less
+- Achieve at least 95% complete evidence-and-citation records
+- Preserve 100% human approval for claim denials and payments
+
+## Operating constraints
+
+- Claims Operations owns business-policy decisions and go-live approval.
+- Security and Compliance owns interpretation of regulatory controls.
+- The Forward Deployed Lead owns end-to-end technical delivery and evidence.
+- Customer production access requires named, least-privilege service accounts.
+- Unresolved safety, regulatory, or production-readiness risk must be escalated before release.</code></pre>
+<p>Why this matters: a role charter must be tied to specific customer outcomes, protected actions, and decision owners rather than a generic job description.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The brief identifies four baselines, four targets, protected claim actions, and Claims Operations go-live authority.</li><li><strong>Acceptable variation:</strong> Markdown wrapping may differ; facts and boundaries must not.</li><li><strong>Failure indicator:</strong> The Forward Deployed Lead can approve claims, payments, regulatory risk, or customer go-live.</li><li><strong>Corrective action:</strong> Restore the ownership and human-approval constraints.</li></ul>
+<h2>Step 3 — Build the Role Charter</h2>
+<p>Create <code>role_charter.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;role_id&quot;: &quot;fde_lead&quot;,
+  &quot;role_name&quot;: &quot;Forward Deployed Lead&quot;,
+  &quot;mission&quot;: &quot;Lead Northstar Mutual from a validated claims-intake problem to a secure, measurable, and supportable AI deployment while preserving customer decision rights.&quot;,
+  &quot;primary_customer&quot;: &quot;Claims Operations Owner&quot;,
+  &quot;owned_outcomes&quot;: [
+    &quot;A production decision supported by architecture, evaluation, security, and operational evidence&quot;,
+    &quot;A clear owner and acceptance criterion for every delivery workstream&quot;,
+    &quot;A controlled transition from the deployment team to Claims Operations&quot;
+  ],
+  &quot;key_activities&quot;: [
+    &quot;Translate the claims workflow into delivery workstreams and acceptance evidence&quot;,
+    &quot;Coordinate AI, platform, security, operations, and adjuster stakeholders&quot;,
+    &quot;Maintain the integrated decision log, risk view, and readiness evidence&quot;,
+    &quot;Present evidence-based proceed, repair, pause, or escalate recommendations&quot;
+  ],
+  &quot;decision_rights&quot;: [
+    &quot;Approve the technical delivery baseline and changes within agreed scope&quot;,
+    &quot;Reject incomplete technical evidence and require remediation before review&quot;,
+    &quot;Pause deployment activity when a safety, security, reliability, or customer-control threshold is breached&quot;,
+    &quot;Recommend go-live; final production authorization remains with the Claims Operations Owner&quot;
+  ],
+  &quot;escalation_paths&quot;: [
+    {
+      &quot;trigger&quot;: &quot;A proposed capability could approve or deny a claim, authorize payment, or send a customer decision without human approval&quot;,
+      &quot;escalate_to&quot;: &quot;Claims Operations Owner and Security FDE&quot;,
+      &quot;evidence_required&quot;: &quot;Affected workflow, proposed permission, control gap, user impact, and safer options&quot;
+    },
+    {
+      &quot;trigger&quot;: &quot;A security, regulatory, or data-boundary control cannot be met before the release date&quot;,
+      &quot;escalate_to&quot;: &quot;Security and Compliance Lead&quot;,
+      &quot;evidence_required&quot;: &quot;Control requirement, current gap, exposure, compensating controls, owner, and decision deadline&quot;
+    },
+    {
+      &quot;trigger&quot;: &quot;A critical dependency threatens the agreed outcome or milestone&quot;,
+      &quot;escalate_to&quot;: &quot;Customer Sponsor and Technical Deployment Lead&quot;,
+      &quot;evidence_required&quot;: &quot;Dependency, impact, attempted resolution, options, recommendation, and decision needed&quot;
+    }
+  ],
+  &quot;success_metrics&quot;: [
+    {
+      &quot;metric&quot;: &quot;Median intake-to-assignment time&quot;,
+      &quot;target&quot;: &quot;6 hours or less during the pilot&quot;,
+      &quot;measurement_source&quot;: &quot;Claims platform event timestamps&quot;
+    },
+    {
+      &quot;metric&quot;: &quot;Claims returned for intake rework&quot;,
+      &quot;target&quot;: &quot;10% or less during the pilot&quot;,
+      &quot;measurement_source&quot;: &quot;Claims operations quality report&quot;
+    },
+    {
+      &quot;metric&quot;: &quot;Complete evidence-and-citation records&quot;,
+      &quot;target&quot;: &quot;95% or more of evaluated claims&quot;,
+      &quot;measurement_source&quot;: &quot;AI evaluation and audit report&quot;
+    },
+    {
+      &quot;metric&quot;: &quot;Human approval for claim denials and payments&quot;,
+      &quot;target&quot;: &quot;100%&quot;,
+      &quot;measurement_source&quot;: &quot;Claims decision audit log&quot;
+    }
+  ],
+  &quot;out_of_scope&quot;: [
+    &quot;Owning Northstar Mutual business policy&quot;,
+    &quot;Approving claim denials or payments&quot;,
+    &quot;Accepting regulatory risk on behalf of the customer&quot;,
+    &quot;Serving as the permanent production operations owner&quot;
+  ]
+}</code></pre>
+<p>Why this matters: the charter defines what the Forward Deployed Lead owns, what evidence supports decisions, when escalation is mandatory, and where customer authority begins.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The charter contains a mission, three owned outcomes, four activities, four decision rights, three escalation paths, four success metrics, and explicit out-of-scope boundaries.</li><li><strong>Acceptable variation:</strong> Wording may improve if the same outcomes, evidence, and authority boundaries remain clear.</li><li><strong>Failure indicator:</strong> The role owns Northstar business policy, approves protected claim actions, or accepts regulatory risk for the customer.</li><li><strong>Corrective action:</strong> Separate technical delivery responsibility from customer authorization and policy ownership.</li></ul>
+<h2>Step 4 — Build the RACI Matrix</h2>
+<p>Create <code>raci_matrix.csv</code>:</p>
+<pre><code class="language-csv">work_item,fde_lead,ai_fde,platform_fde,security_fde,deployment_strategist,claims_owner,adjuster_lead
+Approve discovery exit,R,C,I,C,C,A,C
+Approve architecture baseline,A,R,C,C,I,C,I
+Create evaluation dataset,C,R,I,C,I,C,A
+Approve AI release criteria,A,R,I,C,I,C,C
+Approve security readiness,A,C,C,R,I,C,I
+Authorize production go-live,R,C,C,C,I,A,C
+Own adoption and workflow change,C,I,I,I,R,A,C
+Lead production incident response,A,C,R,C,I,I,I
+Review business outcomes,C,I,I,I,R,A,C</code></pre>
+<p>Use these meanings:</p>
+<ul><li><code>R</code> — performs the work.</li><li><code>A</code> — owns the final decision; exactly one per row.</li><li><code>C</code> — provides input before the decision.</li><li><code>I</code> — is informed after the decision.</li></ul>
+<p>Why this matters: the charter explains the role; the RACI makes ownership testable at each delivery decision.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Nine work items are mapped, every row has one <code>A</code> and at least one <code>R</code>, and <code>claims_owner</code> is <code>A</code> for production go-live.</li><li><strong>Acceptable variation:</strong> Additional Consulted roles are acceptable when they do not create duplicate accountability.</li><li><strong>Failure indicator:</strong> A row has zero or multiple <code>A</code> values, no <code>R</code>, or the FDE Lead authorizes customer go-live.</li><li><strong>Corrective action:</strong> Assign one final decision owner and at least one delivery owner per row.</li></ul>
+<h2>Step 5 — Build the Python Validator</h2>
+<p>Create <code>run_lab.py</code> with this complete source:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Run Lab 02: validate the Forward Deployed role charter and RACI matrix.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+ROLES = {
+    &quot;fde_lead&quot;, &quot;ai_fde&quot;, &quot;platform_fde&quot;, &quot;security_fde&quot;,
+    &quot;deployment_strategist&quot;, &quot;claims_owner&quot;, &quot;adjuster_lead&quot;,
+}
+
+
+def incomplete(value: Any) -&gt; bool:
+    if isinstance(value, str):
+        return not value.strip() or &quot;todo&quot; in value.lower()
+    if isinstance(value, list):
+        return not value or any(incomplete(item) for item in value)
+    if isinstance(value, dict):
+        return not value or any(incomplete(item) for item in value.values())
+    return value is None
+
+
+def main() -&gt; int:
+    charter = json.loads((ROOT / &quot;role_charter.json&quot;).read_text(encoding=&quot;utf-8&quot;))
+    with (ROOT / &quot;raci_matrix.csv&quot;).open(newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as handle:
+        reader = csv.DictReader(handle)
+        headers = list(reader.fieldnames or [])
+        rows = list(reader)
+
+    errors: list[str] = []
+    required = (
+        &quot;role_id&quot;, &quot;role_name&quot;, &quot;mission&quot;, &quot;primary_customer&quot;, &quot;owned_outcomes&quot;,
+        &quot;key_activities&quot;, &quot;decision_rights&quot;, &quot;escalation_paths&quot;,
+        &quot;success_metrics&quot;, &quot;out_of_scope&quot;,
+    )
+    for field in required:
+        if field not in charter or incomplete(charter[field]):
+            errors.append(f&quot;Role charter field is incomplete: {field}&quot;)
+
+    if charter.get(&quot;role_id&quot;) != &quot;fde_lead&quot;:
+        errors.append(&quot;role_id must be fde_lead&quot;)
+    if len(charter.get(&quot;decision_rights&quot;, [])) &lt; 4:
+        errors.append(&quot;At least four decision rights are required&quot;)
+    boundaries = &quot; &quot;.join(charter.get(&quot;out_of_scope&quot;, [])).lower()
+    if &quot;claim denials&quot; not in boundaries or &quot;payments&quot; not in boundaries:
+        errors.append(&quot;The charter must preserve human claim-denial and payment authority&quot;)
+
+    if not headers or headers[0] != &quot;work_item&quot; or set(headers[1:]) != ROLES:
+        errors.append(&quot;RACI headers do not match the required roles&quot;)
+    if len(rows) != 9:
+        errors.append(&quot;RACI must contain nine delivery decisions&quot;)
+    for row in rows:
+        values = [row.get(role, &quot;&quot;).upper() for role in headers[1:]]
+        if values.count(&quot;A&quot;) != 1:
+            errors.append(f&quot;{row.get(&#x27;work_item&#x27;)}: exactly one Accountable role is required&quot;)
+        if &quot;R&quot; not in values:
+            errors.append(f&quot;{row.get(&#x27;work_item&#x27;)}: at least one Responsible role is required&quot;)
+        if any(value not in {&quot;R&quot;, &quot;A&quot;, &quot;C&quot;, &quot;I&quot;} for value in values):
+            errors.append(f&quot;{row.get(&#x27;work_item&#x27;)}: invalid RACI code&quot;)
+    go_live = next((row for row in rows if &quot;go-live&quot; in row.get(&quot;work_item&quot;, &quot;&quot;).lower()), {})
+    if go_live.get(&quot;claims_owner&quot;) != &quot;A&quot;:
+        errors.append(&quot;Claims owner must be Accountable for production go-live&quot;)
+
+    if errors:
+        print(f&quot;LAB 02 FAILED — {len(errors)} issue(s)&quot;)
+        for error in errors:
+            print(f&quot;- {error}&quot;)
+        return 1
+
+    print(&quot;LAB 02 PASSED&quot;)
+    print(f&quot;- Role: {charter[&#x27;role_name&#x27;]}&quot;)
+    print(f&quot;- Owned outcomes: {len(charter[&#x27;owned_outcomes&#x27;])}&quot;)
+    print(f&quot;- Delivery decisions mapped: {len(rows)}&quot;)
+    print(&quot;- Production go-live authority: Claims Operations Owner&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>Why this matters: the program converts role-boundary and RACI rules into repeatable checks, including complete charter fields, one Accountable role per decision, at least one Responsible role, and Claims Operations go-live authority.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The program reads <code>role_charter.json</code> and <code>raci_matrix.csv</code> and reports actionable ownership errors.</li><li><strong>Acceptable variation:</strong> Comments and formatting may differ; the same decision rules must be enforced.</li><li><strong>Failure indicator:</strong> The program allows duplicate accountability, missing responsibility, or FDE-owned customer go-live.</li><li><strong>Corrective action:</strong> Restore the complete source and matching filenames.</li></ul>
+<h2>Step 6 — Compile and Run the Lab</h2>
+<pre><code class="language-bash">python3 -m py_compile run_lab.py
+python3 run_lab.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 02 PASSED
+- Role: Forward Deployed Lead
+- Owned outcomes: 3
+- Delivery decisions mapped: 9
+- Production go-live authority: Claims Operations Owner</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Compilation succeeds and the program prints the five-line passing summary.</li><li><strong>Acceptable variation:</strong> Python may create an ignored <code>__pycache__</code> directory.</li><li><strong>Failure indicator:</strong> A syntax, file, JSON, CSV, charter, or RACI error appears.</li><li><strong>Corrective action:</strong> Repair the named code or artifact and rerun both commands.</li></ul>
+<h2>Step 7 — Commit Your Completed Project</h2>
+<pre><code class="language-bash">printf &#x27;__pycache__/\n*.py[cod]\n.DS_Store\n&#x27; &gt; .gitignore
+git init -b main
+git add .gitignore run_lab.py claims_assistant_brief.md role_charter.json raci_matrix.csv
+git commit -m &quot;Complete role charter and RACI lab&quot;
+git status --short</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git creates a commit and <code>git status --short</code> prints nothing.</li><li><strong>Acceptable variation:</strong> If <code>git init -b main</code> is unsupported, run <code>git init</code> followed by <code>git branch -M main</code>.</li><li><strong>Failure indicator:</strong> Caches, reference files, or unrelated content are staged.</li><li><strong>Corrective action:</strong> Remove transient files and stage only the code and artifacts created in this guide.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>The engagement brief establishes outcomes and protected decision boundaries.</li><li>The role charter assigns delivery outcomes, decision rights, escalation evidence, and limits.</li><li>The RACI maps each decision to one Accountable role and at least one Responsible role.</li><li>Native JSON and CSV checks confirm the artifacts are structurally usable.</li><li>The duplicate-accountability exercise demonstrates why one <code>A</code> per decision matters.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>JSON line/column error</td><td>Invalid JSON punctuation</td><td>Repair the location reported by <code>json.tool</code></td></tr><tr><td>Missing charter field</td><td>Required section is absent or empty</td><td>Add the named evidence-supported section</td></tr><tr><td>Invalid RACI row</td><td>Zero/multiple <code>A</code> values or no <code>R</code></td><td>Assign exactly one <code>A</code> and at least one <code>R</code></td></tr><tr><td>Wrong go-live owner</td><td><code>claims_owner</code> is not <code>A</code></td><td>Restore Claims Operations accountability</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>Keep <code>run_lab.py</code>, <code>claims_assistant_brief.md</code>, <code>role_charter.json</code>, <code>raci_matrix.csv</code>, <code>.gitignore</code>, and your Git history. No additional cleanup is required after the project passes and the working tree is clean.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I created the Python validator, engagement brief, charter, and RACI from this guide.</li><li class="check-item"><span class="box">☐</span> <code>run_lab.py</code> compiles and the completed project reports <code>LAB 02 PASSED</code>.</li><li class="check-item"><span class="box">☐</span> Every RACI row has exactly one <code>A</code> and at least one <code>R</code>.</li><li class="check-item"><span class="box">☐</span> Claims Operations owns production go-live.</li><li class="check-item"><span class="box">☐</span> Protected claim decisions remain with authorized humans.</li><li class="check-item"><span class="box">☐</span> My own Git working tree is clean.</li></ul>
+<h2>Reflection</h2>
+<p>Which decision right most clearly prevents the Forward Deployed Lead from becoming an unbounded owner of customer business policy?</p>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

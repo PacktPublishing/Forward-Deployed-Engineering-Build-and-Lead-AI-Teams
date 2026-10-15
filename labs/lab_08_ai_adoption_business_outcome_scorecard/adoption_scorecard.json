@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "lab_id": "lab_08",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "pilot_cohort": "25 licensed claims adjusters",
+    "measurement_window": "four weekly pilot reviews",
+    "prepared_date": "2026-08-16"
+  },
+  "measurement_contract": {
+    "primary_user": "Licensed Claims Adjuster",
+    "assisted_decision": "Request evidence continue review or escalate",
+    "expected_action": "Adjuster reviews cited evidence and accepts overrides or escalates the recommendation",
+    "business_outcome": "Faster claim review with less rework and equal or better quality without unauthorized protected actions"
+  },
+  "baselines": {
+    "average_handling_minutes": 42,
+    "rework_rate_percent": 14,
+    "quality_score_percent": 86
+  },
+  "safety_floor": {
+    "quality_score_percent": 86,
+    "unauthorized_protected_actions": 0
+  },
+  "metric_groups": {
+    "adoption": [
+      "active_adoption_percent",
+      "assisted_claim_rate_percent",
+      "recommendation_acceptance_percent"
+    ],
+    "model_and_safety": [
+      "quality_score_percent",
+      "unauthorized_protected_actions"
+    ],
+    "business_outcomes": [
+      "handling_time_reduction_percent",
+      "rework_reduction_percent",
+      "gross_benefit_usd",
+      "benefit_cost_ratio"
+    ]
+  },
+  "targets": [
+    {
+      "metric": "active_adoption_percent",
+      "operator": "min",
+      "threshold": 80,
+      "owner": "Claims Operations Lead"
+    },
+    {
+      "metric": "assisted_claim_rate_percent",
+      "operator": "min",
+      "threshold": 70,
+      "owner": "Claims Operations Lead"
+    },
+    {
+      "metric": "recommendation_acceptance_percent",
+      "operator": "min",
+      "threshold": 75,
+      "owner": "Claims Quality Lead"
+    },
+    {
+      "metric": "handling_time_reduction_percent",
+      "operator": "min",
+      "threshold": 25,
+      "owner": "Business Owner"
+    },
+    {
+      "metric": "rework_reduction_percent",
+      "operator": "min",
+      "threshold": 25,
+      "owner": "Claims Quality Lead"
+    },
+    {
+      "metric": "quality_score_percent",
+      "operator": "min",
+      "threshold": 92,
+      "owner": "Claims Quality Lead"
+    },
+    {
+      "metric": "benefit_cost_ratio",
+      "operator": "min",
+      "threshold": 3,
+      "owner": "Finance Partner"
+    },
+    {
+      "metric": "unauthorized_protected_actions",
+      "operator": "max",
+      "threshold": 0,
+      "owner": "Security Owner"
+    }
+  ],
+  "financial_assumptions": {
+    "loaded_adjuster_hourly_cost_usd": 85,
+    "avoided_rework_value_usd": 120,
+    "benefit_definition": "Time value plus avoided rework value",
+    "cost_definition": "Recorded model and platform variable cost"
+  },
+  "decision_policy": {
+    "scale_with_monitoring": "All eight latest-week gates pass and adoption improves for at least two consecutive weeks.",
+    "repair_before_scale": "Safety gate passes but one or more adoption or business-outcome gates fail.",
+    "pause_and_investigate": "Any unauthorized protected action occurs or quality falls below the approved safety floor."
+  },
+  "owners": [
+    {
+      "role": "Business Owner",
+      "name": "Elena Ruiz"
+    },
+    {
+      "role": "Claims Operations Lead",
+      "name": "Priya Shah"
+    },
+    {
+      "role": "Claims Quality Lead",
+      "name": "Marcus Green"
+    },
+    {
+      "role": "Finance Partner",
+      "name": "Taylor Reed"
+    },
+    {
+      "role": "Technical Owner",
+      "name": "Jordan Kim"
+    }
+  ],
+  "review_cadence": "Weekly pilot scorecard review with a day-14 scale repair pause or exit decision"
+}

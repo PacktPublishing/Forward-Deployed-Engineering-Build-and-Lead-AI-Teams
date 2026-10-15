@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="05b1afc71d6425839ca06120e36cef419ae616dfc26828f76afa4b9d6cbec6c3">
+<title>Lab 09 — Create a Productization and Reusability Decision Matrix</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 09 — Create a Productization and Reusability Decision Matrix</h1>
+<h2>Goal</h2>
+<p>Evaluate completed assets from Northstar Mutual's Enterprise AI Claims Assistant and decide which should become product capabilities, shared platform services, supported configuration, isolated customer extensions, or retired work. Apply a transparent scoring policy and generate a portfolio decision record.</p>
+<p>Build the project in your own new directory. Consult the completed reference only when you need help or want to compare results.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>productization_policy.json</code> — scoring dimensions, thresholds, definitions, guardrails, cadence, and accountable roles.</li><li><code>productization_matrix.csv</code> — eight deployment assets with evidence and proposed decisions.</li><li><code>productization_review.py</code> — the executable decision review.</li><li><code>productization_review.md</code> — the generated portfolio recommendation.</li><li><code>.gitignore</code> — Git hygiene.</li></ul>
+<h2>Estimated Time</h2>
+<p>70–95 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This local standard-library exercise makes no network calls and requires no paid service.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m py_compile productization_review.py</code> succeeds.</li><li><code>python3 productization_review.py</code> prints <code>LAB 09 PASSED</code> and <code>PORTFOLIO_PLAN_APPROVED</code>.</li><li>Eight components receive evidence-based, policy-aligned decisions.</li><li>Product and platform candidates demonstrate repeated demand.</li><li>Custom work has isolation, funding ownership, and a dated review.</li><li>Low-value pilot work has an explicit retirement action.</li><li><code>productization_review.md</code> records the portfolio mix and guardrails.</li><li>Git is clean on <code>main</code>.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later</li><li>Git</li><li>A text editor</li><li>Familiarity with product, platform, configuration, and customer-specific delivery work</li><li>The prior claims-assistant architecture, security controls, delivery plan, and pilot outcome evidence.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This lab moves from one successful deployment to portfolio learning. You will use demand, standardization, strategic fit, coupling, security variance, and maintenance evidence to choose product, platform, configuration, custom extension, or retirement. These decisions determine which capabilities the organization in Lab 10 must fund and staff.</p>
+<h2>Step 1 — Create Your Project</h2>
+<pre><code class="language-bash">mkdir lab_09_productization_reusability_decision_matrix
+cd lab_09_productization_reusability_decision_matrix</code></pre>
+<p>Create <code>.gitignore</code>:</p>
+<pre><code class="language-gitignore">__pycache__/
+*.py[cod]
+.DS_Store</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Your learner-owned directory contains only <code>.gitignore</code>.</li><li><strong>Acceptable variation:</strong> Another directory name is acceptable.</li><li><strong>Failure indicator:</strong> You are editing the completed Lab 09 reference repository.</li><li><strong>Corrective action:</strong> Create a separate directory and continue there.</li></ul>
+<h2>Step 2 — Define the Productization Policy</h2>
+<p>Create <code>productization_policy.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_09&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;portfolio_scope&quot;: &quot;Claims deployment assets reviewed for cross-customer reuse&quot;,
+    &quot;review_date&quot;: &quot;2026-08-16&quot;
+  },
+  &quot;scales&quot;: {
+    &quot;reuse_demand&quot;: &quot;1 single customer to 5 repeated demand&quot;,
+    &quot;standardization&quot;: &quot;1 unique implementation to 5 stable shared contract&quot;,
+    &quot;strategic_fit&quot;: &quot;1 peripheral to 5 core differentiation&quot;,
+    &quot;customer_coupling&quot;: &quot;1 independent to 5 deeply customer-specific&quot;,
+    &quot;security_variance&quot;: &quot;1 uniform control to 5 materially different boundaries&quot;,
+    &quot;maintenance_burden&quot;: &quot;1 low to 5 high&quot;
+  },
+  &quot;scoring_formula&quot;: &quot;2*reuse_demand + 2*standardization + strategic_fit - customer_coupling - security_variance - maintenance_burden&quot;,
+  &quot;decision_thresholds&quot;: [
+    {
+      &quot;decision&quot;: &quot;PRODUCT&quot;,
+      &quot;minimum_score&quot;: 12,
+      &quot;maximum_score&quot;: 25
+    },
+    {
+      &quot;decision&quot;: &quot;PLATFORM&quot;,
+      &quot;minimum_score&quot;: 8,
+      &quot;maximum_score&quot;: 11
+    },
+    {
+      &quot;decision&quot;: &quot;CONFIGURATION&quot;,
+      &quot;minimum_score&quot;: 4,
+      &quot;maximum_score&quot;: 7
+    },
+    {
+      &quot;decision&quot;: &quot;CUSTOM_EXTENSION&quot;,
+      &quot;minimum_score&quot;: -20,
+      &quot;maximum_score&quot;: 3
+    }
+  ],
+  &quot;overrides&quot;: {
+    &quot;RETIRE&quot;: &quot;Use when lifecycle_status is retire regardless of score&quot;
+  },
+  &quot;decision_definitions&quot;: {
+    &quot;PRODUCT&quot;: &quot;Versioned supported capability with a standard customer-facing contract and roadmap owner.&quot;,
+    &quot;PLATFORM&quot;: &quot;Shared internal service or framework used by multiple deployments with platform ownership.&quot;,
+    &quot;CONFIGURATION&quot;: &quot;Supported declarative variation that does not fork shared code.&quot;,
+    &quot;CUSTOM_EXTENSION&quot;: &quot;Isolated customer-specific component with funding owner review date and no shared-core fork.&quot;,
+    &quot;RETIRE&quot;: &quot;Remove or archive because value and reuse do not justify ongoing maintenance.&quot;
+  },
+  &quot;portfolio_rules&quot;: [
+    &quot;No permanent customer-specific fork of shared product or platform code.&quot;,
+    &quot;Product and platform decisions require repeated demand and a named owner.&quot;,
+    &quot;Configuration must use a supported contract rather than copied source.&quot;,
+    &quot;Custom extensions require customer funding an isolation boundary and a dated review.&quot;,
+    &quot;Retirement must identify the dependency check and removal action.&quot;
+  ],
+  &quot;review_cadence&quot;: &quot;Quarterly portfolio review using deployment evidence support cost adoption and repeated demand&quot;,
+  &quot;accountable_roles&quot;: [
+    {
+      &quot;role&quot;: &quot;Forward Deployed Product Manager&quot;,
+      &quot;name&quot;: &quot;Avery Chen&quot;
+    },
+    {
+      &quot;role&quot;: &quot;Platform Owner&quot;,
+      &quot;name&quot;: &quot;Jordan Kim&quot;
+    },
+    {
+      &quot;role&quot;: &quot;Security Owner&quot;,
+      &quot;name&quot;: &quot;Dana Brooks&quot;
+    },
+    {
+      &quot;role&quot;: &quot;Claims Solution Owner&quot;,
+      &quot;name&quot;: &quot;Elena Ruiz&quot;
+    }
+  ]
+}</code></pre>
+<p>The policy rewards repeated demand, standardization, and strategic fit while penalizing customer coupling, security variance, and maintenance burden. A lifecycle override allows low-value work to be retired even when teams feel attached to it.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Six scoring dimensions, four score bands, a retirement override, five decision definitions, portfolio guardrails, and accountable roles are present.</li><li><strong>Acceptable variation:</strong> Weights may change with an explicit product strategy.</li><li><strong>Failure indicator:</strong> The policy equates every customer request with a product requirement or lacks rules for custom work and retirement.</li><li><strong>Corrective action:</strong> Restore evidence, ownership, maintenance, and lifecycle criteria.</li></ul>
+<h2>Step 3 — Build the Decision Matrix</h2>
+<p>Create <code>productization_matrix.csv</code>:</p>
+<pre><code class="language-csv">item_id,capability,reuse_demand,standardization,strategic_fit,customer_coupling,security_variance,maintenance_burden,lifecycle_status,proposed_decision,owner,evidence
+P-01,Prompt-injection evaluation pack,5,5,5,1,2,2,active,PRODUCT,AI Quality Product Owner,Used by three regulated deployments with one versioned test contract
+P-02,Effective-policy retrieval pattern,5,4,5,2,3,2,active,PRODUCT,Knowledge Platform Product Owner,Repeated effective-date and jurisdiction need across four insurers
+P-03,Protected-action audit schema,5,5,5,1,2,2,active,PRODUCT,Security Product Owner,Shared identity evidence approval action and result contract
+P-04,Enterprise identity adapter framework,4,4,5,3,4,3,active,PLATFORM,Identity Platform Owner,Reusable framework with customer-specific provider configuration
+P-05,Claims decision workspace shell,4,3,4,4,3,3,active,PLATFORM,Claims Solution Platform Owner,Shared workflow shell with supported extension points
+P-06,Tenant claim-field mapping,3,3,3,4,3,2,active,CONFIGURATION,Implementation Configuration Owner,Declarative mapping schema avoids customer code branches
+P-07,Northstar legacy mainframe action adapter,1,2,2,5,5,5,active,CUSTOM_EXTENSION,Northstar Integration Owner,Customer funded and isolated with review date 2027-03-31
+P-08,Pilot spreadsheet export,1,1,1,4,3,4,retire,RETIRE,Claims Solution Owner,No production dependency and archive after pilot evidence export</code></pre>
+<p>Score each dimension from 1 to 5 using deployment evidence. The proposed decision is reviewable because the raw scores, owner, and evidence remain beside it.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Eight unique assets represent shared evaluation, retrieval, audit, identity, workflow, configuration, custom integration, and retirement decisions.</li><li><strong>Acceptable variation:</strong> Add assets using the same schema and evidence standard.</li><li><strong>Failure indicator:</strong> A product candidate has no repeated demand, a custom extension has no review date, or retirement has no removal action.</li><li><strong>Corrective action:</strong> Change the evidence, lifecycle, or proposed decision; do not manipulate scores to protect sunk work.</li></ul>
+<h2>Step 4 — Create the Executable Portfolio Review</h2>
+<p>Create <code>productization_review.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Evaluate productization and reusability decisions from portfolio evidence.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import json
+from collections import Counter
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+POLICY_FILE = ROOT / &quot;productization_policy.json&quot;
+MATRIX_FILE = ROOT / &quot;productization_matrix.csv&quot;
+REPORT_FILE = ROOT / &quot;productization_review.md&quot;
+
+
+def load_json(path: Path) -&gt; dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding=&quot;utf-8&quot;))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def load_matrix(path: Path) -&gt; list[dict[str, str]]:
+    try:
+        with path.open(encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as handle:
+            return list(csv.DictReader(handle))
+    except OSError as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def score(item: dict[str, str]) -&gt; int:
+    return (
+        2 * int(item[&quot;reuse_demand&quot;])
+        + 2 * int(item[&quot;standardization&quot;])
+        + int(item[&quot;strategic_fit&quot;])
+        - int(item[&quot;customer_coupling&quot;])
+        - int(item[&quot;security_variance&quot;])
+        - int(item[&quot;maintenance_burden&quot;])
+    )
+
+
+def expected_decision(policy: dict[str, Any], item: dict[str, str], item_score: int) -&gt; str:
+    if item[&quot;lifecycle_status&quot;] == &quot;retire&quot;:
+        return &quot;RETIRE&quot;
+    for threshold in policy[&quot;decision_thresholds&quot;]:
+        if threshold[&quot;minimum_score&quot;] &lt;= item_score &lt;= threshold[&quot;maximum_score&quot;]:
+            return threshold[&quot;decision&quot;]
+    raise ValueError(f&quot;No decision threshold covers score {item_score}&quot;)
+
+
+def validate(
+    policy: dict[str, Any], rows: list[dict[str, str]]
+) -&gt; list[dict[str, Any]]:
+    errors: list[str] = []
+    required_sections = {
+        &quot;metadata&quot;, &quot;scales&quot;, &quot;scoring_formula&quot;, &quot;decision_thresholds&quot;,
+        &quot;overrides&quot;, &quot;decision_definitions&quot;, &quot;portfolio_rules&quot;,
+        &quot;review_cadence&quot;, &quot;accountable_roles&quot;,
+    }
+    missing = required_sections - set(policy)
+    if missing:
+        errors.append(&quot;Missing policy sections: &quot; + &quot;, &quot;.join(sorted(missing)))
+
+    expected_columns = {
+        &quot;item_id&quot;, &quot;capability&quot;, &quot;reuse_demand&quot;, &quot;standardization&quot;,
+        &quot;strategic_fit&quot;, &quot;customer_coupling&quot;, &quot;security_variance&quot;,
+        &quot;maintenance_burden&quot;, &quot;lifecycle_status&quot;, &quot;proposed_decision&quot;,
+        &quot;owner&quot;, &quot;evidence&quot;,
+    }
+    if rows and set(rows[0]) != expected_columns:
+        errors.append(&quot;Decision-matrix columns do not match the required schema&quot;)
+    ids = [item.get(&quot;item_id&quot;) for item in rows]
+    if not ids or len(ids) != len(set(ids)):
+        errors.append(&quot;Item IDs must be present and unique&quot;)
+
+    reviewed: list[dict[str, Any]] = []
+    allowed_decisions = set(policy.get(&quot;decision_definitions&quot;, {}))
+    for item in rows:
+        try:
+            numeric_values = [
+                int(item[field])
+                for field in [
+                    &quot;reuse_demand&quot;, &quot;standardization&quot;, &quot;strategic_fit&quot;,
+                    &quot;customer_coupling&quot;, &quot;security_variance&quot;, &quot;maintenance_burden&quot;,
+                ]
+            ]
+        except (KeyError, TypeError, ValueError):
+            errors.append(f&quot;{item.get(&#x27;item_id&#x27;)} contains invalid scoring data&quot;)
+            continue
+        if any(value not in range(1, 6) for value in numeric_values):
+            errors.append(f&quot;{item[&#x27;item_id&#x27;]} scores must be integers 1 through 5&quot;)
+        item_score = score(item)
+        calculated = expected_decision(policy, item, item_score)
+        if item.get(&quot;proposed_decision&quot;) not in allowed_decisions:
+            errors.append(f&quot;{item[&#x27;item_id&#x27;]} has an unsupported decision&quot;)
+        if item.get(&quot;proposed_decision&quot;) != calculated:
+            errors.append(
+                f&quot;{item[&#x27;item_id&#x27;]} proposes {item.get(&#x27;proposed_decision&#x27;)} &quot;
+                f&quot;but the policy calculates {calculated}&quot;
+            )
+        if not item.get(&quot;owner&quot;) or not item.get(&quot;evidence&quot;):
+            errors.append(f&quot;{item[&#x27;item_id&#x27;]} needs an owner and evidence&quot;)
+        if calculated == &quot;CUSTOM_EXTENSION&quot; and &quot;review date&quot; not in item[&quot;evidence&quot;].lower():
+            errors.append(f&quot;{item[&#x27;item_id&#x27;]} custom extension needs a dated review&quot;)
+        if calculated == &quot;RETIRE&quot; and &quot;archive&quot; not in item[&quot;evidence&quot;].lower():
+            errors.append(f&quot;{item[&#x27;item_id&#x27;]} retirement needs a removal or archive action&quot;)
+        if calculated in {&quot;PRODUCT&quot;, &quot;PLATFORM&quot;} and int(item[&quot;reuse_demand&quot;]) &lt; 4:
+            errors.append(f&quot;{item[&#x27;item_id&#x27;]} lacks repeated demand for {calculated}&quot;)
+        reviewed.append({**item, &quot;score&quot;: item_score, &quot;calculated_decision&quot;: calculated})
+
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+    return reviewed
+
+
+def build_report(
+    policy: dict[str, Any], reviewed: list[dict[str, Any]], decision: str
+) -&gt; str:
+    counts = Counter(item[&quot;calculated_decision&quot;] for item in reviewed)
+    lines = [
+        &quot;# Enterprise AI Claims Assistant — Productization and Reusability Review&quot;, &quot;&quot;,
+        f&quot;- **Decision:** {decision}&quot;,
+        f&quot;- **Scope:** {policy[&#x27;metadata&#x27;][&#x27;portfolio_scope&#x27;]}&quot;, &quot;&quot;,
+        &quot;## Decision Matrix&quot;, &quot;&quot;,
+        &quot;| Item | Capability | Score | Decision | Owner |&quot;,
+        &quot;| --- | --- | ---: | --- | --- |&quot;,
+    ]
+    for item in sorted(reviewed, key=lambda row: row[&quot;score&quot;], reverse=True):
+        lines.append(
+            f&quot;| {item[&#x27;item_id&#x27;]} | {item[&#x27;capability&#x27;]} | {item[&#x27;score&#x27;]} | &quot;
+            f&quot;{item[&#x27;calculated_decision&#x27;]} | {item[&#x27;owner&#x27;]} |&quot;
+        )
+    lines.extend([&quot;&quot;, &quot;## Portfolio Mix&quot;, &quot;&quot;])
+    for label in [&quot;PRODUCT&quot;, &quot;PLATFORM&quot;, &quot;CONFIGURATION&quot;, &quot;CUSTOM_EXTENSION&quot;, &quot;RETIRE&quot;]:
+        lines.append(f&quot;- {label}: {counts.get(label, 0)}&quot;)
+    lines.extend([&quot;&quot;, &quot;## Decision Definitions&quot;, &quot;&quot;])
+    for label, definition in policy[&quot;decision_definitions&quot;].items():
+        lines.append(f&quot;- **{label}:** {definition}&quot;)
+    lines.extend([&quot;&quot;, &quot;## Guardrails&quot;, &quot;&quot;])
+    lines.extend(f&quot;- {rule}&quot; for rule in policy[&quot;portfolio_rules&quot;])
+    lines.append(&quot;&quot;)
+    return &quot;\n&quot;.join(lines)
+
+
+def main() -&gt; int:
+    try:
+        policy = load_json(POLICY_FILE)
+        rows = load_matrix(MATRIX_FILE)
+        reviewed = validate(policy, rows)
+        decision = &quot;PORTFOLIO_PLAN_APPROVED&quot;
+        REPORT_FILE.write_text(build_report(policy, reviewed, decision), encoding=&quot;utf-8&quot;)
+    except (KeyError, TypeError, ValueError) as exc:
+        print(f&quot;LAB 09 FAILED\n{exc}&quot;)
+        return 1
+
+    counts = Counter(item[&quot;calculated_decision&quot;] for item in reviewed)
+    print(&quot;LAB 09 PASSED&quot;)
+    print(f&quot;- Decision: {decision}&quot;)
+    print(f&quot;- Components reviewed: {len(reviewed)}&quot;)
+    print(f&quot;- Product candidates: {counts[&#x27;PRODUCT&#x27;]}&quot;)
+    print(f&quot;- Platform candidates: {counts[&#x27;PLATFORM&#x27;]}&quot;)
+    print(f&quot;- Custom extensions: {counts[&#x27;CUSTOM_EXTENSION&#x27;]}&quot;)
+    print(f&quot;- Retirements: {counts[&#x27;RETIRE&#x27;]}&quot;)
+    print(f&quot;- Report: {REPORT_FILE.name}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>The code calculates every score, applies the configured thresholds and retirement override, validates proposed decisions and portfolio guardrails, then generates the review.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The script derives decisions from evidence rather than trusting the CSV label.</li><li><strong>Acceptable variation:</strong> Add dimensions only if the policy and code remain synchronized.</li><li><strong>Failure indicator:</strong> A manual label can bypass the score or a permanent customer fork is treated as normal productization.</li><li><strong>Corrective action:</strong> Restore calculated decisions and custom-extension guardrails.</li></ul>
+<h2>Step 5 — Run and Inspect the Matrix</h2>
+<pre><code class="language-bash">python3 -m py_compile productization_review.py
+python3 productization_review.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 09 PASSED
+- Decision: PORTFOLIO_PLAN_APPROVED
+- Components reviewed: 8
+- Product candidates: 3
+- Platform candidates: 2
+- Custom extensions: 1
+- Retirements: 1
+- Report: productization_review.md</code></pre>
+<p>Inspect the generated review:</p>
+<pre><code class="language-bash">sed -n &#x27;1,240p&#x27; productization_review.md</code></pre>
+<p>On Windows PowerShell:</p>
+<pre><code class="language-powershell">Get-Content productization_review.md</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The portfolio mix contains 3 product, 2 platform, 1 configuration, 1 custom-extension, and 1 retirement decision.</li><li><strong>Acceptable variation:</strong> Another real portfolio may produce a different mix when the evidence supports it.</li><li><strong>Failure indicator:</strong> The script prints <code>LAB 09 FAILED</code> or a proposed decision differs from the calculated policy.</li><li><strong>Corrective action:</strong> Review the named dimensions and evidence, then correct the proposal or policy transparently.</li></ul>
+<h2>Step 6 — Conduct the Product Review</h2>
+<p>Answer from the matrix:</p>
+<ol><li>Which product candidate has the strongest repeated demand?</li><li>Which platform asset should not become a customer-facing product?</li><li>What prevents configuration from turning into copied customer code?</li><li>What evidence must exist before renewing the custom extension?</li><li>Why is retirement a positive portfolio decision?</li></ol>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Each answer cites scores, evidence, ownership, or guardrails.</li><li><strong>Acceptable variation:</strong> Recommend a proof period before committing to productization.</li><li><strong>Failure indicator:</strong> Decisions rely only on a strategic customer's request.</li><li><strong>Corrective action:</strong> Add cross-deployment evidence, cost, coupling, and maintenance consequences.</li></ul>
+<h2>Step 7 — Commit Your Evidence</h2>
+<pre><code class="language-bash">git init -b main
+git add .gitignore productization_policy.json productization_matrix.csv productization_review.py productization_review.md
+git commit -m &quot;Complete productization and reusability decision matrix&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>main</code> is clean.</li><li><strong>Acceptable variation:</strong> Another descriptive commit message is acceptable.</li><li><strong>Failure indicator:</strong> The generated review is missing or caches are tracked.</li><li><strong>Corrective action:</strong> Rerun the review, stage the intended five project files, and commit.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>Define a portfolio scoring policy and decision meanings.</li><li>Collect deployment evidence for reusable and customer-specific assets.</li><li>Score reuse demand, standardization, strategic fit, coupling, security variance, and maintenance.</li><li>Calculate product, platform, configuration, custom-extension, or retirement decisions.</li><li>Apply ownership, no-fork, custom-review, and retirement guardrails.</li><li>Review the portfolio mix and fund the next evidence.</li><li>Repeat the review quarterly using actual reuse and support data.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>Invalid schema</td><td>CSV headers changed</td><td>Restore the documented columns</td></tr><tr><td>Score out of range</td><td>A dimension is not 1–5</td><td>Correct the evidence score</td></tr><tr><td>Decision mismatch</td><td>Proposed label differs from calculated policy</td><td>Review evidence or transparently revise policy</td></tr><tr><td>Weak product evidence</td><td>Reuse demand is below 4</td><td>Keep it configuration or custom until repeated demand exists</td></tr><tr><td>Unsafe custom work</td><td>No owner isolation or review date</td><td>Hold the extension decision</td></tr><tr><td>Retirement failure</td><td>No archive or removal action</td><td>Record dependency check and disposal action</td></tr><tr><td>Stale review</td><td>Inputs changed</td><td>Rerun <code>python3 productization_review.py</code></td></tr></tbody></table>
+<h2>Cleanup</h2>
+<pre><code class="language-bash">python3 -c &quot;import shutil; shutil.rmtree(&#x27;__pycache__&#x27;, ignore_errors=True)&quot;</code></pre>
+<p>Keep the four learner artifacts, <code>.gitignore</code>, and Git history.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I defined the scoring policy and decision meanings.</li><li class="check-item"><span class="box">☐</span> I scored all eight assets using evidence.</li><li class="check-item"><span class="box">☐</span> I distinguished product platform and configuration.</li><li class="check-item"><span class="box">☐</span> I protected shared code from customer-specific forks.</li><li class="check-item"><span class="box">☐</span> I gave the custom extension an owner and review date.</li><li class="check-item"><span class="box">☐</span> I recorded a retirement action.</li><li class="check-item"><span class="box">☐</span> I generated and reviewed <code>productization_review.md</code>.</li><li class="check-item"><span class="box">☐</span> I committed a clean repository.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which asset is most likely to be over-productized and why?</li><li>What real reuse evidence would change a configuration decision into product?</li><li>Which maintenance burden is currently understated?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

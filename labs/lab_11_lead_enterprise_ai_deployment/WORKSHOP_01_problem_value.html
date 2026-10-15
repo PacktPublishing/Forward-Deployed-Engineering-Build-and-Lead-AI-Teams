@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="cce9377a787582d345414dd38ed2f2f8ce506da8faaa0df4a6bad4725af1df4b">
+<title>Capstone Workshop 1 — Frame the Customer Problem and Value Case</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Capstone Workshop 1 — Frame the Customer Problem and Value Case</h1>
+<h2>Goal</h2>
+<p>Start one shared capstone project for Northstar Mutual's Enterprise AI Claims Assistant. Define the customer problem, measurable business outcome, discovery evidence, owned assumptions, and value hypothesis before selecting technology or promising a rollout.</p>
+<p>Build in your own project directory. The completed course repository is a reference you consult only when you are stuck or comparing your result.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>.gitignore</code> — Git hygiene for the shared capstone project.</li><li><code>problem_value.json</code> — the problem, baseline, scope, non-goals, discovery evidence, assumptions, and value calculation contract.</li><li>The first Git commit in the project you will continue through Workshops 2–5.</li></ul>
+<h2>Estimated Time</h2>
+<p>35–50 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This workshop runs locally with Python's standard library. It creates no external services or cost.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m json.tool problem_value.json</code> succeeds.</li><li>The problem names a user, observable friction, and three baseline measures.</li><li>The outcome is measurable and constrained by three explicit non-goals.</li><li>Discovery evidence is separated from assumptions, and every assumption has an owner and test.</li><li>The value hypothesis includes a benefit formula and financial assumptions.</li><li>Git is clean after the Workshop 1 commit.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later</li><li>Git</li><li>A text editor</li><li>Familiarity with customer discovery, workflow baselines, business outcomes, and value hypotheses</li></ul>
+<h2>Where This Workshop Fits</h2>
+<p>This workshop combines the first two capstone lectures: <strong>Define the Customer Problem and Business Outcome</strong> and <strong>Create the Discovery Brief and Value Hypothesis</strong>. Its output becomes the decision contract for every later workshop.</p>
+<h2>Step 1 — Create the Shared Capstone Project</h2>
+<pre><code class="language-bash">mkdir lab_11_lead_enterprise_ai_deployment
+cd lab_11_lead_enterprise_ai_deployment</code></pre>
+<p>Create <code>.gitignore</code>:</p>
+<pre><code class="language-gitignore">__pycache__/
+*.py[cod]
+.DS_Store</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Only <code>.gitignore</code> exists in your learner-owned directory.</li><li><strong>Acceptable variation:</strong> You may use a different directory name.</li><li><strong>Failure indicator:</strong> You are editing the completed reference repository.</li><li><strong>Corrective action:</strong> Create a new empty directory and continue there.</li></ul>
+<h2>Step 2 — Define the Problem and Business Outcome</h2>
+<p>Create <code>problem_value.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_11&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;candidate&quot;: &quot;claims-assistant-1.0.0&quot;,
+    &quot;review_date&quot;: &quot;2026-08-17&quot;,
+    &quot;decision_stage&quot;: &quot;phased production rollout&quot;
+  },
+  &quot;customer_problem&quot;: {
+    &quot;primary_user&quot;: &quot;Licensed Claims Adjuster&quot;,
+    &quot;problem_statement&quot;: &quot;Adjusters spend too much time assembling evidence-linked claim summaries across fragmented systems, causing slow handling, rework, and incomplete audit evidence.&quot;,
+    &quot;baseline&quot;: {
+      &quot;average_handling_minutes&quot;: 42,
+      &quot;rework_rate_percent&quot;: 14,
+      &quot;quality_score_percent&quot;: 86
+    },
+    &quot;business_outcome&quot;: &quot;Reduce handling time and rework while improving quality and citation completeness without allowing unauthorized protected actions.&quot;,
+    &quot;scope&quot;: &quot;Retrieve effective policy evidence, produce a cited summary, and recommend request_evidence, continue_review, or escalate.&quot;,
+    &quot;non_goals&quot;: [
+      &quot;Autonomously approve or deny a claim&quot;,
+      &quot;Authorize payment or change reserves&quot;,
+      &quot;Send customer communication or update the claims system without human approval&quot;
+    ]
+  },
+  &quot;discovery_and_value&quot;: {
+    &quot;evidence&quot;: [
+      &quot;Workflow interviews with licensed adjusters&quot;,
+      &quot;Four-week bounded pilot with 25 adjusters&quot;,
+      &quot;Reviewed evaluation set segmented by claim type and failure mode&quot;,
+      &quot;Security, recovery, and human-approval drills&quot;
+    ],
+    &quot;assumptions&quot;: [
+      {
+        &quot;assumption&quot;: &quot;Effective-date and jurisdiction metadata remain complete for each rollout wave.&quot;,
+        &quot;owner&quot;: &quot;Claims Data Lead&quot;,
+        &quot;test&quot;: &quot;Block a jurisdiction when policy metadata coverage is below 100 percent.&quot;
+      },
+      {
+        &quot;assumption&quot;: &quot;Licensed adjusters retain decision authority and review cited evidence.&quot;,
+        &quot;owner&quot;: &quot;Claims Operations Lead&quot;,
+        &quot;test&quot;: &quot;Monitor acceptance, overrides, approval identity, and audit completeness weekly.&quot;
+      }
+    ],
+    &quot;value_hypothesis&quot;: {
+      &quot;statement&quot;: &quot;If adjusters receive a source-linked summary and a bounded recommendation inside their workflow, then average handling time and rework will fall without reducing quality or safety.&quot;,
+      &quot;benefit_formula&quot;: &quot;time_saved_hours * loaded_adjuster_hourly_cost_usd + avoided_rework_count * avoided_rework_value_usd&quot;,
+      &quot;loaded_adjuster_hourly_cost_usd&quot;: 85,
+      &quot;avoided_rework_value_usd&quot;: 120
+    }
+  }
+}</code></pre>
+<p>Read the <code>customer_problem</code> section as a decision contract:</p>
+<ul><li>The primary user is a licensed claims adjuster.</li><li>The baseline measures time, rework, and quality before AI assistance.</li><li>The assistant is bounded to cited summaries and three allowed recommendations.</li><li>Claim adjudication, payments, reserves, customer communication, and unapproved system writes remain outside the assistant's authority.</li></ul>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The problem, baseline, outcome, scope, and non-goals describe one coherent workflow decision.</li><li><strong>Acceptable variation:</strong> You may rewrite the problem statement while preserving the measurable baseline and protected-action boundary.</li><li><strong>Failure indicator:</strong> The outcome is “deploy AI,” the primary user is missing, or autonomous claim decisions enter scope.</li><li><strong>Corrective action:</strong> Restate the user problem, measurable result, smallest valuable scope, and explicit non-goals.</li></ul>
+<h2>Step 3 — Test the Discovery and Value Logic</h2>
+<p>For each discovery assumption, answer three questions:</p>
+<ol><li>What evidence would prove or disprove it?</li><li>Who owns that evidence?</li><li>What scope change occurs if it fails?</li></ol>
+<p>Then trace the value hypothesis:</p>
+<pre><code class="language-text">Source-linked summary and bounded recommendation
+→ less handling time and avoidable rework
+→ time value plus avoided-rework value
+→ quality and safety must remain above their approved floors</code></pre>
+<p>This prevents the team from counting model activity as business value. The formula values workflow improvement, while later scorecards verify adoption, quality, safety, and cost.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You can distinguish observed evidence, an unproven assumption, a calculated benefit, and a safety constraint.</li><li><strong>Acceptable variation:</strong> Another defensible benefit formula is acceptable if its inputs, owner, and measurement window are explicit.</li><li><strong>Failure indicator:</strong> Benefits depend only on recommendation volume, or assumptions have no owner or test.</li><li><strong>Corrective action:</strong> Connect value to time, rework, quality, or another customer outcome and assign evidence ownership.</li></ul>
+<h2>Step 4 — Validate and Commit Workshop 1</h2>
+<pre><code class="language-bash">python3 -m json.tool problem_value.json
+git init -b main
+git add .gitignore problem_value.json
+git commit -m &quot;Frame capstone problem and value case&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> JSON validation succeeds and Git reports a clean <code>main</code> branch.</li><li><strong>Acceptable variation:</strong> On older Git versions, run <code>git init</code>, followed by <code>git branch -M main</code>.</li><li><strong>Failure indicator:</strong> JSON reports a line error or Git still lists uncommitted files.</li><li><strong>Corrective action:</strong> Repair the first JSON error, stage the intended files, commit, and check status again.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<table><thead><tr><th>Capstone decision</th><th>Evidence you created</th><th>Downstream use</th></tr></thead><tbody><tr><td>Customer problem</td><td>User, friction, baseline, scope, and non-goals</td><td>Controls architecture and rollout scope</td></tr><tr><td>Business outcome</td><td>Time, rework, quality, and safety intent</td><td>Becomes the scorecard contract</td></tr><tr><td>Discovery brief</td><td>Evidence and testable assumptions</td><td>Drives team, data, and risk work</td></tr><tr><td>Value hypothesis</td><td>Benefit formula and financial assumptions</td><td>Enables the final business-outcome decision</td></tr></tbody></table>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody><tr><td><code>JSONDecodeError</code></td><td>Missing comma, quote, brace, or bracket</td><td>Run <code>python3 -m json.tool problem_value.json</code> and repair the first reported line.</td></tr><tr><td>Outcome sounds like a feature</td><td>The result is written as “build an assistant”</td><td>Rewrite it as a measurable workflow or business change.</td></tr><tr><td>Value cannot be calculated</td><td>Inputs or financial assumptions are missing</td><td>Define the baseline, measurement, formula, and owner.</td></tr><tr><td>Scope includes claim decisions</td><td>Product capability and human authority are mixed</td><td>Restore the three non-goals and the licensed-adjuster boundary.</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>This workshop creates no cloud resources. Keep the directory and files for Workshop 2.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I named the primary user and workflow friction.</li><li class="check-item"><span class="box">☐</span> I recorded time, rework, and quality baselines.</li><li class="check-item"><span class="box">☐</span> I defined a measurable outcome and bounded scope.</li><li class="check-item"><span class="box">☐</span> I preserved human authority over protected claim actions.</li><li class="check-item"><span class="box">☐</span> I separated discovery evidence from owned assumptions.</li><li class="check-item"><span class="box">☐</span> I can calculate the proposed benefit.</li><li class="check-item"><span class="box">☐</span> My Workshop 1 commit is clean on <code>main</code>.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which assumption would most weaken the value case if it failed?</li><li>Which attractive feature did the non-goals deliberately exclude?</li><li>What evidence would convince a finance partner that the benefit is real rather than estimated activity?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

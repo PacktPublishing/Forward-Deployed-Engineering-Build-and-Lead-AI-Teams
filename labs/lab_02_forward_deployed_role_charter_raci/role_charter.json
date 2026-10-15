@@ -1,0 +1,69 @@
+{
+  "role_id": "fde_lead",
+  "role_name": "Forward Deployed Lead",
+  "mission": "Lead Northstar Mutual from a validated claims-intake problem to a secure, measurable, and supportable AI deployment while preserving customer decision rights.",
+  "primary_customer": "Claims Operations Owner",
+  "owned_outcomes": [
+    "A production decision supported by architecture, evaluation, security, and operational evidence",
+    "A clear owner and acceptance criterion for every delivery workstream",
+    "A controlled transition from the deployment team to Claims Operations"
+  ],
+  "key_activities": [
+    "Translate the claims workflow into delivery workstreams and acceptance evidence",
+    "Coordinate AI, platform, security, operations, and adjuster stakeholders",
+    "Maintain the integrated decision log, risk view, and readiness evidence",
+    "Present evidence-based proceed, repair, pause, or escalate recommendations"
+  ],
+  "decision_rights": [
+    "Approve the technical delivery baseline and changes within agreed scope",
+    "Reject incomplete technical evidence and require remediation before review",
+    "Pause deployment activity when a safety, security, reliability, or customer-control threshold is breached",
+    "Recommend go-live; final production authorization remains with the Claims Operations Owner"
+  ],
+  "escalation_paths": [
+    {
+      "trigger": "A proposed capability could approve or deny a claim, authorize payment, or send a customer decision without human approval",
+      "escalate_to": "Claims Operations Owner and Security FDE",
+      "evidence_required": "Affected workflow, proposed permission, control gap, user impact, and safer options"
+    },
+    {
+      "trigger": "A security, regulatory, or data-boundary control cannot be met before the release date",
+      "escalate_to": "Security and Compliance Lead",
+      "evidence_required": "Control requirement, current gap, exposure, compensating controls, owner, and decision deadline"
+    },
+    {
+      "trigger": "A critical dependency threatens the agreed outcome or milestone",
+      "escalate_to": "Customer Sponsor and Technical Deployment Lead",
+      "evidence_required": "Dependency, impact, attempted resolution, options, recommendation, and decision needed"
+    }
+  ],
+  "success_metrics": [
+    {
+      "metric": "Median intake-to-assignment time",
+      "target": "6 hours or less during the pilot",
+      "measurement_source": "Claims platform event timestamps"
+    },
+    {
+      "metric": "Claims returned for intake rework",
+      "target": "10% or less during the pilot",
+      "measurement_source": "Claims operations quality report"
+    },
+    {
+      "metric": "Complete evidence-and-citation records",
+      "target": "95% or more of evaluated claims",
+      "measurement_source": "AI evaluation and audit report"
+    },
+    {
+      "metric": "Human approval for claim denials and payments",
+      "target": "100%",
+      "measurement_source": "Claims decision audit log"
+    }
+  ],
+  "out_of_scope": [
+    "Owning Northstar Mutual business policy",
+    "Approving claim denials or payments",
+    "Accepting regulatory risk on behalf of the customer",
+    "Serving as the permanent production operations owner"
+  ]
+}
+

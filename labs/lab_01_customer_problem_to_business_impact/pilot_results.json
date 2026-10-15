@@ -1,0 +1,10 @@
+{
+  "pilot_name": "Northstar Claims Assistant - Pilot 1",
+  "sample_size": 320,
+  "average_handling_time_minutes": 12.5,
+  "incorrect_fast_track_rate": 0.024,
+  "recommendation_acceptance_rate": 0.68,
+  "availability": 0.994,
+  "most_common_failure": "Missing policy endorsements caused unsupported fast-track recommendations",
+  "affected_claims": 14
+}

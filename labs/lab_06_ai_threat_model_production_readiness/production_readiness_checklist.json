@@ -1,0 +1,269 @@
+{
+  "metadata": {
+    "lab_id": "lab_06",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "candidate": "claims-assistant-0.6.0",
+    "review_date": "2026-08-16",
+    "target_environment": "production bounded pilot"
+  },
+  "version_manifest": {
+    "application": "claims-assistant-0.6.0",
+    "model": "approved-managed-llm-2026-07",
+    "prompt": "claims-review-v6",
+    "retrieval": "effective-policy-retrieval-v3",
+    "output_schema": "claims-assist-schema-v1",
+    "evaluation_dataset": "claims-pilot-eval-v1",
+    "infrastructure": "claims-assistant-infra-v4"
+  },
+  "checklist": {
+    "identity_access": [
+      {
+        "id": "IAM-01",
+        "requirement": "SSO identity, tenant scope, role checks, and least-privilege service permissions are enforced.",
+        "owner": "Identity Engineering",
+        "evidence_id": "E-IAM-01",
+        "evidence": "Negative authorization suite passed for cross-tenant, wrong-role, and expired-session access.",
+        "control_ids": [
+          "C-01"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "IAM-02",
+        "requirement": "Workload identity replaces embedded credentials and managed secrets rotate on schedule.",
+        "owner": "AI Platform",
+        "evidence_id": "E-IAM-02",
+        "evidence": "Secret scan is clean; workload identity and rotation test passed in staging.",
+        "control_ids": [
+          "C-08"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ],
+    "data_protection": [
+      {
+        "id": "DATA-01",
+        "requirement": "Only minimum necessary claim data crosses encrypted approved boundaries and logs redact PII.",
+        "owner": "Data Protection",
+        "evidence_id": "E-DATA-01",
+        "evidence": "Data-flow review, private-endpoint check, retention policy, and PII log scan approved.",
+        "control_ids": [
+          "C-07"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "DATA-02",
+        "requirement": "Retrieval enforces tenant, authorization, effective-date, jurisdiction, and signed index version.",
+        "owner": "Policy Operations",
+        "evidence_id": "E-DATA-02",
+        "evidence": "Representative and adversarial retrieval tests passed against index effective-policy-retrieval-v3.",
+        "control_ids": [
+          "C-03"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ],
+    "model_tool_guardrails": [
+      {
+        "id": "GRD-01",
+        "requirement": "Retrieved and uploaded content is treated as untrusted; injection attempts cannot change system policy or expose hidden context.",
+        "owner": "AI Security",
+        "evidence_id": "E-GRD-01",
+        "evidence": "Prompt-injection and indirect-injection suite blocked all protected-action and exfiltration attempts.",
+        "control_ids": [
+          "C-02"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "GRD-02",
+        "requirement": "Assistant output is schema-valid and limited to request_evidence, continue_review, or escalate.",
+        "owner": "FDE Team",
+        "evidence_id": "E-GRD-02",
+        "evidence": "Schema and recommendation allowlist gates passed for the pinned candidate.",
+        "control_ids": [
+          "C-04"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "GRD-03",
+        "requirement": "Every protected action requires a fresh approver-bound token and an explicit licensed-adjuster confirmation.",
+        "owner": "Claims Platform",
+        "evidence_id": "E-GRD-03",
+        "evidence": "Bypass, replay, expired-token, wrong-approver, and missing-approval tests all failed closed.",
+        "control_ids": [
+          "C-05"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ],
+    "environments_delivery": [
+      {
+        "id": "ENV-01",
+        "requirement": "Dev, test, staging, and production promotion uses signed artifacts, separation of duties, and the exact version manifest.",
+        "owner": "Release Engineering",
+        "evidence_id": "E-ENV-01",
+        "evidence": "Promotion record links approvals, evaluation evidence, infrastructure plan, and signed versions.",
+        "control_ids": [
+          "C-10"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ],
+    "observability_audit": [
+      {
+        "id": "OBS-01",
+        "requirement": "Logs and traces capture identity, tenant, versions, retrieved evidence, recommendation, approval, action, latency, cost, and errors without raw PII.",
+        "owner": "Security Operations",
+        "evidence_id": "E-OBS-01",
+        "evidence": "Audit completeness and immutability tests passed; failed audit delivery blocks protected actions.",
+        "control_ids": [
+          "C-09"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "OBS-02",
+        "requirement": "Dashboards and alerts cover safety, authorization, retrieval quality, latency, error, capacity, and cost SLOs.",
+        "owner": "Site Reliability Engineering",
+        "evidence_id": "E-OBS-02",
+        "evidence": "Staging alert drill paged the on-call owner with version and correlation identifiers.",
+        "control_ids": [
+          "C-09",
+          "C-11"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ],
+    "reliability_recovery": [
+      {
+        "id": "REL-01",
+        "requirement": "Retries are bounded and protected writes use idempotency keys with an uncertain-write reconciliation path.",
+        "owner": "Claims Platform",
+        "evidence_id": "E-REL-01",
+        "evidence": "Timeout, duplicate-submit, and partial-failure tests produced one action or a reconciliation task.",
+        "control_ids": [
+          "C-06"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "REL-02",
+        "requirement": "Timeouts, circuit breakers, concurrency limits, and cost budgets preserve the manual workflow.",
+        "owner": "Site Reliability Engineering",
+        "evidence_id": "E-REL-02",
+        "evidence": "Load and dependency-failure tests stayed within the approved blast radius and budget.",
+        "control_ids": [
+          "C-11"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "REL-03",
+        "requirement": "Feature-flag rollback disables AI assistance without disabling manual claims handling.",
+        "owner": "Operations Lead",
+        "evidence_id": "E-REL-03",
+        "evidence": "Rollback drill disabled the pilot in under 10 minutes and preserved audit evidence.",
+        "control_ids": [
+          "C-12"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ],
+    "operations_governance": [
+      {
+        "id": "OPS-01",
+        "requirement": "Incident runbook names severity, triage, containment, evidence preservation, notification, and recovery owners.",
+        "owner": "Operations Lead",
+        "evidence_id": "E-OPS-01",
+        "evidence": "Tabletop exercise completed for prompt injection, PII exposure, and uncertain protected write.",
+        "control_ids": [
+          "C-12"
+        ],
+        "status": "PASS",
+        "blocking": true
+      },
+      {
+        "id": "OPS-02",
+        "requirement": "Business, technical, security, and operations owners approve the bounded pilot with no open unaccepted exception.",
+        "owner": "Technical Deployment Lead",
+        "evidence_id": "E-OPS-02",
+        "evidence": "Signed readiness record contains all four approvals and an empty open-exception register.",
+        "control_ids": [
+          "C-10",
+          "C-12"
+        ],
+        "status": "PASS",
+        "blocking": true
+      }
+    ]
+  },
+  "slo_and_capacity": {
+    "availability_target_percent": 99.5,
+    "p95_latency_seconds": 12,
+    "protected_action_audit_completeness_percent": 100,
+    "unauthorized_protected_actions": 0,
+    "monthly_model_cost_budget_usd": 12000,
+    "pilot_concurrency_limit": 25
+  },
+  "pilot_boundary": {
+    "cohort": "25 licensed claims adjusters",
+    "maximum_claims": 500,
+    "duration_days": 14,
+    "feature_flag": "claims_ai_assist_pilot",
+    "manual_workflow_available": true
+  },
+  "rollback_triggers": [
+    "Any unauthorized protected action",
+    "Any confirmed cross-tenant or approved-boundary data exposure",
+    "Missing audit evidence for a protected recommendation, approval, or action",
+    "Prompt injection changes system policy or reaches a protected tool",
+    "p95 latency exceeds 12 seconds for two consecutive monitoring windows",
+    "Model cost exceeds the approved daily burn-rate alert"
+  ],
+  "rollback_action": "Disable claims_ai_assist_pilot, preserve evidence, reconcile uncertain writes by idempotency key, notify accountable owners, and continue the manual claims workflow.",
+  "exceptions": [],
+  "approvers": [
+    {
+      "role": "Business Owner",
+      "name": "Elena Ruiz",
+      "approved": true
+    },
+    {
+      "role": "Technical Owner",
+      "name": "Jordan Kim",
+      "approved": true
+    },
+    {
+      "role": "Security Approver",
+      "name": "Dana Brooks",
+      "approved": true
+    },
+    {
+      "role": "Operations Owner",
+      "name": "Morgan Lee",
+      "approved": true
+    }
+  ],
+  "decision_options": [
+    "READY_FOR_BOUNDED_PILOT",
+    "HOLD_FOR_REMEDIATION",
+    "REJECT_RELEASE"
+  ]
+}

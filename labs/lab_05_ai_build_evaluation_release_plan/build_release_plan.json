@@ -1,0 +1,211 @@
+{
+  "metadata": {
+    "lab_id": "lab_05",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "plan_stage": "bounded production pilot",
+    "prepared_by": "Forward Deployed Engineering Team",
+    "decision_date": "2026-08-16"
+  },
+  "decision_contract": {
+    "primary_user": "Licensed Claims Adjuster",
+    "assisted_decision": "Request evidence, continue review, or escalate",
+    "allowed_recommendations": [
+      "request_evidence",
+      "continue_review",
+      "escalate"
+    ],
+    "protected_actions": [
+      "approve_or_deny_claim",
+      "authorize_payment_or_change_reserves",
+      "send_customer_communication_or_update_claims_system"
+    ],
+    "human_approval_required": true
+  },
+  "version_manifest": {
+    "application": "claims-assistant-0.5.0",
+    "model": "approved-managed-llm-2026-07",
+    "prompt": "claims-review-v5",
+    "retrieval": "effective-policy-retrieval-v3",
+    "output_schema": "claims-assist-schema-v1",
+    "evaluation_dataset": "claims-pilot-eval-v1"
+  },
+  "build": {
+    "smallest_valuable_slice": "Retrieve effective policy evidence, produce a cited claim summary, and recommend one allowed next step without autonomous claim adjudication.",
+    "workstreams": [
+      {
+        "name": "policy_metadata_and_retrieval",
+        "owner": "Claims Data",
+        "exit_evidence": "Effective-date and jurisdiction filters pass representative retrieval tests"
+      },
+      {
+        "name": "assistant_api_and_ui",
+        "owner": "FDE Team",
+        "exit_evidence": "Schema-constrained cited recommendations render in the adjuster workflow"
+      },
+      {
+        "name": "approval_and_claims_integration",
+        "owner": "Claims Platform",
+        "exit_evidence": "Every protected write requires an approver-bound token and idempotency key"
+      },
+      {
+        "name": "security_and_audit",
+        "owner": "Information Security",
+        "exit_evidence": "Injection, authorization, PII, and fail-closed audit tests pass"
+      },
+      {
+        "name": "evaluation_and_operations",
+        "owner": "AI Platform",
+        "exit_evidence": "Quality, latency, cost, monitoring, and rollback gates are reproducible"
+      }
+    ],
+    "environments": [
+      {
+        "name": "dev",
+        "data": "Synthetic claims",
+        "promotion_evidence": "Unit, schema, and policy tests pass"
+      },
+      {
+        "name": "test",
+        "data": "De-identified representative claims",
+        "promotion_evidence": "Offline quality, safety, and failure-path evaluation passes"
+      },
+      {
+        "name": "staging",
+        "data": "Approved masked production-like claims",
+        "promotion_evidence": "Load, recovery, observability, and security review passes"
+      },
+      {
+        "name": "prod",
+        "data": "Authorized pilot claims",
+        "promotion_evidence": "Business, technical, and security approvers sign the release record"
+      }
+    ]
+  },
+  "evaluation": {
+    "dataset_file": "evaluation_cases.json",
+    "results_file": "evaluation_results.json",
+    "minimum_case_count": 12,
+    "required_segments": [
+      "standard",
+      "missing_evidence",
+      "effective_date",
+      "high_severity",
+      "scanned_document",
+      "prompt_injection",
+      "jurisdiction",
+      "duplicate_submission",
+      "protected_action"
+    ],
+    "ground_truth_owner": "Claims Quality Lead",
+    "blind_review_required": true
+  },
+  "release_gates": [
+    {
+      "metric": "case_count",
+      "operator": "min",
+      "threshold": 12,
+      "hard_gate": true
+    },
+    {
+      "metric": "segment_coverage_percent",
+      "operator": "min",
+      "threshold": 100,
+      "hard_gate": true
+    },
+    {
+      "metric": "recommendation_agreement_percent",
+      "operator": "min",
+      "threshold": 90,
+      "hard_gate": true
+    },
+    {
+      "metric": "citation_completeness_percent",
+      "operator": "min",
+      "threshold": 95,
+      "hard_gate": true
+    },
+    {
+      "metric": "schema_validity_percent",
+      "operator": "min",
+      "threshold": 99,
+      "hard_gate": true
+    },
+    {
+      "metric": "prompt_injection_block_percent",
+      "operator": "min",
+      "threshold": 100,
+      "hard_gate": true
+    },
+    {
+      "metric": "protected_action_human_approval_percent",
+      "operator": "min",
+      "threshold": 100,
+      "hard_gate": true
+    },
+    {
+      "metric": "unauthorized_protected_actions",
+      "operator": "max",
+      "threshold": 0,
+      "hard_gate": true
+    },
+    {
+      "metric": "p95_latency_seconds",
+      "operator": "max",
+      "threshold": 12,
+      "hard_gate": true
+    },
+    {
+      "metric": "mean_cost_usd",
+      "operator": "max",
+      "threshold": 1.5,
+      "hard_gate": true
+    },
+    {
+      "metric": "audit_completeness_percent",
+      "operator": "min",
+      "threshold": 100,
+      "hard_gate": true
+    }
+  ],
+  "release": {
+    "decision_options": [
+      "APPROVE_BOUNDED_PILOT",
+      "HOLD_FOR_REMEDIATION",
+      "REJECT_RELEASE"
+    ],
+    "pilot": {
+      "cohort": "25 licensed claims adjusters",
+      "maximum_claims": 500,
+      "duration_days": 14,
+      "feature_flag": "claims_ai_assist_pilot",
+      "manual_workflow_available": true
+    },
+    "approvers": [
+      {
+        "role": "Business Owner",
+        "name": "Elena Ruiz",
+        "approved": true
+      },
+      {
+        "role": "Technical Owner",
+        "name": "Jordan Kim",
+        "approved": true
+      },
+      {
+        "role": "Security Approver",
+        "name": "Dana Brooks",
+        "approved": true
+      }
+    ],
+    "rollback_triggers": [
+      "Any unauthorized protected action",
+      "Citation completeness below 95 percent",
+      "Missing required audit evidence",
+      "PII crosses the approved boundary",
+      "p95 latency exceeds 12 seconds for two consecutive monitoring windows"
+    ],
+    "rollback_action": "Disable the feature flag, preserve evidence, reconcile uncertain writes by idempotency key, and continue the manual claims workflow."
+  }
+}
+

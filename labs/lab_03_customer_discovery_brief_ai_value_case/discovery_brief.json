@@ -1,0 +1,182 @@
+{
+  "engagement": {
+    "lab_id": "lab_03",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "prepared_by": "FDE Discovery Team",
+    "decision_date": "2026-08-16"
+  },
+  "problem": {
+    "problem_statement": "Licensed claims adjusters wait too long for complete, evidence-linked intake summaries, contributing to an 18-hour median intake-to-assignment time, 22% intake rework, and incomplete audit evidence.",
+    "primary_user": "Licensed Claims Adjuster",
+    "business_owner": "Elena Ruiz, VP of Claims Operations",
+    "current_workflow": [
+      "Receive claim intake forms and supporting documents.",
+      "Verify policy, claimant, and loss details across systems.",
+      "Read documents and assemble a source-linked evidence summary.",
+      "Identify missing information and select a routing queue.",
+      "Record the rationale and assign the claim for adjuster review."
+    ],
+    "frictions": [
+      "Evidence is fragmented across email, scans, policy systems, and the claims platform.",
+      "Intake summaries are written manually and vary by specialist.",
+      "Incorrect or missing intake information causes 22% rework.",
+      "Only 71% of audit records contain complete source citations."
+    ],
+    "non_goals": [
+      "Autonomously approve or deny a claim.",
+      "Authorize payment or change reserves.",
+      "Send customer communications or update the system of record without human approval."
+    ]
+  },
+  "decision_contract": {
+    "user": "Licensed Claims Adjuster",
+    "decision": "Choose whether to request evidence, continue review, or escalate the claim.",
+    "assistant_action": "Present a source-linked summary, identify missing information, and recommend one allowed workflow action.",
+    "expected_outcome": "Reduce intake delay and avoidable rework while improving citation completeness.",
+    "human_authority": "A licensed claims adjuster approves, changes, or rejects every recommendation before any downstream action."
+  },
+  "ai_fit": {
+    "is_ai_appropriate": true,
+    "reasons": [
+      "The workflow requires summarizing variable free text and semi-structured documents.",
+      "Recommendations can be evaluated against reviewed historical claims and cited sources.",
+      "A licensed adjuster remains accountable for the final claim decision and action."
+    ],
+    "deterministic_alternatives": [
+      "Use field-level rules for completeness checks on structured intake forms.",
+      "Fix policy-document version metadata and improve the existing intake checklist."
+    ]
+  },
+  "data_readiness": {
+    "sources": [
+      {
+        "name": "Claim intake forms",
+        "owner": "Claims Data",
+        "readiness": "conditional",
+        "constraint": "Profile the 3% missing structured fields by claim type."
+      },
+      {
+        "name": "Policy documents",
+        "owner": "Policy Administration",
+        "readiness": "not_ready",
+        "constraint": "Normalize version and effective-date labels before retrieval evaluation."
+      },
+      {
+        "name": "Adjuster notes",
+        "owner": "Claims Operations",
+        "readiness": "conditional",
+        "constraint": "Review abbreviations, sensitive text, and access rules."
+      }
+    ],
+    "gaps": [
+      "Create a reviewed evaluation set representing claim types, missing evidence, and escalation conditions.",
+      "Resolve policy-document version and effective-date metadata before pilot ingestion."
+    ],
+    "security_constraints": [
+      "Keep personally identifiable information inside Northstar's approved environment.",
+      "Exclude restricted fraud indicators from the first pilot.",
+      "Audit source retrieval, recommendation, human decision, and downstream action."
+    ]
+  },
+  "pilot": {
+    "duration_weeks": 8,
+    "teams": 3,
+    "maximum_claims": 1500,
+    "included_actions": [
+      "Recommend request evidence.",
+      "Recommend continue review.",
+      "Recommend escalate."
+    ],
+    "excluded_actions": [
+      "Approve or deny a claim.",
+      "Authorize payment or change reserves.",
+      "Send customer communications or update the claims system."
+    ]
+  },
+  "governance": {
+    "owners": {
+      "business_owner": "Elena Ruiz, VP of Claims Operations",
+      "user_representative": "Marcus Lee, Senior Claims Adjuster",
+      "data_owner": "Priya Shah, Director of Claims Data",
+      "technical_owner": "Jordan Kim, Forward Deployed Engineering Lead",
+      "security_approver": "Dana Brooks, Information Security Director"
+    },
+    "human_approval": {
+      "required": true,
+      "role": "Licensed Claims Adjuster",
+      "protected_actions": [
+        "Approve or deny a claim.",
+        "Authorize payment or change reserves.",
+        "Send customer communications or update the claims system of record."
+      ]
+    },
+    "scale_gate": {
+      "status": "pending",
+      "owner": "Elena Ruiz, VP of Claims Operations",
+      "evidence_required": [
+        "Quality results by claim type on a reviewed evaluation set.",
+        "Zero unauthorized protected actions and complete audit records.",
+        "Pilot targets for cycle time, rework, citations, and adoption."
+      ]
+    }
+  },
+  "risks": [
+    {
+      "risk": "The assistant cites the wrong policy version.",
+      "owner": "Priya Shah",
+      "mitigation": "Normalize effective-date metadata and test retrieval by policy version."
+    },
+    {
+      "risk": "Users over-trust a plausible summary.",
+      "owner": "Marcus Lee",
+      "mitigation": "Display source links, require an explicit adjuster decision, and review overrides."
+    },
+    {
+      "risk": "PII leaves the approved boundary.",
+      "owner": "Dana Brooks",
+      "mitigation": "Use approved hosting, least privilege, redaction tests, and audit logging."
+    },
+    {
+      "risk": "Pilot results overrepresent simple claims.",
+      "owner": "Jordan Kim",
+      "mitigation": "Stratify evaluation and pilot samples by claim type and complexity."
+    }
+  ],
+  "discovery_exit_criteria": [
+    {
+      "criterion": "Business owner confirms the problem, baseline, and pilot scope.",
+      "owner": "Elena Ruiz",
+      "status": "met"
+    },
+    {
+      "criterion": "User representative confirms the workflow and human approval boundary.",
+      "owner": "Marcus Lee",
+      "status": "met"
+    },
+    {
+      "criterion": "Data owner accepts the source inventory and remediation plan.",
+      "owner": "Priya Shah",
+      "status": "met"
+    },
+    {
+      "criterion": "Security approver accepts the pilot data boundary and audit requirements.",
+      "owner": "Dana Brooks",
+      "status": "pending"
+    },
+    {
+      "criterion": "Steering committee accepts measurable pilot targets and stop conditions.",
+      "owner": "Elena Ruiz",
+      "status": "pending"
+    }
+  ],
+  "recommendation": {
+    "decision": "pilot",
+    "rationale": "Proceed only with a bounded, human-approved pilot after policy-version metadata and the representative evaluation set are ready; do not authorize autonomous claim decisions or production scale-up during discovery.",
+    "prerequisites": [
+      "Normalize policy version and effective-date metadata.",
+      "Build and approve a representative evaluation set.",
+      "Obtain Security approval for the pilot data boundary and audit design."
+    ]
+  }
+}

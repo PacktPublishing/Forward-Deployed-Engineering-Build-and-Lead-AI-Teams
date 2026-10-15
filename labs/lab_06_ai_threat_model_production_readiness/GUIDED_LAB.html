@@ -1,0 +1,1294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="7f627dc5b1084d8d69f117584779d65321fddd5efaf0b2dcb4b4dc278338e743">
+<title>Lab 06 — Complete an AI Threat Model and Production-Readiness Checklist</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 06 — Complete an AI Threat Model and Production-Readiness Checklist</h1>
+<h2>Goal</h2>
+<p>Create a traceable AI threat model and an executable production-readiness review for Northstar Mutual's Enterprise AI Claims Assistant. You will define the system's decision boundary, assets, trust boundaries, threats, control ownership, readiness evidence, human approvals, pilot limits, and rollback conditions. Then you will run a Python review that fails closed unless the threat model and production evidence are complete.</p>
+<p>Build this lab in your own new project directory. The completed reference repository is for comparison if you become stuck; do not perform the exercise by editing the reference repository.</p>
+<h2>What You'll Build or Produce</h2>
+<p>You will create:</p>
+<ul><li><code>threat_model.json</code> — the decision boundary, assets, trust boundaries, controls, and ten priority threats.</li><li><code>production_readiness_checklist.json</code> — fifteen blocking checks with owners and evidence across seven readiness categories.</li><li><code>readiness_review.py</code> — an executable review that validates traceability and generates the decision.</li><li><code>production_readiness_report.md</code> — the generated audit-friendly review record.</li><li><code>.gitignore</code> — Git hygiene for the Python workflow.</li></ul>
+<h2>Estimated Time</h2>
+<p>75–100 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This lab uses Python's standard library and local JSON files only. It makes no network calls, provisions no cloud resources, and requires no paid model or platform account.</p>
+<h2>Completion Evidence</h2>
+<p>You are finished when:</p>
+<ul><li><code>python3 -m py_compile readiness_review.py</code> succeeds;</li><li><code>python3 readiness_review.py</code> prints <code>LAB 06 PASSED</code> and <code>READY_FOR_BOUNDED_PILOT</code>;</li><li>all ten threat categories have an owner, mapped controls, verification evidence, and low or medium residual risk;</li><li>all twelve controls trace to readiness evidence;</li><li>all fifteen blocking readiness checks pass;</li><li>business, technical, security, and operations approvals are present;</li><li><code>production_readiness_report.md</code> records the decision, pilot boundary, and rollback conditions; and</li><li>your own Git repository is clean on branch <code>main</code>.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later</li><li>Git</li><li>A text editor</li><li>Familiarity with JSON, basic Python, trust boundaries, least privilege, and human approval controls</li><li>The case boundary: the assistant may retrieve effective policy evidence, create a cited summary, and recommend <code>request_evidence</code>, <code>continue_review</code>, or <code>escalate</code>. It must not autonomously adjudicate claims, authorize money, communicate with customers, or update the claims system.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This lab challenges the release candidate from Lab 05 before customer deployment. You will trace concrete threats to enforcing controls and production evidence, then verify identity, data protection, guardrails, observability, reliability, recovery, and accountable approval. Passing means the bounded pilot is ready for a controlled delivery plan—not an unrestricted launch.</p>
+<h2>Step 1 — Create Your Project</h2>
+<p>Create and enter a new directory:</p>
+<pre><code class="language-bash">mkdir lab_06_ai_threat_model_production_readiness
+cd lab_06_ai_threat_model_production_readiness</code></pre>
+<p>Create <code>.gitignore</code>:</p>
+<pre><code class="language-gitignore">__pycache__/
+*.py[cod]
+.DS_Store</code></pre>
+<p>Why this matters: you are building the completed project independently. The reference repository represents the same finished state and is only a recovery aid.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You are in an empty learner-owned directory containing only <code>.gitignore</code>.</li><li><strong>Acceptable variation:</strong> You may choose another directory name.</li><li><strong>Failure indicator:</strong> You are inside the completed reference repository or an earlier lab.</li><li><strong>Corrective action:</strong> Stop, create a separate directory, and continue there.</li></ul>
+<h2>Step 2 — Define the Threat Model</h2>
+<p>Create <code>threat_model.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_06&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;review_scope&quot;: &quot;Bounded production pilot&quot;,
+    &quot;prepared_by&quot;: &quot;Forward Deployed Engineering Team&quot;,
+    &quot;review_date&quot;: &quot;2026-08-16&quot;
+  },
+  &quot;decision_boundary&quot;: {
+    &quot;primary_user&quot;: &quot;Licensed Claims Adjuster&quot;,
+    &quot;allowed_assistance&quot;: [
+      &quot;Retrieve effective policy evidence&quot;,
+      &quot;Produce a cited claim summary&quot;,
+      &quot;Recommend request_evidence, continue_review, or escalate&quot;
+    ],
+    &quot;protected_actions&quot;: [
+      &quot;Approve or deny a claim&quot;,
+      &quot;Authorize payment or change reserves&quot;,
+      &quot;Send customer communication or update the claims system&quot;
+    ],
+    &quot;autonomous_protected_actions_allowed&quot;: false
+  },
+  &quot;assets&quot;: [
+    {
+      &quot;id&quot;: &quot;A-01&quot;,
+      &quot;name&quot;: &quot;Claim files and customer PII&quot;,
+      &quot;classification&quot;: &quot;Restricted&quot;,
+      &quot;owner&quot;: &quot;Claims Data Owner&quot;,
+      &quot;required_properties&quot;: [
+        &quot;confidentiality&quot;,
+        &quot;integrity&quot;,
+        &quot;authorized use&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;A-02&quot;,
+      &quot;name&quot;: &quot;Effective policy corpus and metadata&quot;,
+      &quot;classification&quot;: &quot;Confidential&quot;,
+      &quot;owner&quot;: &quot;Policy Operations&quot;,
+      &quot;required_properties&quot;: [
+        &quot;integrity&quot;,
+        &quot;effective-date accuracy&quot;,
+        &quot;jurisdiction accuracy&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;A-03&quot;,
+      &quot;name&quot;: &quot;Assistant recommendation and citations&quot;,
+      &quot;classification&quot;: &quot;Confidential&quot;,
+      &quot;owner&quot;: &quot;Claims Quality Lead&quot;,
+      &quot;required_properties&quot;: [
+        &quot;integrity&quot;,
+        &quot;traceability&quot;,
+        &quot;schema validity&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;A-04&quot;,
+      &quot;name&quot;: &quot;Claims-system protected actions&quot;,
+      &quot;classification&quot;: &quot;Restricted&quot;,
+      &quot;owner&quot;: &quot;Claims Platform Owner&quot;,
+      &quot;required_properties&quot;: [
+        &quot;authorization&quot;,
+        &quot;idempotency&quot;,
+        &quot;human approval&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;A-05&quot;,
+      &quot;name&quot;: &quot;Audit and release evidence&quot;,
+      &quot;classification&quot;: &quot;Confidential&quot;,
+      &quot;owner&quot;: &quot;Security Operations&quot;,
+      &quot;required_properties&quot;: [
+        &quot;completeness&quot;,
+        &quot;immutability&quot;,
+        &quot;retention&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;A-06&quot;,
+      &quot;name&quot;: &quot;Service credentials and model endpoints&quot;,
+      &quot;classification&quot;: &quot;Secret&quot;,
+      &quot;owner&quot;: &quot;AI Platform&quot;,
+      &quot;required_properties&quot;: [
+        &quot;confidentiality&quot;,
+        &quot;rotation&quot;,
+        &quot;least privilege&quot;
+      ]
+    }
+  ],
+  &quot;trust_boundaries&quot;: [
+    {
+      &quot;id&quot;: &quot;B-01&quot;,
+      &quot;from&quot;: &quot;Adjuster browser&quot;,
+      &quot;to&quot;: &quot;Claims Assistant API&quot;,
+      &quot;data&quot;: &quot;Claim context and user intent&quot;,
+      &quot;enforcement&quot;: &quot;SSO, tenant-scoped authorization, request validation&quot;
+    },
+    {
+      &quot;id&quot;: &quot;B-02&quot;,
+      &quot;from&quot;: &quot;Claims Assistant API&quot;,
+      &quot;to&quot;: &quot;Policy retrieval service&quot;,
+      &quot;data&quot;: &quot;Search query and retrieved policy evidence&quot;,
+      &quot;enforcement&quot;: &quot;Service identity, signed index version, effective-date and jurisdiction filters&quot;
+    },
+    {
+      &quot;id&quot;: &quot;B-03&quot;,
+      &quot;from&quot;: &quot;Claims Assistant API&quot;,
+      &quot;to&quot;: &quot;Managed LLM endpoint&quot;,
+      &quot;data&quot;: &quot;Minimum necessary claim context and policy evidence&quot;,
+      &quot;enforcement&quot;: &quot;Private endpoint, encryption, PII minimization, no provider training&quot;
+    },
+    {
+      &quot;id&quot;: &quot;B-04&quot;,
+      &quot;from&quot;: &quot;Claims Assistant API&quot;,
+      &quot;to&quot;: &quot;Claims system&quot;,
+      &quot;data&quot;: &quot;Human-approved protected command&quot;,
+      &quot;enforcement&quot;: &quot;Approver-bound token, allowlisted operation, idempotency key&quot;
+    },
+    {
+      &quot;id&quot;: &quot;B-05&quot;,
+      &quot;from&quot;: &quot;Application services&quot;,
+      &quot;to&quot;: &quot;Audit platform&quot;,
+      &quot;data&quot;: &quot;Identity, versions, evidence, decision, approval, and action result&quot;,
+      &quot;enforcement&quot;: &quot;Append-only logging and fail-closed audit delivery&quot;
+    }
+  ],
+  &quot;controls&quot;: [
+    {
+      &quot;id&quot;: &quot;C-01&quot;,
+      &quot;name&quot;: &quot;Tenant-scoped identity and least privilege&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;Identity Engineering&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-IAM-01&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-02&quot;,
+      &quot;name&quot;: &quot;Untrusted-content separation and injection detection&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;AI Platform&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-GRD-01&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-03&quot;,
+      &quot;name&quot;: &quot;Versioned retrieval with effective-date and jurisdiction filters&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;Policy Operations&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-DATA-02&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-04&quot;,
+      &quot;name&quot;: &quot;Schema-constrained recommendation allowlist&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;FDE Team&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-GRD-02&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-05&quot;,
+      &quot;name&quot;: &quot;Human approval with approver-bound action token&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;Claims Platform&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-GRD-03&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-06&quot;,
+      &quot;name&quot;: &quot;Idempotent writes and uncertain-write reconciliation&quot;,
+      &quot;type&quot;: &quot;correct&quot;,
+      &quot;owner&quot;: &quot;Claims Platform&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-REL-01&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-07&quot;,
+      &quot;name&quot;: &quot;PII minimization, encryption, and approved data boundary&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;Data Protection&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-DATA-01&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-08&quot;,
+      &quot;name&quot;: &quot;Managed secrets, rotation, and workload identity&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;AI Platform&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-IAM-02&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-09&quot;,
+      &quot;name&quot;: &quot;Complete immutable audit trail with fail-closed delivery&quot;,
+      &quot;type&quot;: &quot;detect&quot;,
+      &quot;owner&quot;: &quot;Security Operations&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-OBS-01&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-10&quot;,
+      &quot;name&quot;: &quot;Signed version manifest and controlled environment promotion&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;Release Engineering&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-ENV-01&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-11&quot;,
+      &quot;name&quot;: &quot;Rate limits, timeouts, circuit breakers, and cost budgets&quot;,
+      &quot;type&quot;: &quot;prevent&quot;,
+      &quot;owner&quot;: &quot;Site Reliability Engineering&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-REL-02&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;C-12&quot;,
+      &quot;name&quot;: &quot;Feature flag, manual path, rollback, and incident runbook&quot;,
+      &quot;type&quot;: &quot;correct&quot;,
+      &quot;owner&quot;: &quot;Operations Lead&quot;,
+      &quot;status&quot;: &quot;implemented&quot;,
+      &quot;evidence_ids&quot;: [
+        &quot;E-REL-03&quot;,
+        &quot;E-OPS-01&quot;
+      ]
+    }
+  ],
+  &quot;threats&quot;: [
+    {
+      &quot;id&quot;: &quot;T-01&quot;,
+      &quot;category&quot;: &quot;prompt_injection&quot;,
+      &quot;scenario&quot;: &quot;A claim attachment instructs the model to ignore policy rules, reveal hidden context, or invoke a protected action.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-01&quot;,
+        &quot;A-03&quot;,
+        &quot;A-04&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-01&quot;,
+        &quot;B-03&quot;,
+        &quot;B-04&quot;
+      ],
+      &quot;likelihood&quot;: &quot;high&quot;,
+      &quot;impact&quot;: &quot;critical&quot;,
+      &quot;inherent_risk&quot;: &quot;critical&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-02&quot;,
+        &quot;C-04&quot;,
+        &quot;C-05&quot;,
+        &quot;C-09&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-GRD-01&quot;,
+        &quot;E-GRD-02&quot;,
+        &quot;E-GRD-03&quot;,
+        &quot;E-OBS-01&quot;
+      ],
+      &quot;owner&quot;: &quot;AI Security Lead&quot;,
+      &quot;residual_risk&quot;: &quot;medium&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-02&quot;,
+      &quot;category&quot;: &quot;tool_abuse&quot;,
+      &quot;scenario&quot;: &quot;A user or compromised service attempts a non-allowlisted claim denial, payment, reserve change, or customer communication.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-04&quot;,
+        &quot;A-05&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-01&quot;,
+        &quot;B-04&quot;,
+        &quot;B-05&quot;
+      ],
+      &quot;likelihood&quot;: &quot;medium&quot;,
+      &quot;impact&quot;: &quot;critical&quot;,
+      &quot;inherent_risk&quot;: &quot;critical&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-01&quot;,
+        &quot;C-04&quot;,
+        &quot;C-05&quot;,
+        &quot;C-06&quot;,
+        &quot;C-09&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-IAM-01&quot;,
+        &quot;E-GRD-02&quot;,
+        &quot;E-GRD-03&quot;,
+        &quot;E-REL-01&quot;,
+        &quot;E-OBS-01&quot;
+      ],
+      &quot;owner&quot;: &quot;Claims Platform Owner&quot;,
+      &quot;residual_risk&quot;: &quot;low&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-03&quot;,
+      &quot;category&quot;: &quot;data_exfiltration&quot;,
+      &quot;scenario&quot;: &quot;Claim PII crosses the approved boundary through prompts, logs, model output, or cross-tenant retrieval.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-01&quot;,
+        &quot;A-05&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-01&quot;,
+        &quot;B-03&quot;,
+        &quot;B-05&quot;
+      ],
+      &quot;likelihood&quot;: &quot;medium&quot;,
+      &quot;impact&quot;: &quot;critical&quot;,
+      &quot;inherent_risk&quot;: &quot;critical&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-01&quot;,
+        &quot;C-07&quot;,
+        &quot;C-09&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-IAM-01&quot;,
+        &quot;E-DATA-01&quot;,
+        &quot;E-OBS-01&quot;
+      ],
+      &quot;owner&quot;: &quot;Data Protection Officer&quot;,
+      &quot;residual_risk&quot;: &quot;medium&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-04&quot;,
+      &quot;category&quot;: &quot;retrieval_integrity&quot;,
+      &quot;scenario&quot;: &quot;The assistant cites a stale, wrong-jurisdiction, poisoned, or unauthorized policy document.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-02&quot;,
+        &quot;A-03&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-02&quot;
+      ],
+      &quot;likelihood&quot;: &quot;high&quot;,
+      &quot;impact&quot;: &quot;high&quot;,
+      &quot;inherent_risk&quot;: &quot;high&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-03&quot;,
+        &quot;C-09&quot;,
+        &quot;C-10&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-DATA-02&quot;,
+        &quot;E-OBS-01&quot;,
+        &quot;E-ENV-01&quot;
+      ],
+      &quot;owner&quot;: &quot;Policy Operations Lead&quot;,
+      &quot;residual_risk&quot;: &quot;medium&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-05&quot;,
+      &quot;category&quot;: &quot;identity_tenant_isolation&quot;,
+      &quot;scenario&quot;: &quot;An adjuster or service accesses a claim, policy, or action outside its tenant, role, or assigned authority.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-01&quot;,
+        &quot;A-02&quot;,
+        &quot;A-04&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-01&quot;,
+        &quot;B-02&quot;,
+        &quot;B-04&quot;
+      ],
+      &quot;likelihood&quot;: &quot;medium&quot;,
+      &quot;impact&quot;: &quot;critical&quot;,
+      &quot;inherent_risk&quot;: &quot;critical&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-01&quot;,
+        &quot;C-07&quot;,
+        &quot;C-09&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-IAM-01&quot;,
+        &quot;E-DATA-01&quot;,
+        &quot;E-OBS-01&quot;
+      ],
+      &quot;owner&quot;: &quot;Identity Engineering Lead&quot;,
+      &quot;residual_risk&quot;: &quot;low&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-06&quot;,
+      &quot;category&quot;: &quot;secrets&quot;,
+      &quot;scenario&quot;: &quot;A credential is committed, logged, exposed to the model, or reused beyond its intended workload.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-06&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-02&quot;,
+        &quot;B-03&quot;,
+        &quot;B-04&quot;,
+        &quot;B-05&quot;
+      ],
+      &quot;likelihood&quot;: &quot;medium&quot;,
+      &quot;impact&quot;: &quot;high&quot;,
+      &quot;inherent_risk&quot;: &quot;high&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-08&quot;,
+        &quot;C-09&quot;,
+        &quot;C-10&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-IAM-02&quot;,
+        &quot;E-OBS-01&quot;,
+        &quot;E-ENV-01&quot;
+      ],
+      &quot;owner&quot;: &quot;AI Platform Lead&quot;,
+      &quot;residual_risk&quot;: &quot;low&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-07&quot;,
+      &quot;category&quot;: &quot;transaction_integrity&quot;,
+      &quot;scenario&quot;: &quot;A timeout, retry, or partial failure creates a duplicate action or leaves an uncertain claims-system write.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-04&quot;,
+        &quot;A-05&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-04&quot;,
+        &quot;B-05&quot;
+      ],
+      &quot;likelihood&quot;: &quot;high&quot;,
+      &quot;impact&quot;: &quot;high&quot;,
+      &quot;inherent_risk&quot;: &quot;high&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-05&quot;,
+        &quot;C-06&quot;,
+        &quot;C-09&quot;,
+        &quot;C-12&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-GRD-03&quot;,
+        &quot;E-REL-01&quot;,
+        &quot;E-OBS-01&quot;,
+        &quot;E-REL-03&quot;
+      ],
+      &quot;owner&quot;: &quot;Claims Platform Owner&quot;,
+      &quot;residual_risk&quot;: &quot;medium&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-08&quot;,
+      &quot;category&quot;: &quot;audit&quot;,
+      &quot;scenario&quot;: &quot;A protected recommendation, approval, version, or action result is missing from the audit record or can be altered.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-03&quot;,
+        &quot;A-04&quot;,
+        &quot;A-05&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-05&quot;
+      ],
+      &quot;likelihood&quot;: &quot;medium&quot;,
+      &quot;impact&quot;: &quot;high&quot;,
+      &quot;inherent_risk&quot;: &quot;high&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-09&quot;,
+        &quot;C-12&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-OBS-01&quot;,
+        &quot;E-OPS-01&quot;
+      ],
+      &quot;owner&quot;: &quot;Security Operations Lead&quot;,
+      &quot;residual_risk&quot;: &quot;low&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-09&quot;,
+      &quot;category&quot;: &quot;change_management&quot;,
+      &quot;scenario&quot;: &quot;An unapproved model, prompt, retrieval index, schema, or tool version reaches production without matching evaluation evidence.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-02&quot;,
+        &quot;A-03&quot;,
+        &quot;A-04&quot;,
+        &quot;A-05&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-02&quot;,
+        &quot;B-03&quot;,
+        &quot;B-04&quot;
+      ],
+      &quot;likelihood&quot;: &quot;medium&quot;,
+      &quot;impact&quot;: &quot;high&quot;,
+      &quot;inherent_risk&quot;: &quot;high&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-03&quot;,
+        &quot;C-10&quot;,
+        &quot;C-12&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-DATA-02&quot;,
+        &quot;E-ENV-01&quot;,
+        &quot;E-REL-03&quot;
+      ],
+      &quot;owner&quot;: &quot;Release Engineering Lead&quot;,
+      &quot;residual_risk&quot;: &quot;low&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    },
+    {
+      &quot;id&quot;: &quot;T-10&quot;,
+      &quot;category&quot;: &quot;denial_of_service&quot;,
+      &quot;scenario&quot;: &quot;Large documents, repeated retries, or abusive traffic exhaust latency, capacity, or model-cost budgets and block adjuster work.&quot;,
+      &quot;asset_ids&quot;: [
+        &quot;A-03&quot;,
+        &quot;A-06&quot;
+      ],
+      &quot;trust_boundary_ids&quot;: [
+        &quot;B-01&quot;,
+        &quot;B-02&quot;,
+        &quot;B-03&quot;
+      ],
+      &quot;likelihood&quot;: &quot;high&quot;,
+      &quot;impact&quot;: &quot;medium&quot;,
+      &quot;inherent_risk&quot;: &quot;high&quot;,
+      &quot;control_ids&quot;: [
+        &quot;C-09&quot;,
+        &quot;C-11&quot;,
+        &quot;C-12&quot;
+      ],
+      &quot;verification_evidence_ids&quot;: [
+        &quot;E-OBS-01&quot;,
+        &quot;E-REL-02&quot;,
+        &quot;E-REL-03&quot;
+      ],
+      &quot;owner&quot;: &quot;Site Reliability Engineering Lead&quot;,
+      &quot;residual_risk&quot;: &quot;medium&quot;,
+      &quot;disposition&quot;: &quot;MITIGATE&quot;
+    }
+  ],
+  &quot;risk_policy&quot;: {
+    &quot;production_blockers&quot;: [
+      &quot;critical residual risk&quot;,
+      &quot;high residual risk without approved exception&quot;,
+      &quot;unowned threat&quot;,
+      &quot;unverified blocking control&quot;
+    ],
+    &quot;allowed_residual_risk_for_pilot&quot;: [
+      &quot;low&quot;,
+      &quot;medium&quot;
+    ],
+    &quot;exception_requires&quot;: [
+      &quot;named risk owner&quot;,
+      &quot;business approval&quot;,
+      &quot;security approval&quot;,
+      &quot;expiration date&quot;,
+      &quot;compensating control&quot;
+    ]
+  }
+}</code></pre>
+<p>The model begins with the exact business decision boundary, not a generic list of AI risks. Each threat crosses a named trust boundary, affects known assets, maps to enforcing controls and evidence, has a named risk owner, and ends with an explicit residual-risk disposition.</p>
+<p>The ten categories deliberately cover the production concerns most likely to matter for this case: indirect prompt injection, tool abuse, data exfiltration, retrieval integrity, tenant isolation, secret exposure, duplicate or uncertain writes, audit failure, uncontrolled change, and availability or cost exhaustion.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The file contains 6 assets, 5 trust boundaries, 12 controls, and 10 owned threats.</li><li><strong>Acceptable variation:</strong> You may add scenario-specific threats, but preserve every required category and all protected-action boundaries.</li><li><strong>Failure indicator:</strong> Threats are generic one-line concerns without assets, trust boundaries, owners, controls, evidence, or residual risk.</li><li><strong>Corrective action:</strong> Turn each concern into a concrete abuse or failure scenario and map it to enforceable controls and verification evidence.</li></ul>
+<h2>Step 3 — Build the Production-Readiness Checklist</h2>
+<p>Create <code>production_readiness_checklist.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_06&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;candidate&quot;: &quot;claims-assistant-0.6.0&quot;,
+    &quot;review_date&quot;: &quot;2026-08-16&quot;,
+    &quot;target_environment&quot;: &quot;production bounded pilot&quot;
+  },
+  &quot;version_manifest&quot;: {
+    &quot;application&quot;: &quot;claims-assistant-0.6.0&quot;,
+    &quot;model&quot;: &quot;approved-managed-llm-2026-07&quot;,
+    &quot;prompt&quot;: &quot;claims-review-v6&quot;,
+    &quot;retrieval&quot;: &quot;effective-policy-retrieval-v3&quot;,
+    &quot;output_schema&quot;: &quot;claims-assist-schema-v1&quot;,
+    &quot;evaluation_dataset&quot;: &quot;claims-pilot-eval-v1&quot;,
+    &quot;infrastructure&quot;: &quot;claims-assistant-infra-v4&quot;
+  },
+  &quot;checklist&quot;: {
+    &quot;identity_access&quot;: [
+      {
+        &quot;id&quot;: &quot;IAM-01&quot;,
+        &quot;requirement&quot;: &quot;SSO identity, tenant scope, role checks, and least-privilege service permissions are enforced.&quot;,
+        &quot;owner&quot;: &quot;Identity Engineering&quot;,
+        &quot;evidence_id&quot;: &quot;E-IAM-01&quot;,
+        &quot;evidence&quot;: &quot;Negative authorization suite passed for cross-tenant, wrong-role, and expired-session access.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-01&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;IAM-02&quot;,
+        &quot;requirement&quot;: &quot;Workload identity replaces embedded credentials and managed secrets rotate on schedule.&quot;,
+        &quot;owner&quot;: &quot;AI Platform&quot;,
+        &quot;evidence_id&quot;: &quot;E-IAM-02&quot;,
+        &quot;evidence&quot;: &quot;Secret scan is clean; workload identity and rotation test passed in staging.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-08&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ],
+    &quot;data_protection&quot;: [
+      {
+        &quot;id&quot;: &quot;DATA-01&quot;,
+        &quot;requirement&quot;: &quot;Only minimum necessary claim data crosses encrypted approved boundaries and logs redact PII.&quot;,
+        &quot;owner&quot;: &quot;Data Protection&quot;,
+        &quot;evidence_id&quot;: &quot;E-DATA-01&quot;,
+        &quot;evidence&quot;: &quot;Data-flow review, private-endpoint check, retention policy, and PII log scan approved.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-07&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;DATA-02&quot;,
+        &quot;requirement&quot;: &quot;Retrieval enforces tenant, authorization, effective-date, jurisdiction, and signed index version.&quot;,
+        &quot;owner&quot;: &quot;Policy Operations&quot;,
+        &quot;evidence_id&quot;: &quot;E-DATA-02&quot;,
+        &quot;evidence&quot;: &quot;Representative and adversarial retrieval tests passed against index effective-policy-retrieval-v3.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-03&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ],
+    &quot;model_tool_guardrails&quot;: [
+      {
+        &quot;id&quot;: &quot;GRD-01&quot;,
+        &quot;requirement&quot;: &quot;Retrieved and uploaded content is treated as untrusted; injection attempts cannot change system policy or expose hidden context.&quot;,
+        &quot;owner&quot;: &quot;AI Security&quot;,
+        &quot;evidence_id&quot;: &quot;E-GRD-01&quot;,
+        &quot;evidence&quot;: &quot;Prompt-injection and indirect-injection suite blocked all protected-action and exfiltration attempts.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-02&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;GRD-02&quot;,
+        &quot;requirement&quot;: &quot;Assistant output is schema-valid and limited to request_evidence, continue_review, or escalate.&quot;,
+        &quot;owner&quot;: &quot;FDE Team&quot;,
+        &quot;evidence_id&quot;: &quot;E-GRD-02&quot;,
+        &quot;evidence&quot;: &quot;Schema and recommendation allowlist gates passed for the pinned candidate.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-04&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;GRD-03&quot;,
+        &quot;requirement&quot;: &quot;Every protected action requires a fresh approver-bound token and an explicit licensed-adjuster confirmation.&quot;,
+        &quot;owner&quot;: &quot;Claims Platform&quot;,
+        &quot;evidence_id&quot;: &quot;E-GRD-03&quot;,
+        &quot;evidence&quot;: &quot;Bypass, replay, expired-token, wrong-approver, and missing-approval tests all failed closed.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-05&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ],
+    &quot;environments_delivery&quot;: [
+      {
+        &quot;id&quot;: &quot;ENV-01&quot;,
+        &quot;requirement&quot;: &quot;Dev, test, staging, and production promotion uses signed artifacts, separation of duties, and the exact version manifest.&quot;,
+        &quot;owner&quot;: &quot;Release Engineering&quot;,
+        &quot;evidence_id&quot;: &quot;E-ENV-01&quot;,
+        &quot;evidence&quot;: &quot;Promotion record links approvals, evaluation evidence, infrastructure plan, and signed versions.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-10&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ],
+    &quot;observability_audit&quot;: [
+      {
+        &quot;id&quot;: &quot;OBS-01&quot;,
+        &quot;requirement&quot;: &quot;Logs and traces capture identity, tenant, versions, retrieved evidence, recommendation, approval, action, latency, cost, and errors without raw PII.&quot;,
+        &quot;owner&quot;: &quot;Security Operations&quot;,
+        &quot;evidence_id&quot;: &quot;E-OBS-01&quot;,
+        &quot;evidence&quot;: &quot;Audit completeness and immutability tests passed; failed audit delivery blocks protected actions.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-09&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;OBS-02&quot;,
+        &quot;requirement&quot;: &quot;Dashboards and alerts cover safety, authorization, retrieval quality, latency, error, capacity, and cost SLOs.&quot;,
+        &quot;owner&quot;: &quot;Site Reliability Engineering&quot;,
+        &quot;evidence_id&quot;: &quot;E-OBS-02&quot;,
+        &quot;evidence&quot;: &quot;Staging alert drill paged the on-call owner with version and correlation identifiers.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-09&quot;,
+          &quot;C-11&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ],
+    &quot;reliability_recovery&quot;: [
+      {
+        &quot;id&quot;: &quot;REL-01&quot;,
+        &quot;requirement&quot;: &quot;Retries are bounded and protected writes use idempotency keys with an uncertain-write reconciliation path.&quot;,
+        &quot;owner&quot;: &quot;Claims Platform&quot;,
+        &quot;evidence_id&quot;: &quot;E-REL-01&quot;,
+        &quot;evidence&quot;: &quot;Timeout, duplicate-submit, and partial-failure tests produced one action or a reconciliation task.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-06&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;REL-02&quot;,
+        &quot;requirement&quot;: &quot;Timeouts, circuit breakers, concurrency limits, and cost budgets preserve the manual workflow.&quot;,
+        &quot;owner&quot;: &quot;Site Reliability Engineering&quot;,
+        &quot;evidence_id&quot;: &quot;E-REL-02&quot;,
+        &quot;evidence&quot;: &quot;Load and dependency-failure tests stayed within the approved blast radius and budget.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-11&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;REL-03&quot;,
+        &quot;requirement&quot;: &quot;Feature-flag rollback disables AI assistance without disabling manual claims handling.&quot;,
+        &quot;owner&quot;: &quot;Operations Lead&quot;,
+        &quot;evidence_id&quot;: &quot;E-REL-03&quot;,
+        &quot;evidence&quot;: &quot;Rollback drill disabled the pilot in under 10 minutes and preserved audit evidence.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-12&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ],
+    &quot;operations_governance&quot;: [
+      {
+        &quot;id&quot;: &quot;OPS-01&quot;,
+        &quot;requirement&quot;: &quot;Incident runbook names severity, triage, containment, evidence preservation, notification, and recovery owners.&quot;,
+        &quot;owner&quot;: &quot;Operations Lead&quot;,
+        &quot;evidence_id&quot;: &quot;E-OPS-01&quot;,
+        &quot;evidence&quot;: &quot;Tabletop exercise completed for prompt injection, PII exposure, and uncertain protected write.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-12&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      },
+      {
+        &quot;id&quot;: &quot;OPS-02&quot;,
+        &quot;requirement&quot;: &quot;Business, technical, security, and operations owners approve the bounded pilot with no open unaccepted exception.&quot;,
+        &quot;owner&quot;: &quot;Technical Deployment Lead&quot;,
+        &quot;evidence_id&quot;: &quot;E-OPS-02&quot;,
+        &quot;evidence&quot;: &quot;Signed readiness record contains all four approvals and an empty open-exception register.&quot;,
+        &quot;control_ids&quot;: [
+          &quot;C-10&quot;,
+          &quot;C-12&quot;
+        ],
+        &quot;status&quot;: &quot;PASS&quot;,
+        &quot;blocking&quot;: true
+      }
+    ]
+  },
+  &quot;slo_and_capacity&quot;: {
+    &quot;availability_target_percent&quot;: 99.5,
+    &quot;p95_latency_seconds&quot;: 12,
+    &quot;protected_action_audit_completeness_percent&quot;: 100,
+    &quot;unauthorized_protected_actions&quot;: 0,
+    &quot;monthly_model_cost_budget_usd&quot;: 12000,
+    &quot;pilot_concurrency_limit&quot;: 25
+  },
+  &quot;pilot_boundary&quot;: {
+    &quot;cohort&quot;: &quot;25 licensed claims adjusters&quot;,
+    &quot;maximum_claims&quot;: 500,
+    &quot;duration_days&quot;: 14,
+    &quot;feature_flag&quot;: &quot;claims_ai_assist_pilot&quot;,
+    &quot;manual_workflow_available&quot;: true
+  },
+  &quot;rollback_triggers&quot;: [
+    &quot;Any unauthorized protected action&quot;,
+    &quot;Any confirmed cross-tenant or approved-boundary data exposure&quot;,
+    &quot;Missing audit evidence for a protected recommendation, approval, or action&quot;,
+    &quot;Prompt injection changes system policy or reaches a protected tool&quot;,
+    &quot;p95 latency exceeds 12 seconds for two consecutive monitoring windows&quot;,
+    &quot;Model cost exceeds the approved daily burn-rate alert&quot;
+  ],
+  &quot;rollback_action&quot;: &quot;Disable claims_ai_assist_pilot, preserve evidence, reconcile uncertain writes by idempotency key, notify accountable owners, and continue the manual claims workflow.&quot;,
+  &quot;exceptions&quot;: [],
+  &quot;approvers&quot;: [
+    {
+      &quot;role&quot;: &quot;Business Owner&quot;,
+      &quot;name&quot;: &quot;Elena Ruiz&quot;,
+      &quot;approved&quot;: true
+    },
+    {
+      &quot;role&quot;: &quot;Technical Owner&quot;,
+      &quot;name&quot;: &quot;Jordan Kim&quot;,
+      &quot;approved&quot;: true
+    },
+    {
+      &quot;role&quot;: &quot;Security Approver&quot;,
+      &quot;name&quot;: &quot;Dana Brooks&quot;,
+      &quot;approved&quot;: true
+    },
+    {
+      &quot;role&quot;: &quot;Operations Owner&quot;,
+      &quot;name&quot;: &quot;Morgan Lee&quot;,
+      &quot;approved&quot;: true
+    }
+  ],
+  &quot;decision_options&quot;: [
+    &quot;READY_FOR_BOUNDED_PILOT&quot;,
+    &quot;HOLD_FOR_REMEDIATION&quot;,
+    &quot;REJECT_RELEASE&quot;
+  ]
+}</code></pre>
+<p>A readiness checklist is evidence, not optimism. Every item is blocking, names an accountable owner, records a concrete evidence statement, and maps back to one or more threat controls. The four accountable approvers and the empty exception register prevent a technically passing script from becoming an unowned release decision.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The checklist contains all seven categories, 15 unique evidence IDs, a pinned version manifest, four approvals, a bounded pilot, and explicit rollback triggers.</li><li><strong>Acceptable variation:</strong> A real review may contain <code>HOLD</code> or <code>FAIL</code> items; the correct outcome is then to hold the release and document remediation.</li><li><strong>Failure indicator:</strong> Items say only "done," lack owners, lack test or review evidence, or do not map to threat controls.</li><li><strong>Corrective action:</strong> Replace assertions with specific evidence from a test, configuration review, drill, signed record, or measured result.</li></ul>
+<h2>Step 4 — Create the Executable Readiness Review</h2>
+<p>Create <code>readiness_review.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Validate a threat model and generate an auditable production-readiness decision.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import json
+from collections import Counter
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+THREAT_MODEL_FILE = ROOT / &quot;threat_model.json&quot;
+CHECKLIST_FILE = ROOT / &quot;production_readiness_checklist.json&quot;
+REPORT_FILE = ROOT / &quot;production_readiness_report.md&quot;
+
+REQUIRED_THREAT_CATEGORIES = {
+    &quot;prompt_injection&quot;, &quot;tool_abuse&quot;, &quot;data_exfiltration&quot;, &quot;retrieval_integrity&quot;,
+    &quot;identity_tenant_isolation&quot;, &quot;secrets&quot;, &quot;transaction_integrity&quot;, &quot;audit&quot;,
+    &quot;change_management&quot;, &quot;denial_of_service&quot;,
+}
+REQUIRED_CHECKLIST_CATEGORIES = {
+    &quot;identity_access&quot;, &quot;data_protection&quot;, &quot;model_tool_guardrails&quot;,
+    &quot;environments_delivery&quot;, &quot;observability_audit&quot;, &quot;reliability_recovery&quot;,
+    &quot;operations_governance&quot;,
+}
+
+
+def load_json(path: Path) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Load a JSON artifact with a useful file-specific error.&quot;&quot;&quot;
+    try:
+        return json.loads(path.read_text(encoding=&quot;utf-8&quot;))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def unique_index(items: list[dict[str, Any]], label: str) -&gt; dict[str, dict[str, Any]]:
+    &quot;&quot;&quot;Index records by unique, non-empty ID.&quot;&quot;&quot;
+    identifiers = [item.get(&quot;id&quot;) for item in items]
+    if any(not identifier for identifier in identifiers):
+        raise ValueError(f&quot;{label} must have non-empty IDs&quot;)
+    if len(identifiers) != len(set(identifiers)):
+        raise ValueError(f&quot;{label} IDs must be unique&quot;)
+    return {item[&quot;id&quot;]: item for item in items}
+
+
+def flatten_checklist(checklist: dict[str, list[dict[str, Any]]]) -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;Return every readiness item while preserving its category.&quot;&quot;&quot;
+    return [
+        {**item, &quot;category&quot;: category}
+        for category, items in checklist.items()
+        for item in items
+    ]
+
+
+def validate_inputs(
+    model: dict[str, Any], readiness: dict[str, Any]
+) -&gt; tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    &quot;&quot;&quot;Validate traceability, ownership, evidence, and release boundaries.&quot;&quot;&quot;
+    errors: list[str] = []
+    required_model_sections = {
+        &quot;metadata&quot;, &quot;decision_boundary&quot;, &quot;assets&quot;, &quot;trust_boundaries&quot;,
+        &quot;controls&quot;, &quot;threats&quot;, &quot;risk_policy&quot;,
+    }
+    missing_model_sections = required_model_sections - set(model)
+    if missing_model_sections:
+        errors.append(&quot;Missing threat-model sections: &quot; + &quot;, &quot;.join(sorted(missing_model_sections)))
+
+    checklist_doc = readiness.get(&quot;checklist&quot;, {})
+    missing_checklist_categories = REQUIRED_CHECKLIST_CATEGORIES - set(checklist_doc)
+    extra_checklist_categories = set(checklist_doc) - REQUIRED_CHECKLIST_CATEGORIES
+    if missing_checklist_categories:
+        errors.append(&quot;Missing checklist categories: &quot; + &quot;, &quot;.join(sorted(missing_checklist_categories)))
+    if extra_checklist_categories:
+        errors.append(&quot;Unknown checklist categories: &quot; + &quot;, &quot;.join(sorted(extra_checklist_categories)))
+
+    try:
+        assets = unique_index(model.get(&quot;assets&quot;, []), &quot;Asset&quot;)
+        boundaries = unique_index(model.get(&quot;trust_boundaries&quot;, []), &quot;Trust boundary&quot;)
+        controls = unique_index(model.get(&quot;controls&quot;, []), &quot;Control&quot;)
+        threats = list(unique_index(model.get(&quot;threats&quot;, []), &quot;Threat&quot;).values())
+        checklist_items = flatten_checklist(checklist_doc)
+        unique_index(checklist_items, &quot;Checklist item&quot;)
+    except ValueError as exc:
+        errors.append(str(exc))
+        assets, boundaries, controls, threats, checklist_items = {}, {}, {}, [], []
+
+    observed_categories = {threat.get(&quot;category&quot;) for threat in threats}
+    missing_threat_categories = REQUIRED_THREAT_CATEGORIES - observed_categories
+    if missing_threat_categories:
+        errors.append(&quot;Missing threat categories: &quot; + &quot;, &quot;.join(sorted(missing_threat_categories)))
+
+    evidence_ids = [item.get(&quot;evidence_id&quot;) for item in checklist_items]
+    if any(not evidence_id for evidence_id in evidence_ids):
+        errors.append(&quot;Every checklist item must have an evidence_id&quot;)
+    if len(evidence_ids) != len(set(evidence_ids)):
+        errors.append(&quot;Checklist evidence IDs must be unique&quot;)
+    evidence_set = set(evidence_ids)
+
+    for control in controls.values():
+        if control.get(&quot;status&quot;) != &quot;implemented&quot;:
+            errors.append(f&quot;{control[&#x27;id&#x27;]} is not implemented&quot;)
+        if not control.get(&quot;owner&quot;):
+            errors.append(f&quot;{control[&#x27;id&#x27;]} has no owner&quot;)
+        unknown_evidence = set(control.get(&quot;evidence_ids&quot;, [])) - evidence_set
+        if unknown_evidence:
+            errors.append(f&quot;{control[&#x27;id&#x27;]} references unknown evidence: &quot; + &quot;, &quot;.join(sorted(unknown_evidence)))
+
+    for threat in threats:
+        if set(threat.get(&quot;asset_ids&quot;, [])) - set(assets):
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} references unknown assets&quot;)
+        if set(threat.get(&quot;trust_boundary_ids&quot;, [])) - set(boundaries):
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} references unknown trust boundaries&quot;)
+        if set(threat.get(&quot;control_ids&quot;, [])) - set(controls):
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} references unknown controls&quot;)
+        if set(threat.get(&quot;verification_evidence_ids&quot;, [])) - evidence_set:
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} references unknown verification evidence&quot;)
+        if not threat.get(&quot;owner&quot;):
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} has no risk owner&quot;)
+        if threat.get(&quot;residual_risk&quot;) in {&quot;critical&quot;, &quot;high&quot;}:
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} retains blocking residual risk&quot;)
+        if threat.get(&quot;disposition&quot;) != &quot;MITIGATE&quot;:
+            errors.append(f&quot;{threat[&#x27;id&#x27;]} lacks a MITIGATE disposition&quot;)
+
+    mapped_controls = {control_id for item in checklist_items for control_id in item.get(&quot;control_ids&quot;, [])}
+    if mapped_controls - set(controls):
+        errors.append(&quot;Checklist references unknown controls: &quot; + &quot;, &quot;.join(sorted(mapped_controls - set(controls))))
+    if set(controls) - mapped_controls:
+        errors.append(&quot;Controls without readiness evidence: &quot; + &quot;, &quot;.join(sorted(set(controls) - mapped_controls)))
+
+    for item in checklist_items:
+        if item.get(&quot;status&quot;) not in {&quot;PASS&quot;, &quot;HOLD&quot;, &quot;FAIL&quot;}:
+            errors.append(f&quot;{item.get(&#x27;id&#x27;)} has an invalid status&quot;)
+        if item.get(&quot;blocking&quot;) is not True:
+            errors.append(f&quot;{item.get(&#x27;id&#x27;)} must be an explicit blocking check&quot;)
+        if not item.get(&quot;owner&quot;) or not item.get(&quot;evidence&quot;):
+            errors.append(f&quot;{item.get(&#x27;id&#x27;)} needs an owner and concrete evidence&quot;)
+
+    decision_boundary = model.get(&quot;decision_boundary&quot;, {})
+    if decision_boundary.get(&quot;autonomous_protected_actions_allowed&quot;) is not False:
+        errors.append(&quot;Autonomous protected actions must be prohibited&quot;)
+    if len(decision_boundary.get(&quot;protected_actions&quot;, [])) &lt; 3:
+        errors.append(&quot;Protected action boundary is incomplete&quot;)
+
+    pilot = readiness.get(&quot;pilot_boundary&quot;, {})
+    if pilot.get(&quot;manual_workflow_available&quot;) is not True:
+        errors.append(&quot;The manual claims workflow must remain available&quot;)
+    if not pilot.get(&quot;feature_flag&quot;):
+        errors.append(&quot;The bounded pilot requires a feature flag&quot;)
+
+    expected_roles = {&quot;Business Owner&quot;, &quot;Technical Owner&quot;, &quot;Security Approver&quot;, &quot;Operations Owner&quot;}
+    if {item.get(&quot;role&quot;) for item in readiness.get(&quot;approvers&quot;, [])} != expected_roles:
+        errors.append(&quot;Business, technical, security, and operations approvers are required&quot;)
+
+    open_exceptions = [
+        item for item in readiness.get(&quot;exceptions&quot;, [])
+        if item.get(&quot;status&quot;) == &quot;OPEN&quot; and item.get(&quot;risk_acceptance&quot;) != &quot;APPROVED&quot;
+    ]
+    if open_exceptions:
+        errors.append(&quot;Open unaccepted production exceptions remain&quot;)
+
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+    return threats, checklist_items, sorted(mapped_controls)
+
+
+def decision_for(
+    threats: list[dict[str, Any]],
+    checklist_items: list[dict[str, Any]],
+    approvers: list[dict[str, Any]],
+) -&gt; str:
+    &quot;&quot;&quot;Fail closed unless every blocking item and required approval passes.&quot;&quot;&quot;
+    checks_pass = all(item[&quot;status&quot;] == &quot;PASS&quot; for item in checklist_items if item[&quot;blocking&quot;])
+    risks_acceptable = all(threat[&quot;residual_risk&quot;] in {&quot;low&quot;, &quot;medium&quot;} for threat in threats)
+    approvals_complete = bool(approvers) and all(item.get(&quot;approved&quot;) is True for item in approvers)
+    return &quot;READY_FOR_BOUNDED_PILOT&quot; if checks_pass and risks_acceptable and approvals_complete else &quot;HOLD_FOR_REMEDIATION&quot;
+
+
+def build_report(
+    model: dict[str, Any],
+    readiness: dict[str, Any],
+    threats: list[dict[str, Any]],
+    checklist_items: list[dict[str, Any]],
+    mapped_controls: list[str],
+    decision: str,
+) -&gt; str:
+    &quot;&quot;&quot;Render the auditable threat and readiness review.&quot;&quot;&quot;
+    risk_counts = Counter(threat[&quot;inherent_risk&quot;] for threat in threats)
+    lines = [
+        &quot;# Enterprise AI Claims Assistant — Threat Model and Production Readiness&quot;,
+        &quot;&quot;,
+        f&quot;- **Decision:** {decision}&quot;,
+        f&quot;- **Candidate:** {readiness[&#x27;metadata&#x27;][&#x27;candidate&#x27;]}&quot;,
+        f&quot;- **Target:** {readiness[&#x27;metadata&#x27;][&#x27;target_environment&#x27;]}&quot;,
+        f&quot;- **Review date:** {readiness[&#x27;metadata&#x27;][&#x27;review_date&#x27;]}&quot;,
+        &quot;&quot;,
+        &quot;## Decision Boundary&quot;,
+        &quot;&quot;,
+        f&quot;- Primary user: {model[&#x27;decision_boundary&#x27;][&#x27;primary_user&#x27;]}&quot;,
+        &quot;- The assistant may retrieve policy evidence, summarize with citations, and recommend an allowed next step.&quot;,
+        &quot;- Claim adjudication, payment, reserve changes, customer communication, and claims-system writes remain protected human actions.&quot;,
+        &quot;&quot;,
+        &quot;## Threat Summary&quot;,
+        &quot;&quot;,
+        f&quot;- Threats reviewed: {len(threats)}&quot;,
+        f&quot;- Inherent risk: {risk_counts.get(&#x27;critical&#x27;, 0)} critical, {risk_counts.get(&#x27;high&#x27;, 0)} high, {risk_counts.get(&#x27;medium&#x27;, 0)} medium&quot;,
+        f&quot;- Controls traced to readiness evidence: {len(mapped_controls)}/{len(model[&#x27;controls&#x27;])}&quot;,
+        &quot;&quot;,
+        &quot;| Threat | Category | Inherent | Residual | Owner | Controls |&quot;,
+        &quot;| --- | --- | --- | --- | --- | --- |&quot;,
+    ]
+    for threat in threats:
+        lines.append(
+            f&quot;| {threat[&#x27;id&#x27;]} | {threat[&#x27;category&#x27;]} | {threat[&#x27;inherent_risk&#x27;]} | &quot;
+            f&quot;{threat[&#x27;residual_risk&#x27;]} | {threat[&#x27;owner&#x27;]} | {&#x27;, &#x27;.join(threat[&#x27;control_ids&#x27;])} |&quot;
+        )
+
+    lines.extend([
+        &quot;&quot;, &quot;## Production-Readiness Checklist&quot;, &quot;&quot;,
+        &quot;| Category | Check | Status | Owner | Evidence ID |&quot;,
+        &quot;| --- | --- | --- | --- | --- |&quot;,
+    ])
+    for item in checklist_items:
+        lines.append(
+            f&quot;| {item[&#x27;category&#x27;]} | {item[&#x27;id&#x27;]} | {item[&#x27;status&#x27;]} | &quot;
+            f&quot;{item[&#x27;owner&#x27;]} | {item[&#x27;evidence_id&#x27;]} |&quot;
+        )
+
+    lines.extend([&quot;&quot;, &quot;## Version Manifest&quot;, &quot;&quot;, &quot;| Artifact | Version |&quot;, &quot;| --- | --- |&quot;])
+    for name, version in readiness[&quot;version_manifest&quot;].items():
+        lines.append(f&quot;| {name.replace(&#x27;_&#x27;, &#x27; &#x27;).title()} | {version} |&quot;)
+
+    lines.extend([&quot;&quot;, &quot;## Required Approvals&quot;, &quot;&quot;])
+    for approver in readiness[&quot;approvers&quot;]:
+        state = &quot;Approved&quot; if approver[&quot;approved&quot;] else &quot;Pending&quot;
+        lines.append(f&quot;- {state} — {approver[&#x27;role&#x27;]}: {approver[&#x27;name&#x27;]}&quot;)
+
+    pilot = readiness[&quot;pilot_boundary&quot;]
+    lines.extend([
+        &quot;&quot;, &quot;## Bounded Pilot and Recovery&quot;, &quot;&quot;,
+        f&quot;- Cohort: {pilot[&#x27;cohort&#x27;]}&quot;,
+        f&quot;- Maximum volume: {pilot[&#x27;maximum_claims&#x27;]} claims&quot;,
+        f&quot;- Duration: {pilot[&#x27;duration_days&#x27;]} days&quot;,
+        f&quot;- Feature flag: {pilot[&#x27;feature_flag&#x27;]}&quot;,
+        &quot;- Manual workflow remains available: yes&quot;,
+        &quot;&quot;, &quot;### Rollback triggers&quot;, &quot;&quot;,
+    ])
+    lines.extend(f&quot;- {trigger}&quot; for trigger in readiness[&quot;rollback_triggers&quot;])
+    lines.extend([&quot;&quot;, f&quot;**Rollback action:** {readiness[&#x27;rollback_action&#x27;]}&quot;, &quot;&quot;])
+    return &quot;\n&quot;.join(lines)
+
+
+def main() -&gt; int:
+    try:
+        model = load_json(THREAT_MODEL_FILE)
+        readiness = load_json(CHECKLIST_FILE)
+        threats, checklist_items, mapped_controls = validate_inputs(model, readiness)
+
+        blocking_failures = [
+            item[&quot;id&quot;] for item in checklist_items
+            if item[&quot;blocking&quot;] and item[&quot;status&quot;] != &quot;PASS&quot;
+        ]
+        if blocking_failures:
+            raise ValueError(&quot;Blocking checks not passed: &quot; + &quot;, &quot;.join(blocking_failures))
+
+        pending_approvals = [
+            item[&quot;role&quot;] for item in readiness[&quot;approvers&quot;]
+            if item.get(&quot;approved&quot;) is not True
+        ]
+        if pending_approvals:
+            raise ValueError(&quot;Pending approvals: &quot; + &quot;, &quot;.join(pending_approvals))
+
+        decision = decision_for(threats, checklist_items, readiness[&quot;approvers&quot;])
+        report = build_report(model, readiness, threats, checklist_items, mapped_controls, decision)
+        REPORT_FILE.write_text(report, encoding=&quot;utf-8&quot;)
+    except (KeyError, TypeError, ValueError) as exc:
+        print(f&quot;LAB 06 FAILED\n{exc}&quot;)
+        return 1
+
+    blocking_count = sum(item[&quot;blocking&quot;] for item in checklist_items)
+    print(&quot;LAB 06 PASSED&quot;)
+    print(f&quot;- Decision: {decision}&quot;)
+    print(f&quot;- Threats reviewed: {len(threats)}&quot;)
+    print(f&quot;- Controls traced: {len(mapped_controls)}/{len(model[&#x27;controls&#x27;])}&quot;)
+    print(f&quot;- Blocking checks passed: {blocking_count}/{blocking_count}&quot;)
+    print(f&quot;- Report: {REPORT_FILE.name}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>The program checks both the shape and the meaning of the review. It detects missing threat categories, broken asset or boundary references, unmapped controls, duplicate evidence IDs, non-implemented controls, blocking residual risk, open exceptions, missing approver roles, unpassed checks, and absent pilot safeguards. It then produces a review record from the validated evidence rather than relying on a manually typed decision.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The script reads the two JSON files, validates all cross-references, fails closed on incomplete evidence, and generates <code>production_readiness_report.md</code>.</li><li><strong>Acceptable variation:</strong> You may split the code into additional learner-built modules if your guide and final repository teach every file.</li><li><strong>Failure indicator:</strong> The code approves based only on a count, ignores unknown IDs, or treats human approvals and rollback as optional.</li><li><strong>Corrective action:</strong> Restore explicit references, blocking gates, all four approver roles, and fail-closed validation before continuing.</li></ul>
+<h2>Step 5 — Run the Production-Readiness Review</h2>
+<p>Compile and execute the review:</p>
+<pre><code class="language-bash">python3 -m py_compile readiness_review.py
+python3 readiness_review.py</code></pre>
+<p>Expected terminal output:</p>
+<pre><code class="language-text">LAB 06 PASSED
+- Decision: READY_FOR_BOUNDED_PILOT
+- Threats reviewed: 10
+- Controls traced: 12/12
+- Blocking checks passed: 15/15
+- Report: production_readiness_report.md</code></pre>
+<p>Inspect the generated report:</p>
+<pre><code class="language-bash">sed -n &#x27;1,260p&#x27; production_readiness_report.md</code></pre>
+<p>On Windows PowerShell, use:</p>
+<pre><code class="language-powershell">Get-Content production_readiness_report.md</code></pre>
+<p>Confirm that the report includes the protected-action boundary, all ten threats, all fifteen readiness checks, the exact version manifest, four approvals, the 25-adjuster/500-claim/14-day pilot boundary, the feature flag, the manual workflow, and all rollback triggers.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The command exits successfully, prints <code>READY_FOR_BOUNDED_PILOT</code>, and generates a complete report.</li><li><strong>Acceptable variation:</strong> If you intentionally change a blocking check to <code>HOLD</code>, a failed command is the correct control outcome. Restore the passing reference state afterward.</li><li><strong>Failure indicator:</strong> The command prints <code>LAB 06 FAILED</code>, a control is untraced, an evidence ID is unknown, or the generated report omits a release boundary.</li><li><strong>Corrective action:</strong> Read the exact validation message, repair the named ownership, reference, evidence, approval, or pilot-boundary issue, and rerun both commands.</li></ul>
+<h2>Step 6 — Review the Decision Like an FDE Lead</h2>
+<p>Before accepting the result, answer these release questions in your own notes:</p>
+<ol><li>Does the protected-action boundary match what the system technically enforces?</li><li>Does every high-impact threat have a preventive, detective, or corrective control with evidence?</li><li>Can the team identify the exact user, tenant, model, prompt, retrieval index, evidence, approval, and action for a protected decision?</li><li>Can operators disable AI assistance without disabling manual claims work?</li><li>Does every rollback trigger have observable evidence and a named responder?</li><li>Would a version change invalidate the evidence that justified this decision?</li></ol>
+<p>Why this matters: the executable check verifies internal consistency. Accountable reviewers still judge whether the evidence is credible, current, and sufficient for the actual customer environment.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You can defend the decision using concrete control evidence and operational boundaries.</li><li><strong>Acceptable variation:</strong> You may narrow the pilot further if evidence supports a smaller blast radius.</li><li><strong>Failure indicator:</strong> Your defense depends on "the model should behave" or an undocumented manual workaround.</li><li><strong>Corrective action:</strong> Add an enforcing control, measurable evidence, accountable owner, or narrower release boundary.</li></ul>
+<h2>Step 7 — Commit Your Evidence</h2>
+<p>Initialize and commit your own completed project:</p>
+<pre><code class="language-bash">git init -b main
+git add .gitignore threat_model.json production_readiness_checklist.json readiness_review.py production_readiness_report.md
+git commit -m &quot;Complete AI threat model and production readiness review&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git reports branch <code>main</code> with no uncommitted changes.</li><li><strong>Acceptable variation:</strong> Another clear commit message is acceptable.</li><li><strong>Failure indicator:</strong> The report is missing, Python caches are tracked, or the working tree is dirty.</li><li><strong>Corrective action:</strong> Run the review again, confirm <code>.gitignore</code>, stage the five intended project files, and commit.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>Bound the assistant's allowed decisions and protected human actions.</li><li>Identify assets and trust boundaries across the user, retrieval, model, claims-system, and audit paths.</li><li>Describe concrete abuse and failure scenarios with inherent and residual risk.</li><li>Map each threat to owned preventive, detective, or corrective controls.</li><li>Bind every control to production-readiness evidence.</li><li>Validate identity, data, model, tool, environment, audit, reliability, recovery, and governance checks.</li><li>Require business, technical, security, and operations approvals.</li><li>Release only to a feature-flagged, time-, volume-, and cohort-limited pilot with a manual path.</li><li>Monitor explicit rollback triggers and preserve evidence for incident response and reevaluation.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td><code>Cannot load ...</code></td><td>Missing file, malformed JSON, or wrong working directory</td><td>Run from the project root and validate the named JSON file</td></tr><tr><td>Unknown asset, boundary, control, or evidence</td><td>A cross-reference is misspelled or absent</td><td>Compare the exact IDs and restore one traceable record</td></tr><tr><td>Missing threat categories</td><td>A required production risk was omitted</td><td>Add the named category with a concrete scenario and controls</td></tr><tr><td>Control has no readiness evidence</td><td>Checklist mapping is incomplete</td><td>Add the control ID to the relevant evidenced readiness item</td></tr><tr><td>Blocking residual risk</td><td>A threat still has high or critical residual risk</td><td>Add and verify controls, narrow the pilot, or hold the release</td></tr><tr><td>Blocking check not passed</td><td>Evidence is incomplete or a control failed</td><td>Remediate and rerun; do not change the status without evidence</td></tr><tr><td>Pending approvals</td><td>An accountable owner has not accepted the evidence</td><td>Keep the release on hold until the named approval is recorded</td></tr><tr><td>Report is stale</td><td>JSON inputs changed after the last run</td><td>Run <code>python3 readiness_review.py</code> again and review the generated report</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>This lab creates no cloud resources and makes no network calls. To remove only Python cache files from your project:</p>
+<pre><code class="language-bash">python3 -c &quot;import shutil; shutil.rmtree(&#x27;__pycache__&#x27;, ignore_errors=True)&quot;</code></pre>
+<p>Keep the four learner-built artifacts, <code>.gitignore</code>, and Git history as portfolio evidence.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I defined the allowed assistance and protected human actions.</li><li class="check-item"><span class="box">☐</span> I identified all six assets and five trust boundaries.</li><li class="check-item"><span class="box">☐</span> I modeled all ten required threat categories.</li><li class="check-item"><span class="box">☐</span> Every threat has an owner, controls, evidence, and acceptable residual risk.</li><li class="check-item"><span class="box">☐</span> All twelve controls trace to readiness evidence.</li><li class="check-item"><span class="box">☐</span> All fifteen blocking checks pass across seven categories.</li><li class="check-item"><span class="box">☐</span> I pinned the application, model, prompt, retrieval, schema, dataset, and infrastructure versions.</li><li class="check-item"><span class="box">☐</span> I preserved four accountable approvals and an empty unaccepted-exception register.</li><li class="check-item"><span class="box">☐</span> I limited the pilot by cohort, volume, time, feature flag, and manual fallback.</li><li class="check-item"><span class="box">☐</span> I generated and reviewed <code>production_readiness_report.md</code>.</li><li class="check-item"><span class="box">☐</span> I committed the completed evidence in my own repository.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which threat should force an immediate rollback even if no customer harm is yet confirmed?</li><li>Which control is most important for preventing a recommendation from becoming an unauthorized action?</li><li>What new evidence must be collected if the model or retrieval index changes?</li><li>Which medium residual risk would you narrow through pilot scope rather than additional engineering?</li><li>What would make you reject the release instead of holding it for remediation?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="87e8d926eb8e06bf9d05e243ccf7ec69556fbb0cffa98e7666f4d7ac47dcf02e">
+<title>Capstone Workshop 5 — Decide Reusability and Measure Business Outcomes</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Capstone Workshop 5 — Decide Reusability and Measure Business Outcomes</h1>
+<h2>Goal</h2>
+<p>Complete the Enterprise AI Claims Assistant capstone by classifying reusable capabilities, defining the adoption and business-outcome scorecard, integrating all five workshop artifacts, and producing an evidence-based executive rollout decision.</p>
+<p>Continue in the learner-owned project from Workshops 1–4. The completed repository is a reference, not your workspace.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>reuse_scorecard.json</code> — reuse decisions, ownership boundaries, baselines, targets, cadence, and decision policy.</li><li><code>pilot_results.csv</code> — four weeks of adoption, outcome, quality, safety, latency, cost, and audit evidence.</li><li><code>capstone_review.py</code> — the executable integration and decision review.</li><li><code>executive_deployment_decision.md</code> — the generated steering-committee decision memo.</li><li><code>README.md</code> — the shared project handoff.</li><li>The final Workshop 5 Git commit.</li></ul>
+<h2>Estimated Time</h2>
+<p>80–110 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This workshop uses Python's standard library and local files only. It creates no external services or cost.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m json.tool reuse_scorecard.json</code> succeeds.</li><li>Six capabilities have product, platform, configuration, or custom-extension decisions, owners, and boundaries.</li><li>The scorecard contains 11 adoption, outcome, quality, safety, value, latency, and audit gates.</li><li><code>python3 -m py_compile capstone_review.py</code> succeeds.</li><li><code>python3 capstone_review.py</code> prints <code>LAB 11 PASSED</code> and <code>APPROVE_PHASED_PRODUCTION_ROLLOUT</code>.</li><li>The review connects 10/10 capstone decisions and generates the executive memo.</li><li>Git is clean on <code>main</code>.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Completed Workshops 1–4 in the same project directory</li><li>Python 3.10 or later</li><li>Familiarity with productization, adoption, ROI, rollout decisions, and executive communication</li></ul>
+<h2>Where This Workshop Fits</h2>
+<p>This workshop combines <strong>Identify Reusable Product Capabilities</strong> and <strong>Create the Adoption and Business-Outcome Scorecard</strong>. It completes the shared project and provides the evidence used in the separate executive role-play and final-rubric lectures.</p>
+<h2>Step 1 — Create the Reuse and Scorecard Artifact</h2>
+<p>Create <code>reuse_scorecard.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_11&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;candidate&quot;: &quot;claims-assistant-1.0.0&quot;,
+    &quot;review_date&quot;: &quot;2026-08-17&quot;,
+    &quot;decision_stage&quot;: &quot;phased production rollout&quot;
+  },
+  &quot;reusable_capabilities&quot;: [
+    {
+      &quot;capability&quot;: &quot;Prompt-injection evaluation pack&quot;,
+      &quot;decision&quot;: &quot;PRODUCT&quot;,
+      &quot;owner&quot;: &quot;AI Quality Product Owner&quot;,
+      &quot;boundary&quot;: &quot;Versioned test contract with deployment-specific fixtures&quot;
+    },
+    {
+      &quot;capability&quot;: &quot;Effective-policy retrieval pattern&quot;,
+      &quot;decision&quot;: &quot;PRODUCT&quot;,
+      &quot;owner&quot;: &quot;Knowledge Platform Product Owner&quot;,
+      &quot;boundary&quot;: &quot;Shared retrieval contract with configured jurisdiction and source connectors&quot;
+    },
+    {
+      &quot;capability&quot;: &quot;Protected-action audit schema&quot;,
+      &quot;decision&quot;: &quot;PRODUCT&quot;,
+      &quot;owner&quot;: &quot;Security Product Owner&quot;,
+      &quot;boundary&quot;: &quot;Shared identity, evidence, approval, action, and result schema&quot;
+    },
+    {
+      &quot;capability&quot;: &quot;Enterprise identity adapter framework&quot;,
+      &quot;decision&quot;: &quot;PLATFORM&quot;,
+      &quot;owner&quot;: &quot;Identity Platform Owner&quot;,
+      &quot;boundary&quot;: &quot;Shared adapter interface with customer-specific identity configuration&quot;
+    },
+    {
+      &quot;capability&quot;: &quot;Tenant claim-field mapping&quot;,
+      &quot;decision&quot;: &quot;CONFIGURATION&quot;,
+      &quot;owner&quot;: &quot;Implementation Configuration Owner&quot;,
+      &quot;boundary&quot;: &quot;Declarative mapping that cannot fork shared source&quot;
+    },
+    {
+      &quot;capability&quot;: &quot;Northstar legacy mainframe adapter&quot;,
+      &quot;decision&quot;: &quot;CUSTOM_EXTENSION&quot;,
+      &quot;owner&quot;: &quot;Northstar Integration Owner&quot;,
+      &quot;boundary&quot;: &quot;Customer-funded isolated extension with review date 2027-03-31&quot;
+    }
+  ],
+  &quot;adoption_and_outcome_scorecard&quot;: {
+    &quot;baselines&quot;: {
+      &quot;average_handling_minutes&quot;: 42,
+      &quot;rework_rate_percent&quot;: 14,
+      &quot;quality_score_percent&quot;: 86
+    },
+    &quot;targets&quot;: [
+      {
+        &quot;metric&quot;: &quot;active_adoption_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 80,
+        &quot;owner&quot;: &quot;Claims Operations Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;assisted_claim_rate_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 70,
+        &quot;owner&quot;: &quot;Claims Operations Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;recommendation_acceptance_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 75,
+        &quot;owner&quot;: &quot;Claims Quality Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;handling_time_reduction_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 25,
+        &quot;owner&quot;: &quot;Business Owner&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;rework_reduction_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 25,
+        &quot;owner&quot;: &quot;Claims Quality Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;quality_score_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 92,
+        &quot;owner&quot;: &quot;Claims Quality Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;citation_completeness_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 95,
+        &quot;owner&quot;: &quot;Claims Quality Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;p95_latency_seconds&quot;,
+        &quot;operator&quot;: &quot;max&quot;,
+        &quot;threshold&quot;: 12,
+        &quot;owner&quot;: &quot;Site Reliability Lead&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;benefit_cost_ratio&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 3,
+        &quot;owner&quot;: &quot;Finance Partner&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;unauthorized_protected_actions&quot;,
+        &quot;operator&quot;: &quot;max&quot;,
+        &quot;threshold&quot;: 0,
+        &quot;owner&quot;: &quot;Security Approver&quot;
+      },
+      {
+        &quot;metric&quot;: &quot;audit_completeness_percent&quot;,
+        &quot;operator&quot;: &quot;min&quot;,
+        &quot;threshold&quot;: 100,
+        &quot;owner&quot;: &quot;Security Operations&quot;
+      }
+    ],
+    &quot;review_cadence&quot;: &quot;Weekly during rollout with a formal day-30 continue, repair, pause, or expand decision&quot;
+  },
+  &quot;decision_policy&quot;: {
+    &quot;approve&quot;: &quot;All scorecard gates pass, safety evidence passes, blocking readiness controls pass, approvals are complete, and no risk is OPEN.&quot;,
+    &quot;hold&quot;: &quot;Safety passes but a value, adoption, readiness, approval, or delivery condition fails.&quot;,
+    &quot;pause&quot;: &quot;Any unauthorized protected action, quality below the safety floor, cross-tenant exposure, or missing protected-action audit occurs.&quot;
+  }
+}</code></pre>
+<p>The reuse decisions distinguish stable shared contracts from customer-specific implementation. Product and platform capabilities need repeated demand and durable ownership. Configuration must avoid source forks. A custom extension must remain isolated, funded, and reviewable.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> At least five capabilities have a supported decision, owner, and explicit reuse boundary.</li><li><strong>Acceptable variation:</strong> Add or remove capabilities when deployment evidence supports the portfolio decision.</li><li><strong>Failure indicator:</strong> “Reusable” means copying customer code into a shared repository without a contract or owner.</li><li><strong>Corrective action:</strong> Choose product, platform, configuration, custom extension, or retirement and state the supported boundary.</li></ul>
+<h2>Step 2 — Add the Pilot Evidence</h2>
+<p>Create <code>pilot_results.csv</code>:</p>
+<pre><code class="language-csv">week,eligible_adjusters,active_adjusters,eligible_claims,assisted_claims,recommendations_shown,recommendations_accepted,average_handling_minutes,rework_rate_percent,quality_score_percent,citation_completeness_percent,p95_latency_seconds,model_cost_usd,unauthorized_protected_actions,audit_completeness_percent
+1,25,14,100,48,45,30,38,12.5,88.5,96.0,11.8,80,0,100
+2,25,18,110,70,65,51,34,10.5,91.0,97.0,11.4,105,0,100
+3,25,21,115,90,85,70,31,9.2,93.2,98.0,10.7,135,0,100
+4,25,22,120,105,100,82,29,8.5,94.5,99.0,10.2,165,0,100</code></pre>
+<p>The latest week is evaluated against 11 gates. Adoption alone cannot approve scale. The evidence must also show workflow coverage, handling-time and rework improvement, quality, citation completeness, latency, benefit relative to cost, zero unauthorized protected actions, and complete audit records.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Weeks 1–4 are sequential and every row satisfies <code>accepted ≤ shown ≤ assisted ≤ eligible</code>.</li><li><strong>Acceptable variation:</strong> Different pilot values are acceptable when they are internally consistent and lead to an honest decision.</li><li><strong>Failure indicator:</strong> Safety, latency, audit, or cost data is missing because adoption looks strong.</li><li><strong>Corrective action:</strong> Restore the complete measurement contract before calculating a rollout decision.</li></ul>
+<h2>Step 3 — Build the Integrated Capstone Review</h2>
+<p>Create <code>capstone_review.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Validate an integrated enterprise AI deployment and write its decision memo.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+PLAN_FILES = [
+    ROOT / &quot;problem_value.json&quot;,
+    ROOT / &quot;team_decisions.json&quot;,
+    ROOT / &quot;architecture_approval.json&quot;,
+    ROOT / &quot;readiness_deployment.json&quot;,
+    ROOT / &quot;reuse_scorecard.json&quot;,
+]
+RISK_FILE = ROOT / &quot;risk_register.csv&quot;
+PILOT_FILE = ROOT / &quot;pilot_results.csv&quot;
+REPORT_FILE = ROOT / &quot;executive_deployment_decision.md&quot;
+
+CAPSTONE_SECTIONS = {
+    &quot;customer_problem&quot;,
+    &quot;discovery_and_value&quot;,
+    &quot;forward_deployed_team&quot;,
+    &quot;decision_rights&quot;,
+    &quot;architecture&quot;,
+    &quot;evaluation_and_human_approval&quot;,
+    &quot;security_and_readiness&quot;,
+    &quot;deployment_plan&quot;,
+    &quot;reusable_capabilities&quot;,
+    &quot;adoption_and_outcome_scorecard&quot;,
+}
+
+
+def load_json(path: Path) -&gt; dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding=&quot;utf-8&quot;))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def load_csv(path: Path) -&gt; list[dict[str, str]]:
+    try:
+        with path.open(encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as handle:
+            return list(csv.DictReader(handle))
+    except OSError as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def load_plan(paths: list[Path]) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Combine the five workshop artifacts into one coherent capstone plan.&quot;&quot;&quot;
+    documents = [load_json(path) for path in paths]
+    metadata = documents[0].get(&quot;metadata&quot;) if documents else None
+    if not metadata:
+        raise ValueError(&quot;Workshop 1 must define capstone metadata&quot;)
+    plan: dict[str, Any] = {&quot;metadata&quot;: metadata}
+    for path, document in zip(paths, documents):
+        if document.get(&quot;metadata&quot;) != metadata:
+            raise ValueError(f&quot;{path.name} metadata does not match Workshop 1&quot;)
+        for key, value in document.items():
+            if key == &quot;metadata&quot;:
+                continue
+            if key in plan:
+                raise ValueError(f&quot;Duplicate capstone section {key} in {path.name}&quot;)
+            plan[key] = value
+    return plan
+
+
+def percent(numerator: float, denominator: float) -&gt; float:
+    return round(100 * numerator / denominator, 2) if denominator else 0.0
+
+
+def target_passed(target: dict[str, Any], actual: float) -&gt; bool:
+    threshold = float(target[&quot;threshold&quot;])
+    if target[&quot;operator&quot;] == &quot;min&quot;:
+        return actual &gt;= threshold
+    if target[&quot;operator&quot;] == &quot;max&quot;:
+        return actual &lt;= threshold
+    raise ValueError(f&quot;Unsupported operator for {target[&#x27;metric&#x27;]}: {target[&#x27;operator&#x27;]}&quot;)
+
+
+def validate_plan(plan: dict[str, Any]) -&gt; None:
+    errors: list[str] = []
+    missing = CAPSTONE_SECTIONS - set(plan)
+    if missing:
+        errors.append(&quot;Missing capstone sections: &quot; + &quot;, &quot;.join(sorted(missing)))
+
+    problem = plan.get(&quot;customer_problem&quot;, {})
+    baseline = problem.get(&quot;baseline&quot;, {})
+    if not problem.get(&quot;primary_user&quot;) or not problem.get(&quot;problem_statement&quot;):
+        errors.append(&quot;Customer problem needs a primary user and evidence-based statement&quot;)
+    if set(baseline) != {
+        &quot;average_handling_minutes&quot;, &quot;rework_rate_percent&quot;, &quot;quality_score_percent&quot;
+    }:
+        errors.append(&quot;Customer baseline must define time, rework, and quality&quot;)
+    if not problem.get(&quot;business_outcome&quot;) or not problem.get(&quot;scope&quot;):
+        errors.append(&quot;Customer problem needs a measurable outcome and bounded scope&quot;)
+    if len(problem.get(&quot;non_goals&quot;, [])) &lt; 3:
+        errors.append(&quot;At least three protected non-goals are required&quot;)
+
+    discovery = plan.get(&quot;discovery_and_value&quot;, {})
+    value = discovery.get(&quot;value_hypothesis&quot;, {})
+    if len(discovery.get(&quot;evidence&quot;, [])) &lt; 4 or len(discovery.get(&quot;assumptions&quot;, [])) &lt; 2:
+        errors.append(&quot;Discovery must separate evidence from owned testable assumptions&quot;)
+    if not value.get(&quot;statement&quot;) or not value.get(&quot;benefit_formula&quot;):
+        errors.append(&quot;Value hypothesis needs a statement and calculation contract&quot;)
+
+    required_roles = {
+        &quot;Technical Deployment Lead&quot;, &quot;Forward Deployed Engineer&quot;, &quot;AI Engineer&quot;,
+        &quot;Platform Engineer&quot;, &quot;Security Engineer&quot;, &quot;Product Partner&quot;,
+        &quot;Claims Subject-Matter Expert&quot;,
+    }
+    team = plan.get(&quot;forward_deployed_team&quot;, [])
+    roles = [item.get(&quot;role&quot;) for item in team]
+    if set(roles) != required_roles or len(roles) != len(set(roles)):
+        errors.append(&quot;Forward deployed team must contain seven unique required roles&quot;)
+    for member in team:
+        if not member.get(&quot;name&quot;) or not member.get(&quot;accountability&quot;):
+            errors.append(f&quot;{member.get(&#x27;role&#x27;)} needs a named person and accountability&quot;)
+        if float(member.get(&quot;allocation_fte&quot;, 0)) &lt;= 0:
+            errors.append(f&quot;{member.get(&#x27;role&#x27;)} needs a positive allocation&quot;)
+
+    decisions = plan.get(&quot;decision_rights&quot;, [])
+    required_decisions = {
+        &quot;Business outcome and rollout scope&quot;, &quot;Architecture and technical exceptions&quot;,
+        &quot;Security risk acceptance&quot;, &quot;Protected claim action&quot;, &quot;Go-live or rollback&quot;,
+        &quot;Productization investment&quot;,
+    }
+    decision_names = [item.get(&quot;decision&quot;) for item in decisions]
+    if set(decision_names) != required_decisions or len(decision_names) != len(set(decision_names)):
+        errors.append(&quot;Decision rights must cover six unique enterprise decisions&quot;)
+    for decision in decisions:
+        if not decision.get(&quot;responsible&quot;) or not decision.get(&quot;accountable&quot;):
+            errors.append(f&quot;{decision.get(&#x27;decision&#x27;)} needs responsible and accountable ownership&quot;)
+
+    architecture = plan.get(&quot;architecture&quot;, {})
+    components = architecture.get(&quot;components&quot;, [])
+    component_types = {item.get(&quot;type&quot;) for item in components}
+    if not {&quot;human_interface&quot;, &quot;probabilistic_ai&quot;, &quot;deterministic_control&quot;, &quot;protected_action&quot;} &lt;= component_types:
+        errors.append(&quot;Architecture must separate human, probabilistic, deterministic, and protected-action components&quot;)
+    if len(architecture.get(&quot;trust_boundaries&quot;, [])) &lt; 4:
+        errors.append(&quot;Architecture needs at least four explicit trust boundaries&quot;)
+    workflow = architecture.get(&quot;workflow&quot;, [])
+    try:
+        approval_index = next(i for i, item in enumerate(workflow) if &quot;explicit licensed-adjuster approval&quot; in item)
+        execution_index = next(i for i, item in enumerate(workflow) if item.startswith(&quot;Execute&quot;))
+        audit_index = next(i for i, item in enumerate(workflow) if item.startswith(&quot;Write identity&quot;))
+        if not approval_index &lt; execution_index &lt; audit_index:
+            errors.append(&quot;Workflow must approve before execution and audit the result&quot;)
+    except StopIteration:
+        errors.append(&quot;Workflow is missing approval, execution, or audit ordering&quot;)
+
+    evaluation = plan.get(&quot;evaluation_and_human_approval&quot;, {})
+    segments = evaluation.get(&quot;required_segments&quot;, [])
+    gates = evaluation.get(&quot;release_gates&quot;, [])
+    results = evaluation.get(&quot;latest_results&quot;, {})
+    if len(segments) &lt; 9:
+        errors.append(&quot;Evaluation must cover representative and adversarial segments&quot;)
+    if {item.get(&quot;metric&quot;) for item in gates} != set(results):
+        errors.append(&quot;Every release gate needs a latest result and no ungoverned result&quot;)
+    approval = evaluation.get(&quot;human_approval&quot;, {})
+    if approval.get(&quot;required&quot;) is not True or approval.get(&quot;role&quot;) != &quot;Licensed Claims Adjuster&quot;:
+        errors.append(&quot;Licensed-adjuster approval must be mandatory&quot;)
+    if len(approval.get(&quot;protected_actions&quot;, [])) &lt; 3 or len(approval.get(&quot;approval_evidence&quot;, [])) &lt; 5:
+        errors.append(&quot;Protected actions and approval evidence are incomplete&quot;)
+
+    readiness = plan.get(&quot;security_and_readiness&quot;, {})
+    controls = readiness.get(&quot;controls&quot;, [])
+    required_categories = {
+        &quot;identity_access&quot;, &quot;data_protection&quot;, &quot;model_guardrail&quot;, &quot;human_approval&quot;,
+        &quot;observability_audit&quot;, &quot;reliability_recovery&quot;, &quot;operations&quot;,
+    }
+    if {item.get(&quot;category&quot;) for item in controls} != required_categories:
+        errors.append(&quot;Security review must cover all seven readiness categories&quot;)
+    for control in controls:
+        if not all(control.get(field) for field in (&quot;id&quot;, &quot;owner&quot;, &quot;evidence&quot;, &quot;status&quot;)):
+            errors.append(&quot;Every readiness control needs ID, owner, evidence, and status&quot;)
+    approval_roles = {item.get(&quot;role&quot;) for item in readiness.get(&quot;approvals&quot;, [])}
+    if approval_roles != {&quot;Business Owner&quot;, &quot;Technical Owner&quot;, &quot;Security Approver&quot;, &quot;Operations Owner&quot;}:
+        errors.append(&quot;Business, technical, security, and operations approvals are required&quot;)
+    if not readiness.get(&quot;rollback_action&quot;):
+        errors.append(&quot;Readiness review needs a concrete rollback action&quot;)
+
+    deployment = plan.get(&quot;deployment_plan&quot;, {})
+    boundary = deployment.get(&quot;rollout_boundary&quot;, {})
+    if not boundary.get(&quot;feature_flag&quot;) or boundary.get(&quot;manual_workflow_available&quot;) is not True:
+        errors.append(&quot;Rollout must have a feature flag and preserve the manual workflow&quot;)
+    milestones = deployment.get(&quot;milestones&quot;, [])
+    milestone_ids = [item.get(&quot;id&quot;) for item in milestones]
+    if len(milestone_ids) &lt; 7 or len(milestone_ids) != len(set(milestone_ids)):
+        errors.append(&quot;Deployment needs at least seven unique milestones&quot;)
+    known_ids = set(milestone_ids)
+    for milestone in milestones:
+        if not all(milestone.get(field) for field in (&quot;id&quot;, &quot;name&quot;, &quot;owner&quot;, &quot;exit_evidence&quot;)):
+            errors.append(&quot;Every milestone needs an ID, name, owner, and exit evidence&quot;)
+        unknown = set(milestone.get(&quot;depends_on&quot;, [])) - known_ids
+        if unknown:
+            errors.append(f&quot;{milestone.get(&#x27;id&#x27;)} has unknown dependencies: {sorted(unknown)}&quot;)
+    visiting: set[str] = set()
+    visited: set[str] = set()
+    index = {item[&quot;id&quot;]: item for item in milestones if item.get(&quot;id&quot;)}
+
+    def visit(milestone_id: str) -&gt; None:
+        if milestone_id in visiting:
+            errors.append(f&quot;Deployment dependency cycle includes {milestone_id}&quot;)
+            return
+        if milestone_id in visited or milestone_id not in index:
+            return
+        visiting.add(milestone_id)
+        for dependency in index[milestone_id].get(&quot;depends_on&quot;, []):
+            visit(dependency)
+        visiting.remove(milestone_id)
+        visited.add(milestone_id)
+
+    for milestone_id in index:
+        visit(milestone_id)
+
+    capabilities = plan.get(&quot;reusable_capabilities&quot;, [])
+    allowed_decisions = {&quot;PRODUCT&quot;, &quot;PLATFORM&quot;, &quot;CONFIGURATION&quot;, &quot;CUSTOM_EXTENSION&quot;, &quot;RETIRE&quot;}
+    if len(capabilities) &lt; 5:
+        errors.append(&quot;At least five capabilities must be reviewed for reuse&quot;)
+    for capability in capabilities:
+        if capability.get(&quot;decision&quot;) not in allowed_decisions:
+            errors.append(f&quot;{capability.get(&#x27;capability&#x27;)} has an invalid reuse decision&quot;)
+        if not capability.get(&quot;owner&quot;) or not capability.get(&quot;boundary&quot;):
+            errors.append(f&quot;{capability.get(&#x27;capability&#x27;)} needs an owner and reuse boundary&quot;)
+
+    scorecard = plan.get(&quot;adoption_and_outcome_scorecard&quot;, {})
+    targets = scorecard.get(&quot;targets&quot;, [])
+    target_names = [item.get(&quot;metric&quot;) for item in targets]
+    if len(target_names) != 11 or len(target_names) != len(set(target_names)):
+        errors.append(&quot;Scorecard must contain eleven unique adoption, outcome, quality, safety, and operations gates&quot;)
+    if scorecard.get(&quot;baselines&quot;) != baseline:
+        errors.append(&quot;Problem baseline and scorecard baseline must match exactly&quot;)
+
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+
+
+def validate_pilot(rows: list[dict[str, str]]) -&gt; None:
+    expected_columns = {
+        &quot;week&quot;, &quot;eligible_adjusters&quot;, &quot;active_adjusters&quot;, &quot;eligible_claims&quot;,
+        &quot;assisted_claims&quot;, &quot;recommendations_shown&quot;, &quot;recommendations_accepted&quot;,
+        &quot;average_handling_minutes&quot;, &quot;rework_rate_percent&quot;, &quot;quality_score_percent&quot;,
+        &quot;citation_completeness_percent&quot;, &quot;p95_latency_seconds&quot;, &quot;model_cost_usd&quot;,
+        &quot;unauthorized_protected_actions&quot;, &quot;audit_completeness_percent&quot;,
+    }
+    errors: list[str] = []
+    if not rows or set(rows[0]) != expected_columns:
+        errors.append(&quot;Pilot-results columns do not match the required schema&quot;)
+    try:
+        weeks = [int(row[&quot;week&quot;]) for row in rows]
+    except (KeyError, ValueError):
+        weeks = []
+    if weeks != list(range(1, len(rows) + 1)):
+        errors.append(&quot;Pilot weeks must be sequential starting at 1&quot;)
+    for row in rows:
+        try:
+            eligible_users = int(row[&quot;eligible_adjusters&quot;])
+            active_users = int(row[&quot;active_adjusters&quot;])
+            eligible_claims = int(row[&quot;eligible_claims&quot;])
+            assisted_claims = int(row[&quot;assisted_claims&quot;])
+            shown = int(row[&quot;recommendations_shown&quot;])
+            accepted = int(row[&quot;recommendations_accepted&quot;])
+            percentages = [
+                float(row[&quot;rework_rate_percent&quot;]), float(row[&quot;quality_score_percent&quot;]),
+                float(row[&quot;citation_completeness_percent&quot;]),
+                float(row[&quot;audit_completeness_percent&quot;]),
+            ]
+            handling = float(row[&quot;average_handling_minutes&quot;])
+            latency = float(row[&quot;p95_latency_seconds&quot;])
+            cost = float(row[&quot;model_cost_usd&quot;])
+            unauthorized = int(row[&quot;unauthorized_protected_actions&quot;])
+        except (KeyError, TypeError, ValueError):
+            errors.append(f&quot;Week {row.get(&#x27;week&#x27;)} contains invalid numeric data&quot;)
+            continue
+        if not 0 &lt;= active_users &lt;= eligible_users:
+            errors.append(f&quot;Week {row[&#x27;week&#x27;]} has invalid user counts&quot;)
+        if not 0 &lt;= accepted &lt;= shown &lt;= assisted_claims &lt;= eligible_claims:
+            errors.append(f&quot;Week {row[&#x27;week&#x27;]} has invalid claim or recommendation counts&quot;)
+        if any(not 0 &lt;= value &lt;= 100 for value in percentages):
+            errors.append(f&quot;Week {row[&#x27;week&#x27;]} has an invalid percentage&quot;)
+        if min(handling, latency) &lt;= 0 or cost &lt; 0 or unauthorized &lt; 0:
+            errors.append(f&quot;Week {row[&#x27;week&#x27;]} has invalid time, cost, or incident data&quot;)
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+
+
+def validate_risks(rows: list[dict[str, str]]) -&gt; None:
+    expected_columns = {
+        &quot;risk_id&quot;, &quot;category&quot;, &quot;description&quot;, &quot;probability&quot;, &quot;impact&quot;, &quot;score&quot;,
+        &quot;owner&quot;, &quot;response&quot;, &quot;trigger&quot;, &quot;contingency&quot;, &quot;status&quot;,
+    }
+    errors: list[str] = []
+    if not rows or set(rows[0]) != expected_columns:
+        errors.append(&quot;Risk-register columns do not match the required schema&quot;)
+    risk_ids = [row.get(&quot;risk_id&quot;) for row in rows]
+    if len(risk_ids) &lt; 8 or len(risk_ids) != len(set(risk_ids)):
+        errors.append(&quot;Risk register needs at least eight unique risks&quot;)
+    for row in rows:
+        try:
+            probability = int(row[&quot;probability&quot;])
+            impact = int(row[&quot;impact&quot;])
+            score = int(row[&quot;score&quot;])
+        except (KeyError, TypeError, ValueError):
+            errors.append(f&quot;{row.get(&#x27;risk_id&#x27;)} has invalid scoring&quot;)
+            continue
+        if probability not in range(1, 6) or impact not in range(1, 6):
+            errors.append(f&quot;{row[&#x27;risk_id&#x27;]} probability and impact must be 1 through 5&quot;)
+        if score != probability * impact:
+            errors.append(f&quot;{row[&#x27;risk_id&#x27;]} score must equal probability times impact&quot;)
+        if row.get(&quot;response&quot;) not in {&quot;AVOID&quot;, &quot;MITIGATE&quot;, &quot;TRANSFER&quot;, &quot;ACCEPT&quot;}:
+            errors.append(f&quot;{row[&#x27;risk_id&#x27;]} has an invalid response&quot;)
+        if row.get(&quot;status&quot;) not in {&quot;OPEN&quot;, &quot;MONITORED&quot;, &quot;MITIGATED&quot;, &quot;CLOSED&quot;}:
+            errors.append(f&quot;{row[&#x27;risk_id&#x27;]} has an invalid status&quot;)
+        if not all(row.get(field) for field in (&quot;owner&quot;, &quot;trigger&quot;, &quot;contingency&quot;)):
+            errors.append(f&quot;{row[&#x27;risk_id&#x27;]} needs owner, trigger, and contingency&quot;)
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+
+
+def calculate_metrics(plan: dict[str, Any], row: dict[str, str]) -&gt; dict[str, float]:
+    baseline = plan[&quot;adoption_and_outcome_scorecard&quot;][&quot;baselines&quot;]
+    value = plan[&quot;discovery_and_value&quot;][&quot;value_hypothesis&quot;]
+    eligible_users = int(row[&quot;eligible_adjusters&quot;])
+    active_users = int(row[&quot;active_adjusters&quot;])
+    eligible_claims = int(row[&quot;eligible_claims&quot;])
+    assisted_claims = int(row[&quot;assisted_claims&quot;])
+    shown = int(row[&quot;recommendations_shown&quot;])
+    accepted = int(row[&quot;recommendations_accepted&quot;])
+    handling = float(row[&quot;average_handling_minutes&quot;])
+    rework = float(row[&quot;rework_rate_percent&quot;])
+    cost = float(row[&quot;model_cost_usd&quot;])
+    time_saved_hours = assisted_claims * (baseline[&quot;average_handling_minutes&quot;] - handling) / 60
+    avoided_rework = assisted_claims * (baseline[&quot;rework_rate_percent&quot;] - rework) / 100
+    gross_benefit = (
+        time_saved_hours * value[&quot;loaded_adjuster_hourly_cost_usd&quot;]
+        + avoided_rework * value[&quot;avoided_rework_value_usd&quot;]
+    )
+    return {
+        &quot;active_adoption_percent&quot;: percent(active_users, eligible_users),
+        &quot;assisted_claim_rate_percent&quot;: percent(assisted_claims, eligible_claims),
+        &quot;recommendation_acceptance_percent&quot;: percent(accepted, shown),
+        &quot;handling_time_reduction_percent&quot;: percent(
+            baseline[&quot;average_handling_minutes&quot;] - handling,
+            baseline[&quot;average_handling_minutes&quot;],
+        ),
+        &quot;rework_reduction_percent&quot;: percent(
+            baseline[&quot;rework_rate_percent&quot;] - rework,
+            baseline[&quot;rework_rate_percent&quot;],
+        ),
+        &quot;quality_score_percent&quot;: float(row[&quot;quality_score_percent&quot;]),
+        &quot;citation_completeness_percent&quot;: float(row[&quot;citation_completeness_percent&quot;]),
+        &quot;p95_latency_seconds&quot;: float(row[&quot;p95_latency_seconds&quot;]),
+        &quot;gross_benefit_usd&quot;: round(gross_benefit, 2),
+        &quot;benefit_cost_ratio&quot;: round(gross_benefit / cost, 2) if cost else 0.0,
+        &quot;unauthorized_protected_actions&quot;: float(row[&quot;unauthorized_protected_actions&quot;]),
+        &quot;audit_completeness_percent&quot;: float(row[&quot;audit_completeness_percent&quot;]),
+    }
+
+
+def build_report(
+    plan: dict[str, Any],
+    risks: list[dict[str, str]],
+    metrics: dict[str, float],
+    scorecard_gates: list[dict[str, Any]],
+    release_gates: list[dict[str, Any]],
+    decision: str,
+) -&gt; str:
+    problem = plan[&quot;customer_problem&quot;]
+    readiness = plan[&quot;security_and_readiness&quot;]
+    rollout = plan[&quot;deployment_plan&quot;][&quot;rollout_boundary&quot;]
+    lines = [
+        &quot;# Enterprise AI Claims Assistant — Executive Deployment Decision&quot;, &quot;&quot;,
+        f&quot;- **Decision:** {decision}&quot;,
+        f&quot;- **Customer:** {plan[&#x27;metadata&#x27;][&#x27;customer&#x27;]}&quot;,
+        f&quot;- **Candidate:** {plan[&#x27;metadata&#x27;][&#x27;candidate&#x27;]}&quot;,
+        f&quot;- **Approved boundary:** {rollout[&#x27;cohort&#x27;]}; maximum {rollout[&#x27;maximum_claims&#x27;]} claims over {rollout[&#x27;duration_days&#x27;]} days&quot;,
+        f&quot;- **Business outcome:** {problem[&#x27;business_outcome&#x27;]}&quot;, &quot;&quot;,
+        &quot;## Decision Rationale&quot;, &quot;&quot;,
+        f&quot;The four-week pilot passed {sum(item[&#x27;passed&#x27;] for item in scorecard_gates)}/{len(scorecard_gates)} adoption, outcome, quality, safety, and operations gates. &quot;
+        f&quot;The pinned release candidate passed {sum(item[&#x27;passed&#x27;] for item in release_gates)}/{len(release_gates)} evaluation and human-approval gates. &quot;
+        f&quot;All {len(readiness[&#x27;controls&#x27;])} readiness controls and all {len(readiness[&#x27;approvals&#x27;])} required approvals are complete.&quot;, &quot;&quot;,
+        &quot;## Latest-Week Scorecard&quot;, &quot;&quot;,
+        &quot;| Metric | Rule | Actual | Owner | Result |&quot;,
+        &quot;| --- | --- | ---: | --- | --- |&quot;,
+    ]
+    for gate in scorecard_gates:
+        symbol = &quot;&gt;=&quot; if gate[&quot;operator&quot;] == &quot;min&quot; else &quot;&lt;=&quot;
+        lines.append(
+            f&quot;| {gate[&#x27;metric&#x27;]} | {symbol} {gate[&#x27;threshold&#x27;]} | {gate[&#x27;actual&#x27;]:.2f} | &quot;
+            f&quot;{gate[&#x27;owner&#x27;]} | {&#x27;PASS&#x27; if gate[&#x27;passed&#x27;] else &#x27;FAIL&#x27;} |&quot;
+        )
+    lines.extend([
+        &quot;&quot;, &quot;## Release and Human-Approval Evidence&quot;, &quot;&quot;,
+        &quot;| Metric | Rule | Actual | Owner | Result |&quot;,
+        &quot;| --- | --- | ---: | --- | --- |&quot;,
+    ])
+    for gate in release_gates:
+        symbol = &quot;&gt;=&quot; if gate[&quot;operator&quot;] == &quot;min&quot; else &quot;&lt;=&quot;
+        lines.append(
+            f&quot;| {gate[&#x27;metric&#x27;]} | {symbol} {gate[&#x27;threshold&#x27;]} | {gate[&#x27;actual&#x27;]:.2f} | &quot;
+            f&quot;{gate[&#x27;owner&#x27;]} | {&#x27;PASS&#x27; if gate[&#x27;passed&#x27;] else &#x27;FAIL&#x27;} |&quot;
+        )
+    lines.extend([
+        &quot;&quot;, &quot;## Rollout and Rollback&quot;, &quot;&quot;,
+        f&quot;- Feature flag: `{rollout[&#x27;feature_flag&#x27;]}`&quot;,
+        f&quot;- Manual workflow available: {str(rollout[&#x27;manual_workflow_available&#x27;]).lower()}&quot;,
+        f&quot;- Rollback: {readiness[&#x27;rollback_action&#x27;]}&quot;, &quot;&quot;,
+        &quot;## Highest Risks&quot;, &quot;&quot;,
+        &quot;| Risk | Score | Owner | Status | Trigger | Contingency |&quot;,
+        &quot;| --- | ---: | --- | --- | --- | --- |&quot;,
+    ])
+    for risk in sorted(risks, key=lambda item: int(item[&quot;score&quot;]), reverse=True)[:5]:
+        lines.append(
+            f&quot;| {risk[&#x27;risk_id&#x27;]}: {risk[&#x27;description&#x27;]} | {risk[&#x27;score&#x27;]} | {risk[&#x27;owner&#x27;]} | &quot;
+            f&quot;{risk[&#x27;status&#x27;]} | {risk[&#x27;trigger&#x27;]} | {risk[&#x27;contingency&#x27;]} |&quot;
+        )
+    lines.extend([&quot;&quot;, &quot;## Reusable Capability Decisions&quot;, &quot;&quot;])
+    for capability in plan[&quot;reusable_capabilities&quot;]:
+        lines.append(
+            f&quot;- **{capability[&#x27;decision&#x27;]} — {capability[&#x27;capability&#x27;]}:** &quot;
+            f&quot;{capability[&#x27;boundary&#x27;]} Owner: {capability[&#x27;owner&#x27;]}.&quot;
+        )
+    lines.extend([
+        &quot;&quot;, &quot;## Next Governance Decision&quot;, &quot;&quot;,
+        &quot;At day 30, the Business Owner, Claims Operations Owner, Technical Owner, Security Approver, and Product Owner review the scorecard, incidents, open risks, support load, and reusable-capability evidence before expanding, repairing, pausing, or ending the rollout.&quot;, &quot;&quot;,
+    ])
+    return &quot;\n&quot;.join(lines)
+
+
+def main() -&gt; int:
+    try:
+        plan = load_plan(PLAN_FILES)
+        risks = load_csv(RISK_FILE)
+        pilot_rows = load_csv(PILOT_FILE)
+        validate_plan(plan)
+        validate_risks(risks)
+        validate_pilot(pilot_rows)
+
+        metrics = calculate_metrics(plan, pilot_rows[-1])
+        scorecard_gates = []
+        for target in plan[&quot;adoption_and_outcome_scorecard&quot;][&quot;targets&quot;]:
+            actual = metrics[target[&quot;metric&quot;]]
+            scorecard_gates.append({**target, &quot;actual&quot;: actual, &quot;passed&quot;: target_passed(target, actual)})
+
+        evaluation = plan[&quot;evaluation_and_human_approval&quot;]
+        release_gates = []
+        for target in evaluation[&quot;release_gates&quot;]:
+            actual = float(evaluation[&quot;latest_results&quot;][target[&quot;metric&quot;]])
+            release_gates.append({**target, &quot;actual&quot;: actual, &quot;passed&quot;: target_passed(target, actual)})
+
+        baseline_quality = float(plan[&quot;customer_problem&quot;][&quot;baseline&quot;][&quot;quality_score_percent&quot;])
+        safety_pass = (
+            metrics[&quot;unauthorized_protected_actions&quot;] == 0
+            and metrics[&quot;quality_score_percent&quot;] &gt;= baseline_quality
+            and metrics[&quot;audit_completeness_percent&quot;] == 100
+        )
+        readiness = plan[&quot;security_and_readiness&quot;]
+        controls_pass = all(item[&quot;status&quot;] == &quot;PASS&quot; for item in readiness[&quot;controls&quot;])
+        approvals_pass = all(item[&quot;approved&quot;] is True for item in readiness[&quot;approvals&quot;])
+        risks_ready = all(item[&quot;status&quot;] != &quot;OPEN&quot; for item in risks)
+
+        if not safety_pass:
+            decision = &quot;PAUSE_AND_INVESTIGATE&quot;
+        elif (
+            all(item[&quot;passed&quot;] for item in scorecard_gates)
+            and all(item[&quot;passed&quot;] for item in release_gates)
+            and controls_pass
+            and approvals_pass
+            and risks_ready
+            and not readiness[&quot;open_exceptions&quot;]
+        ):
+            decision = &quot;APPROVE_PHASED_PRODUCTION_ROLLOUT&quot;
+        else:
+            decision = &quot;HOLD_FOR_REMEDIATION&quot;
+
+        REPORT_FILE.write_text(
+            build_report(plan, risks, metrics, scorecard_gates, release_gates, decision),
+            encoding=&quot;utf-8&quot;,
+        )
+    except (KeyError, IndexError, TypeError, ValueError) as exc:
+        print(f&quot;LAB 11 FAILED\n{exc}&quot;)
+        return 1
+
+    print(&quot;LAB 11 PASSED&quot;)
+    print(f&quot;- Decision: {decision}&quot;)
+    print(f&quot;- Capstone decisions connected: {len(CAPSTONE_SECTIONS)}/10&quot;)
+    print(f&quot;- Latest-week scorecard gates: {sum(item[&#x27;passed&#x27;] for item in scorecard_gates)}/{len(scorecard_gates)}&quot;)
+    print(f&quot;- Release gates: {sum(item[&#x27;passed&#x27;] for item in release_gates)}/{len(release_gates)}&quot;)
+    print(f&quot;- Readiness controls: {sum(item[&#x27;status&#x27;] == &#x27;PASS&#x27; for item in readiness[&#x27;controls&#x27;])}/{len(readiness[&#x27;controls&#x27;])}&quot;)
+    print(f&quot;- Risks with owners and responses: {len(risks)}/{len(risks)}&quot;)
+    print(f&quot;- Report: {REPORT_FILE.name}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>The program loads the five workshop JSON artifacts and rejects mismatched metadata or duplicated sections. It then verifies the problem, value, team, decisions, architecture, evaluation, approval, readiness, deployment, risks, reuse boundaries, and scorecard before calculating the latest-week business results.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>python3 -m py_compile capstone_review.py</code> returns to the prompt without output.</li><li><strong>Acceptable variation:</strong> Use <code>python</code> instead of <code>python3</code> when it points to Python 3.10 or later.</li><li><strong>Failure indicator:</strong> Python prints a syntax or indentation error.</li><li><strong>Corrective action:</strong> Repair the first reported line using the complete source above and compile again.</li></ul>
+<h2>Step 4 — Run the Final Deployment Decision</h2>
+<pre><code class="language-bash">python3 -m json.tool reuse_scorecard.json
+python3 -m py_compile capstone_review.py
+python3 capstone_review.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 11 PASSED
+- Decision: APPROVE_PHASED_PRODUCTION_ROLLOUT
+- Capstone decisions connected: 10/10
+- Latest-week scorecard gates: 11/11
+- Release gates: 6/6
+- Readiness controls: 7/7
+- Risks with owners and responses: 8/8
+- Report: executive_deployment_decision.md</code></pre>
+<p><code>LAB 11 PASSED</code> means the five artifacts are structurally coherent. The business decision is separate: unsafe evidence produces <code>PAUSE_AND_INVESTIGATE</code>, while incomplete non-safety evidence produces <code>HOLD_FOR_REMEDIATION</code>.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The exact decision and gate counts above print, and <code>executive_deployment_decision.md</code> is created.</li><li><strong>Acceptable variation:</strong> A different valid dataset may correctly produce hold or pause.</li><li><strong>Failure indicator:</strong> The program reports a schema error, mismatched metadata, a failed safety floor, or no report.</li><li><strong>Corrective action:</strong> Fix the first source error or failed evidence condition; do not weaken a gate simply to obtain approval.</li></ul>
+<h2>Step 5 — Inspect the Executive Decision</h2>
+<pre><code class="language-bash">sed -n &#x27;1,260p&#x27; executive_deployment_decision.md</code></pre>
+<p>Confirm that the memo includes:</p>
+<ul><li>the candidate and phased rollout boundary;</li><li>business outcome and decision rationale;</li><li>11 scorecard gates and six release gates;</li><li>feature flag, manual fallback, and rollback action;</li><li>the five highest delivery risks;</li><li>all reusable-capability decisions; and</li><li>the day-30 governance decision.</li></ul>
+<p>This memo becomes the evidence source for <strong>Role Play: Present the Executive Go-Live Recommendation</strong>. The role play should defend a bounded rollout, not claim that pilot success removes uncertainty.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Every executive claim traces to one workshop artifact, a CSV result, or a calculated gate.</li><li><strong>Acceptable variation:</strong> Your presentation may emphasize different risks while preserving the evidence and boundary.</li><li><strong>Failure indicator:</strong> The recommendation relies on confidence or stakeholder excitement without measurable evidence, rollback, or ownership.</li><li><strong>Corrective action:</strong> Replace unsupported statements with exact evidence, owners, triggers, or rollout constraints.</li></ul>
+<h2>Step 6 — Apply the Final Delivery Rubric</h2>
+<p>Before committing, score the capstone across five dimensions:</p>
+<table><thead><tr><th>Dimension</th><th>Evidence of readiness</th></tr></thead><tbody><tr><td>Customer and value clarity</td><td>Problem, baseline, outcome, scope, assumptions, and value formula agree</td></tr><tr><td>Authority and ownership</td><td>Team capacity and decision rights preserve customer authority</td></tr><tr><td>Technical and safety design</td><td>Architecture, evaluation, approval, security, audit, and recovery are enforceable</td></tr><tr><td>Delivery control</td><td>Milestones, dependencies, risks, cutover, rollback, hypercare, and handoff are executable</td></tr><tr><td>Product and outcome learning</td><td>Reuse boundaries and the scorecard support a day-30 portfolio and scale decision</td></tr></tbody></table>
+<p>A strong submission is not the one with the most content. It is the one where each decision has evidence, ownership, a boundary, and a next action.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> You can identify at least one artifact and one decision owner for every rubric dimension.</li><li><strong>Acceptable variation:</strong> Use the course's numeric rubric if provided; preserve these five evidence dimensions.</li><li><strong>Failure indicator:</strong> A dimension receives a high score because a document exists, even though its decisions conflict with another artifact.</li><li><strong>Corrective action:</strong> Resolve the conflict and rerun the integrated review before scoring.</li></ul>
+<h2>Step 7 — Add the Handoff and Commit</h2>
+<p>Create <code>README.md</code>:</p>
+<pre><code class="language-markdown"># Lab 11 — Capstone: Lead an Enterprise AI Deployment
+
+One shared Enterprise AI Claims Assistant capstone completed through five progressive workshops.
+
+## Workshop guides
+
+1. [Workshop 1: Problem and Value](WORKSHOP_01_problem_value.md) / [HTML](WORKSHOP_01_problem_value.html)
+2. [Workshop 2: Team and Decisions](WORKSHOP_02_team_decisions.md) / [HTML](WORKSHOP_02_team_decisions.html)
+3. [Workshop 3: Architecture and Approval](WORKSHOP_03_architecture_approval.md) / [HTML](WORKSHOP_03_architecture_approval.html)
+4. [Workshop 4: Readiness and Delivery](WORKSHOP_04_readiness_delivery.md) / [HTML](WORKSHOP_04_readiness_delivery.html)
+5. [Workshop 5: Reuse and Outcomes](WORKSHOP_05_reuse_outcomes.md) / [HTML](WORKSHOP_05_reuse_outcomes.html)
+
+## Project artifacts
+
+- Five workshop JSON decision artifacts
+- `risk_register.csv` and `pilot_results.csv`
+- `capstone_review.py`
+- Generated `executive_deployment_decision.md`
+
+Run `python3 -m py_compile capstone_review.py`, then `python3 capstone_review.py`.
+
+Requires Python 3.10 or later and only the Python standard library.</code></pre>
+<pre><code class="language-bash">git add .
+git commit -m &quot;Complete enterprise AI deployment capstone&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git reports <code>main</code> with no changed or untracked files.</li><li><strong>Acceptable variation:</strong> Additional earlier workshop commits are expected.</li><li><strong>Failure indicator:</strong> The generated report is missing, caches are tracked, or source files remain uncommitted.</li><li><strong>Corrective action:</strong> Rerun the review, confirm <code>.gitignore</code>, stage the intended files, commit, and check status again.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<table><thead><tr><th>Workshop</th><th>Artifact</th><th>Capstone decisions completed</th></tr></thead><tbody><tr><td>1</td><td><code>problem_value.json</code></td><td>Customer problem, business outcome, discovery brief, and value hypothesis</td></tr><tr><td>2</td><td><code>team_decisions.json</code></td><td>Forward deployed team, ownership, and decision rights</td></tr><tr><td>3</td><td><code>architecture_approval.json</code></td><td>Production architecture, evaluation, and human approval</td></tr><tr><td>4</td><td><code>readiness_deployment.json</code>, <code>risk_register.csv</code></td><td>Security, readiness, deployment plan, and risks</td></tr><tr><td>5</td><td><code>reuse_scorecard.json</code>, <code>pilot_results.csv</code></td><td>Reusable capabilities, adoption, outcomes, and rollout decision</td></tr><tr><td>Integration</td><td><code>capstone_review.py</code>, generated memo</td><td>Executive recommendation and final rubric evidence</td></tr></tbody></table>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody><tr><td>Metadata mismatch</td><td>Workshop files describe different case versions</td><td>Copy the complete metadata object from Workshop 1 into all five JSON files.</td></tr><tr><td>Duplicate capstone section</td><td>The same decision section appears in two JSON files</td><td>Keep each section only in its assigned workshop artifact.</td></tr><tr><td>Pilot columns do not match</td><td>A CSV header was renamed or omitted</td><td>Restore the exact Step 2 header.</td></tr><tr><td>Risk score fails</td><td>Probability, impact, and score disagree</td><td>Recalculate score as probability × impact.</td></tr><tr><td><code>HOLD_FOR_REMEDIATION</code></td><td>A non-safety evidence condition failed</td><td>Repair the evidence or reduce scope without weakening the threshold.</td></tr><tr><td><code>PAUSE_AND_INVESTIGATE</code></td><td>A safety floor failed</td><td>Stop rollout, preserve evidence, use manual handling, and follow rollback.</td></tr><tr><td>Report did not update</td><td>The review was not rerun</td><td>Run <code>python3 capstone_review.py</code> again.</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>The capstone creates no cloud resources. Remove local Python caches while keeping all completion evidence:</p>
+<pre><code class="language-bash">find . -type d -name __pycache__ -prune -exec rm -rf {} +</code></pre>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> All five workshop JSON files use identical metadata.</li><li class="check-item"><span class="box">☐</span> Ten capstone decisions are present and connected.</li><li class="check-item"><span class="box">☐</span> Reuse decisions have owners and explicit boundaries.</li><li class="check-item"><span class="box">☐</span> Eleven scorecard gates cover adoption, outcomes, quality, safety, value, latency, and audit.</li><li class="check-item"><span class="box">☐</span> The integrated review passes and generates the executive memo.</li><li class="check-item"><span class="box">☐</span> I can defend the phased boundary, top risks, rollback, and day-30 decision.</li><li class="check-item"><span class="box">☐</span> I applied the final rubric to evidence, not document count.</li><li class="check-item"><span class="box">☐</span> My capstone repository is clean on <code>main</code>.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which pilot metric could look healthy while masking a poor employee or customer outcome?</li><li>Which capability should remain customer-specific even if another customer asks for something similar?</li><li>What exact evidence would cause you to expand, repair, pause, or end the rollout at day 30?</li><li>Which conflict between two artifacts would be most dangerous to miss in an executive review?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

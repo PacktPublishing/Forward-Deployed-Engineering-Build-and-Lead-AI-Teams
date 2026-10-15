@@ -1,0 +1,220 @@
+{
+  "metadata": {
+    "lab_id": "lab_10",
+    "organization": "Northstar Forward Deployed AI Practice",
+    "case_anchor": "Enterprise AI Claims Assistant",
+    "planning_horizon": "Q4 2026 portfolio",
+    "review_date": "2026-08-16"
+  },
+  "operating_model": {
+    "topology": "Persistent capability groups staff temporary cross-functional deployment pods.",
+    "deployment_pod": [
+      "Forward Deployed Engineer",
+      "AI Engineer",
+      "Platform Engineer",
+      "Product Partner",
+      "Technical Deployment Lead"
+    ],
+    "shared_specialists": [
+      "Forward Deployed Architect",
+      "Security Engineer"
+    ],
+    "leadership_layers": [
+      {
+        "layer": "Engagement",
+        "accountability": "Customer outcome scope delivery and operational transition",
+        "owner": "Technical Deployment Lead"
+      },
+      {
+        "layer": "Technical",
+        "accountability": "Architecture quality security and reusable engineering decisions",
+        "owner": "Principal FDE"
+      },
+      {
+        "layer": "Portfolio",
+        "accountability": "Capacity prioritization specialist allocation and escalation",
+        "owner": "FDE Director"
+      }
+    ]
+  },
+  "roles": [
+    {
+      "id": "fde",
+      "title": "Forward Deployed Engineer",
+      "available_fte": 8,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "End-to-end customer solution",
+        "Integration and evidence",
+        "Customer technical ownership"
+      ]
+    },
+    {
+      "id": "ai",
+      "title": "AI Engineer",
+      "available_fte": 5,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "Models retrieval evaluation and guardrails",
+        "AI quality evidence"
+      ]
+    },
+    {
+      "id": "architect",
+      "title": "Forward Deployed Architect",
+      "available_fte": 3,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "Cross-system architecture",
+        "Trade-offs and design governance"
+      ]
+    },
+    {
+      "id": "platform",
+      "title": "Platform Engineer",
+      "available_fte": 4,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "Environments delivery reliability and observability"
+      ]
+    },
+    {
+      "id": "security",
+      "title": "Security Engineer",
+      "available_fte": 3,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "Threat model access data protection and release approval"
+      ]
+    },
+    {
+      "id": "product",
+      "title": "Product Partner",
+      "available_fte": 3,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "Discovery adoption value and product feedback"
+      ]
+    },
+    {
+      "id": "delivery",
+      "title": "Technical Deployment Lead",
+      "available_fte": 3,
+      "max_target_utilization_percent": 90,
+      "accountabilities": [
+        "Integrated plan decisions risks cutover and handoff"
+      ]
+    }
+  ],
+  "staffing_rules": [
+    "Every engagement has a named DRI and a different backup DRI.",
+    "Risk level 5 requires at least 0.5 architect FTE and 0.5 security FTE.",
+    "Go-live requires at least 1.0 platform FTE and 0.5 delivery FTE.",
+    "Discovery requires at least 1.0 FDE FTE and 0.5 product FTE.",
+    "Pilot requires at least 1.0 AI FTE and 0.5 platform FTE.",
+    "No role pool may exceed its target utilization."
+  ],
+  "governance": [
+    {
+      "cadence": "Weekly portfolio staffing review",
+      "owner": "FDE Director",
+      "decisions": [
+        "Priority changes",
+        "Specialist conflicts",
+        "Hiring or contractor trigger"
+      ]
+    },
+    {
+      "cadence": "Weekly architecture and security council",
+      "owner": "Principal FDE",
+      "decisions": [
+        "Design exceptions",
+        "Security risk acceptance",
+        "Reusable pattern approval"
+      ]
+    },
+    {
+      "cadence": "Biweekly talent review",
+      "owner": "FDE Manager",
+      "decisions": [
+        "Coaching load",
+        "Backup coverage",
+        "Career evidence and rotations"
+      ]
+    }
+  ],
+  "decision_rights": [
+    {
+      "decision": "Engagement priority",
+      "dri": "FDE Director",
+      "approver": "Executive Portfolio Sponsor"
+    },
+    {
+      "decision": "Technical standard",
+      "dri": "Principal FDE",
+      "approver": "Architecture Council"
+    },
+    {
+      "decision": "Security exception",
+      "dri": "Security Lead",
+      "approver": "Chief Information Security Officer"
+    },
+    {
+      "decision": "Staff reassignment",
+      "dri": "FDE Director",
+      "approver": "Affected Engagement Sponsors"
+    },
+    {
+      "decision": "Hiring trigger",
+      "dri": "FDE Director",
+      "approver": "Business Unit Leader"
+    }
+  ],
+  "scaling_triggers": [
+    {
+      "trigger": "Any role exceeds 85 percent utilization for two planning cycles",
+      "action": "Open capacity plan and reduce uncommitted scope"
+    },
+    {
+      "trigger": "A shared specialist becomes the sole qualified owner for two or more critical engagements",
+      "action": "Assign a shadow and create a dated capability transfer plan"
+    },
+    {
+      "trigger": "Security or architecture review wait exceeds 10 business days",
+      "action": "Add reviewer capacity or narrow concurrent high-risk work"
+    },
+    {
+      "trigger": "More than two engagements enter go-live or hypercare together",
+      "action": "Create a temporary command-center rotation and executive priority review"
+    },
+    {
+      "trigger": "Reusable work exceeds 30 percent of delivery effort",
+      "action": "Fund a dedicated product or platform workstream"
+    }
+  ],
+  "anti_hero_controls": [
+    "Primary and backup DRI on every engagement",
+    "Decision and runbook artifacts stored in shared repositories",
+    "Observed handoffs before role rotation",
+    "Shared on-call and review rotations",
+    "No critical approval dependent on one person"
+  ],
+  "career_levels": [
+    {
+      "level": "FDE",
+      "evidence": "Delivers a bounded workstream with support"
+    },
+    {
+      "level": "Senior FDE",
+      "evidence": "Owns an engagement slice and customer decisions"
+    },
+    {
+      "level": "Principal FDE",
+      "evidence": "Sets technical direction across engagements and develops specialists"
+    },
+    {
+      "level": "FDE Manager",
+      "evidence": "Builds capability capacity and consistent delivery systems"
+    }
+  ]
+}

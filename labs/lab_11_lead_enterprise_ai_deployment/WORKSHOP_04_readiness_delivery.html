@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="9df9ab6a54b5e1bc8054701f34adb28c07072d7b3441e7192b7539a82b56fd8e">
+<title>Capstone Workshop 4 — Complete Readiness, Deployment, and Risk Planning</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Capstone Workshop 4 — Complete Readiness, Deployment, and Risk Planning</h1>
+<h2>Goal</h2>
+<p>Convert the approved architecture into a production-readiness review, phased deployment plan, and actionable risk register for the Enterprise AI Claims Assistant.</p>
+<p>Continue in the same learner-owned capstone directory. The completed repository is a reference only.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>readiness_deployment.json</code> — readiness controls, evidence, approvals, exceptions, rollback, rollout boundary, milestones, dependencies, and cutover checks.</li><li><code>risk_register.csv</code> — eight scored delivery risks with owners, responses, triggers, contingencies, and statuses.</li><li>The Workshop 4 Git commit.</li></ul>
+<h2>Estimated Time</h2>
+<p>50–70 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This workshop runs locally and creates no infrastructure or external cost.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m json.tool readiness_deployment.json</code> succeeds.</li><li>Seven security and operational readiness categories contain evidence and owners.</li><li>Business, technical, security, and operations approvals are complete.</li><li>Wave 1 has an explicit cohort, volume, duration, feature flag, and manual fallback.</li><li>Seven milestones form a valid dependency chain with exit evidence.</li><li>Eight risks have mathematically correct scores and actionable triggers and contingencies.</li><li>Git is clean after the Workshop 4 commit.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Completed Workshops 1–3 in the same project directory</li><li>Familiarity with production readiness, integrated deployment planning, cutover, rollback, and risk management</li></ul>
+<h2>Where This Workshop Fits</h2>
+<p>This workshop combines <strong>Complete the Security and Production-Readiness Review</strong> and <strong>Build the Deployment Plan and Risk Register</strong>. It turns technical design into controlled delivery.</p>
+<h2>Step 1 — Create the Readiness and Deployment Artifact</h2>
+<p>Create <code>readiness_deployment.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_11&quot;,
+    &quot;customer&quot;: &quot;Northstar Mutual&quot;,
+    &quot;initiative&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;candidate&quot;: &quot;claims-assistant-1.0.0&quot;,
+    &quot;review_date&quot;: &quot;2026-08-17&quot;,
+    &quot;decision_stage&quot;: &quot;phased production rollout&quot;
+  },
+  &quot;security_and_readiness&quot;: {
+    &quot;controls&quot;: [
+      {
+        &quot;id&quot;: &quot;C-01&quot;,
+        &quot;category&quot;: &quot;identity_access&quot;,
+        &quot;owner&quot;: &quot;Identity Engineering&quot;,
+        &quot;evidence&quot;: &quot;Cross-tenant, wrong-role, and expired-session tests fail closed&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      },
+      {
+        &quot;id&quot;: &quot;C-02&quot;,
+        &quot;category&quot;: &quot;data_protection&quot;,
+        &quot;owner&quot;: &quot;Data Protection&quot;,
+        &quot;evidence&quot;: &quot;Private boundary, minimization, retention, and PII log scan approved&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      },
+      {
+        &quot;id&quot;: &quot;C-03&quot;,
+        &quot;category&quot;: &quot;model_guardrail&quot;,
+        &quot;owner&quot;: &quot;AI Security&quot;,
+        &quot;evidence&quot;: &quot;Direct and indirect prompt-injection suite blocked protected actions&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      },
+      {
+        &quot;id&quot;: &quot;C-04&quot;,
+        &quot;category&quot;: &quot;human_approval&quot;,
+        &quot;owner&quot;: &quot;Claims Platform&quot;,
+        &quot;evidence&quot;: &quot;Bypass, replay, expired-token, and wrong-approver tests fail closed&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      },
+      {
+        &quot;id&quot;: &quot;C-05&quot;,
+        &quot;category&quot;: &quot;observability_audit&quot;,
+        &quot;owner&quot;: &quot;Security Operations&quot;,
+        &quot;evidence&quot;: &quot;Audit completeness and immutability tests pass&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      },
+      {
+        &quot;id&quot;: &quot;C-06&quot;,
+        &quot;category&quot;: &quot;reliability_recovery&quot;,
+        &quot;owner&quot;: &quot;Site Reliability Engineering&quot;,
+        &quot;evidence&quot;: &quot;Load, dependency-failure, idempotency, and rollback drills pass&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      },
+      {
+        &quot;id&quot;: &quot;C-07&quot;,
+        &quot;category&quot;: &quot;operations&quot;,
+        &quot;owner&quot;: &quot;Operations Owner&quot;,
+        &quot;evidence&quot;: &quot;Runbook tabletop and primary/backup on-call review complete&quot;,
+        &quot;status&quot;: &quot;PASS&quot;
+      }
+    ],
+    &quot;approvals&quot;: [
+      {
+        &quot;role&quot;: &quot;Business Owner&quot;,
+        &quot;name&quot;: &quot;Elena Ruiz&quot;,
+        &quot;approved&quot;: true
+      },
+      {
+        &quot;role&quot;: &quot;Technical Owner&quot;,
+        &quot;name&quot;: &quot;Jordan Kim&quot;,
+        &quot;approved&quot;: true
+      },
+      {
+        &quot;role&quot;: &quot;Security Approver&quot;,
+        &quot;name&quot;: &quot;Dana Brooks&quot;,
+        &quot;approved&quot;: true
+      },
+      {
+        &quot;role&quot;: &quot;Operations Owner&quot;,
+        &quot;name&quot;: &quot;Morgan Lee&quot;,
+        &quot;approved&quot;: true
+      }
+    ],
+    &quot;open_exceptions&quot;: [],
+    &quot;rollback_action&quot;: &quot;Disable claims_ai_assist_rollout, preserve evidence, reconcile uncertain writes, notify accountable owners, and continue the manual claims workflow.&quot;
+  },
+  &quot;deployment_plan&quot;: {
+    &quot;rollout_boundary&quot;: {
+      &quot;wave&quot;: &quot;Wave 1 production rollout&quot;,
+      &quot;cohort&quot;: &quot;75 trained licensed claims adjusters&quot;,
+      &quot;maximum_claims&quot;: 1500,
+      &quot;duration_days&quot;: 30,
+      &quot;feature_flag&quot;: &quot;claims_ai_assist_rollout&quot;,
+      &quot;manual_workflow_available&quot;: true
+    },
+    &quot;milestones&quot;: [
+      {
+        &quot;id&quot;: &quot;M-01&quot;,
+        &quot;name&quot;: &quot;Outcome and scope sign-off&quot;,
+        &quot;owner&quot;: &quot;Business Owner&quot;,
+        &quot;depends_on&quot;: [],
+        &quot;exit_evidence&quot;: &quot;Signed outcome, scope, non-goals, and rollout boundary&quot;
+      },
+      {
+        &quot;id&quot;: &quot;M-02&quot;,
+        &quot;name&quot;: &quot;Architecture and data readiness&quot;,
+        &quot;owner&quot;: &quot;Technical Deployment Lead&quot;,
+        &quot;depends_on&quot;: [
+          &quot;M-01&quot;
+        ],
+        &quot;exit_evidence&quot;: &quot;Approved design, effective-policy coverage, and version manifest&quot;
+      },
+      {
+        &quot;id&quot;: &quot;M-03&quot;,
+        &quot;name&quot;: &quot;Evaluation and security approval&quot;,
+        &quot;owner&quot;: &quot;Security Approver&quot;,
+        &quot;depends_on&quot;: [
+          &quot;M-02&quot;
+        ],
+        &quot;exit_evidence&quot;: &quot;All release gates and readiness controls pass&quot;
+      },
+      {
+        &quot;id&quot;: &quot;M-04&quot;,
+        &quot;name&quot;: &quot;Cutover readiness review&quot;,
+        &quot;owner&quot;: &quot;Claims Operations Owner&quot;,
+        &quot;depends_on&quot;: [
+          &quot;M-03&quot;
+        ],
+        &quot;exit_evidence&quot;: &quot;Training, on-call, rollback, communications, and support evidence complete&quot;
+      },
+      {
+        &quot;id&quot;: &quot;M-05&quot;,
+        &quot;name&quot;: &quot;Wave 1 go-live&quot;,
+        &quot;owner&quot;: &quot;Technical Deployment Lead&quot;,
+        &quot;depends_on&quot;: [
+          &quot;M-04&quot;
+        ],
+        &quot;exit_evidence&quot;: &quot;Feature flag enabled only for the approved cohort&quot;
+      },
+      {
+        &quot;id&quot;: &quot;M-06&quot;,
+        &quot;name&quot;: &quot;Hypercare and outcome review&quot;,
+        &quot;owner&quot;: &quot;Product Partner&quot;,
+        &quot;depends_on&quot;: [
+          &quot;M-05&quot;
+        ],
+        &quot;exit_evidence&quot;: &quot;Thirty-day scorecard, incidents, adoption, value, and next-wave decision&quot;
+      },
+      {
+        &quot;id&quot;: &quot;M-07&quot;,
+        &quot;name&quot;: &quot;Operational handoff&quot;,
+        &quot;owner&quot;: &quot;Operations Owner&quot;,
+        &quot;depends_on&quot;: [
+          &quot;M-06&quot;
+        ],
+        &quot;exit_evidence&quot;: &quot;Runbooks, dashboards, support ownership, and backlog accepted&quot;
+      }
+    ],
+    &quot;cutover_checks&quot;: [
+      &quot;Approved version manifest is pinned&quot;,
+      &quot;Only trained users are in the feature-flag cohort&quot;,
+      &quot;Primary and backup on-call owners are confirmed&quot;,
+      &quot;Rollback drill completed in under 10 minutes&quot;,
+      &quot;Manual claims workflow remains available&quot;
+    ]
+  }
+}</code></pre>
+<p>The readiness controls cover identity, data, model guardrails, human approval, observability, recovery, and operations. A status is credible only when it includes a named owner and concrete evidence.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Seven unique control categories have IDs, owners, evidence, and <code>PASS</code> status; four approval domains are present.</li><li><strong>Acceptable variation:</strong> Add organization-specific controls without removing the seven required categories.</li><li><strong>Failure indicator:</strong> A checklist says “ready” without evidence, an owner, rollback, or an exception record.</li><li><strong>Corrective action:</strong> Replace assertions with test, drill, review, or signed approval evidence and name the accountable owner.</li></ul>
+<h2>Step 2 — Inspect the Rollout Boundary and Critical Path</h2>
+<p>Trace the milestone dependencies from outcome sign-off through operational handoff:</p>
+<pre><code class="language-text">M-01 Outcome and scope
+→ M-02 Architecture and data
+→ M-03 Evaluation and security
+→ M-04 Cutover readiness
+→ M-05 Wave 1 go-live
+→ M-06 Hypercare and outcome review
+→ M-07 Operational handoff</code></pre>
+<p>Each milestone exits on evidence, not a calendar date alone. Wave 1 is intentionally constrained to 75 trained adjusters, 1,500 claims, 30 days, and one feature flag while manual handling stays available.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Every dependency references a real milestone, every milestone has one owner and exit evidence, and no dependency cycle exists.</li><li><strong>Acceptable variation:</strong> Parallelize work where dependencies genuinely allow it.</li><li><strong>Failure indicator:</strong> Go-live can occur before evaluation, security, training, on-call, or rollback evidence is complete.</li><li><strong>Corrective action:</strong> Restore the blocking dependency and explicit exit evidence.</li></ul>
+<h2>Step 3 — Build the Risk Register</h2>
+<p>Create <code>risk_register.csv</code>:</p>
+<pre><code class="language-csv">risk_id,category,description,probability,impact,score,owner,response,trigger,contingency,status
+R-01,integration,Claims-system write API is not certified for the rollout window,4,5,20,Claims Platform Lead,MITIGATE,Certification slips beyond milestone M-04,Launch read-only assistance and defer protected writes,MITIGATED
+R-02,security,Cross-tenant authorization defect appears in preproduction,4,5,20,Security Lead,MITIGATE,Any negative authorization test succeeds,Stop promotion and repair tenant enforcement,MITIGATED
+R-03,data,Effective-date metadata is incomplete for a rollout jurisdiction,3,5,15,Claims Data Lead,MITIGATE,Policy coverage falls below 100 percent,Remove the jurisdiction from scope and repair metadata,MONITORED
+R-04,adoption,Training completion falls below 90 percent before a rollout wave,3,4,12,Claims Operations Lead,MITIGATE,Completion is below target three days before cutover,Limit the wave to trained adjusters and add office hours,MONITORED
+R-05,reliability,p95 latency exceeds 12 seconds under rollout load,3,4,12,Site Reliability Lead,MITIGATE,Two consecutive monitoring windows exceed the SLO,Disable the feature flag and continue manual handling,MITIGATED
+R-06,scope,An executive requests enterprise-wide rollout before wave evidence,3,4,12,Technical Deployment Lead,AVOID,Requested cohort exceeds the approved wave boundary,Require a new scope decision and readiness review,MONITORED
+R-07,operations,Primary or backup on-call coverage is missing during cutover,2,5,10,Operations Owner,MITIGATE,Any severity-one slot lacks both roles,Delay cutover or add approved coverage,MITIGATED
+R-08,product,Customer-specific adapter changes leak into shared platform code,2,4,8,Product Owner,AVOID,Shared-core pull request contains Northstar-only logic,Move logic to the isolated extension and review the contract,MONITORED</code></pre>
+<p>Use <code>probability × impact</code> for prioritization, with both values on a 1–5 scale. The trigger tells the owner when to act. The contingency is the pre-agreed response if mitigation is insufficient.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Eight unique risks cover integration, security, data, adoption, reliability, scope, operations, and product concerns.</li><li><strong>Acceptable variation:</strong> Add a risk when it introduces a new category, owner, trigger, or contingency.</li><li><strong>Failure indicator:</strong> A risk says only “model may fail,” has no owner, or uses “monitor” without an activation trigger.</li><li><strong>Corrective action:</strong> State a concrete event, calculate its score, assign an owner, and define response and contingency.</li></ul>
+<h2>Step 4 — Test Cutover and Rollback Readiness</h2>
+<p>Conduct a tabletop using two risk triggers:</p>
+<ol><li>A cross-tenant negative authorization test succeeds before promotion.</li><li>p95 latency exceeds 12 seconds for two consecutive rollout windows.</li></ol>
+<p>For each, identify who detects it, who decides, how the feature flag changes, how evidence is preserved, which users are notified, and how manual claims handling continues.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Both scenarios stop or constrain AI assistance without disabling the manual workflow.</li><li><strong>Acceptable variation:</strong> The notification and incident workflow may follow your organization's process.</li><li><strong>Failure indicator:</strong> Rollback depends on redeploying code, loses evidence, or interrupts all claim handling.</li><li><strong>Corrective action:</strong> Use the feature flag, preserve audit evidence, reconcile uncertain writes, and retain the manual path.</li></ul>
+<h2>Step 5 — Validate and Commit Workshop 4</h2>
+<pre><code class="language-bash">python3 -m json.tool readiness_deployment.json
+python3 -c &quot;import csv; rows=list(csv.DictReader(open(&#x27;risk_register.csv&#x27;))); assert len(rows)&gt;=8; assert all(int(r[&#x27;score&#x27;])==int(r[&#x27;probability&#x27;])*int(r[&#x27;impact&#x27;]) for r in rows); assert all(r[&#x27;owner&#x27;] and r[&#x27;trigger&#x27;] and r[&#x27;contingency&#x27;] for r in rows); print(&#x27;Risk register valid&#x27;)&quot;
+git add readiness_deployment.json risk_register.csv
+git commit -m &quot;Complete capstone readiness and delivery plan&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> JSON validates, <code>Risk register valid</code> prints, and Git is clean.</li><li><strong>Acceptable variation:</strong> Equivalent local CSV validation is acceptable.</li><li><strong>Failure indicator:</strong> A score is incorrect or a risk lacks owner, trigger, or contingency.</li><li><strong>Corrective action:</strong> Repair the reported risk fields and rerun before committing.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<table><thead><tr><th>Architecture evidence</th><th>Delivery control</th></tr></thead><tbody><tr><td>Identity and authorization tests</td><td>Identity-access readiness control</td></tr><tr><td>Model and approval gates</td><td>Model-guardrail and human-approval controls</td></tr><tr><td>Audit and recovery design</td><td>Observability, recovery, and operations controls</td></tr><tr><td>Passed readiness review</td><td>Cutover milestone dependency</td></tr><tr><td>Known uncertainty</td><td>Owned risk, trigger, response, and contingency</td></tr><tr><td>Approved rollout boundary</td><td>Feature-flagged Wave 1 with manual fallback</td></tr></tbody></table>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody><tr><td>Readiness says PASS without evidence</td><td>Checklist completion replaced proof</td><td>Add the exact test, drill, review, or signed record.</td></tr><tr><td>Milestone dependency is circular</td><td>Work packages depend on each other</td><td>Identify the real prerequisite and remove the cycle.</td></tr><tr><td>Risk score is wrong</td><td>Score was typed independently</td><td>Recalculate probability × impact.</td></tr><tr><td>Contingency is vague</td><td>Mitigation and recovery were confused</td><td>State the concrete action taken after the trigger fires.</td></tr><tr><td>Rollback disables claims operations</td><td>AI assistance and core workflow are coupled</td><td>Preserve the manual workflow behind a separate boundary.</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>No external resources were created. Keep all project files for Workshop 5.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> Seven readiness categories have owners and evidence.</li><li class="check-item"><span class="box">☐</span> Four approval domains are complete and exceptions are explicit.</li><li class="check-item"><span class="box">☐</span> The rollout boundary constrains cohort, volume, duration, and feature access.</li><li class="check-item"><span class="box">☐</span> Milestone dependencies and exit evidence form a valid path.</li><li class="check-item"><span class="box">☐</span> Eight risks have correct scores, owners, triggers, and contingencies.</li><li class="check-item"><span class="box">☐</span> Rollback preserves evidence and manual handling.</li><li class="check-item"><span class="box">☐</span> My Workshop 4 commit is clean.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which readiness control is easiest to mark complete without sufficient evidence?</li><li>Which milestone would you refuse to compress under executive pressure?</li><li>Which risk trigger would require immediate rollback rather than continued monitoring?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "organization": "Northstar Mutual",
+  "weekly_eligible_claims": 1200,
+  "claims_adjusters": 48,
+  "current_workflow": [
+    "Open a new property claim",
+    "Review the claim form",
+    "Locate the applicable policy and endorsements",
+    "Review photographs and prior notes",
+    "Decide whether to fast-track or manually review the claim",
+    "Record the rationale and route the claim"
+  ],
+  "observations": {
+    "average_handling_time_minutes": 18,
+    "incorrect_fast_track_rate": 0.012,
+    "claims_completed_within_24_hours": 0.82,
+    "primary_friction": "Evidence is distributed across multiple systems"
+  },
+  "business_request": "Build an AI claims assistant",
+  "targets": {
+    "average_handling_time_minutes": 11,
+    "maximum_incorrect_fast_track_rate": 0.015,
+    "measurement_window": "30 days after pilot launch",
+    "minimum_pilot_sample_size": 200
+  },
+  "constraints": [
+    "The adjuster retains the final routing decision",
+    "The system cannot deny claims autonomously",
+    "The system cannot issue payments",
+    "Customer information must remain inside the approved environment",
+    "Recommendations must cite supporting policy evidence",
+    "Missing or conflicting evidence must trigger manual review"
+  ]
+}

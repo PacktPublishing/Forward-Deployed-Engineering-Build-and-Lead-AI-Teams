@@ -1,0 +1,579 @@
+{
+  "metadata": {
+    "lab_id": "lab_06",
+    "customer": "Northstar Mutual",
+    "initiative": "Enterprise AI Claims Assistant",
+    "review_scope": "Bounded production pilot",
+    "prepared_by": "Forward Deployed Engineering Team",
+    "review_date": "2026-08-16"
+  },
+  "decision_boundary": {
+    "primary_user": "Licensed Claims Adjuster",
+    "allowed_assistance": [
+      "Retrieve effective policy evidence",
+      "Produce a cited claim summary",
+      "Recommend request_evidence, continue_review, or escalate"
+    ],
+    "protected_actions": [
+      "Approve or deny a claim",
+      "Authorize payment or change reserves",
+      "Send customer communication or update the claims system"
+    ],
+    "autonomous_protected_actions_allowed": false
+  },
+  "assets": [
+    {
+      "id": "A-01",
+      "name": "Claim files and customer PII",
+      "classification": "Restricted",
+      "owner": "Claims Data Owner",
+      "required_properties": [
+        "confidentiality",
+        "integrity",
+        "authorized use"
+      ]
+    },
+    {
+      "id": "A-02",
+      "name": "Effective policy corpus and metadata",
+      "classification": "Confidential",
+      "owner": "Policy Operations",
+      "required_properties": [
+        "integrity",
+        "effective-date accuracy",
+        "jurisdiction accuracy"
+      ]
+    },
+    {
+      "id": "A-03",
+      "name": "Assistant recommendation and citations",
+      "classification": "Confidential",
+      "owner": "Claims Quality Lead",
+      "required_properties": [
+        "integrity",
+        "traceability",
+        "schema validity"
+      ]
+    },
+    {
+      "id": "A-04",
+      "name": "Claims-system protected actions",
+      "classification": "Restricted",
+      "owner": "Claims Platform Owner",
+      "required_properties": [
+        "authorization",
+        "idempotency",
+        "human approval"
+      ]
+    },
+    {
+      "id": "A-05",
+      "name": "Audit and release evidence",
+      "classification": "Confidential",
+      "owner": "Security Operations",
+      "required_properties": [
+        "completeness",
+        "immutability",
+        "retention"
+      ]
+    },
+    {
+      "id": "A-06",
+      "name": "Service credentials and model endpoints",
+      "classification": "Secret",
+      "owner": "AI Platform",
+      "required_properties": [
+        "confidentiality",
+        "rotation",
+        "least privilege"
+      ]
+    }
+  ],
+  "trust_boundaries": [
+    {
+      "id": "B-01",
+      "from": "Adjuster browser",
+      "to": "Claims Assistant API",
+      "data": "Claim context and user intent",
+      "enforcement": "SSO, tenant-scoped authorization, request validation"
+    },
+    {
+      "id": "B-02",
+      "from": "Claims Assistant API",
+      "to": "Policy retrieval service",
+      "data": "Search query and retrieved policy evidence",
+      "enforcement": "Service identity, signed index version, effective-date and jurisdiction filters"
+    },
+    {
+      "id": "B-03",
+      "from": "Claims Assistant API",
+      "to": "Managed LLM endpoint",
+      "data": "Minimum necessary claim context and policy evidence",
+      "enforcement": "Private endpoint, encryption, PII minimization, no provider training"
+    },
+    {
+      "id": "B-04",
+      "from": "Claims Assistant API",
+      "to": "Claims system",
+      "data": "Human-approved protected command",
+      "enforcement": "Approver-bound token, allowlisted operation, idempotency key"
+    },
+    {
+      "id": "B-05",
+      "from": "Application services",
+      "to": "Audit platform",
+      "data": "Identity, versions, evidence, decision, approval, and action result",
+      "enforcement": "Append-only logging and fail-closed audit delivery"
+    }
+  ],
+  "controls": [
+    {
+      "id": "C-01",
+      "name": "Tenant-scoped identity and least privilege",
+      "type": "prevent",
+      "owner": "Identity Engineering",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-IAM-01"
+      ]
+    },
+    {
+      "id": "C-02",
+      "name": "Untrusted-content separation and injection detection",
+      "type": "prevent",
+      "owner": "AI Platform",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-GRD-01"
+      ]
+    },
+    {
+      "id": "C-03",
+      "name": "Versioned retrieval with effective-date and jurisdiction filters",
+      "type": "prevent",
+      "owner": "Policy Operations",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-DATA-02"
+      ]
+    },
+    {
+      "id": "C-04",
+      "name": "Schema-constrained recommendation allowlist",
+      "type": "prevent",
+      "owner": "FDE Team",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-GRD-02"
+      ]
+    },
+    {
+      "id": "C-05",
+      "name": "Human approval with approver-bound action token",
+      "type": "prevent",
+      "owner": "Claims Platform",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-GRD-03"
+      ]
+    },
+    {
+      "id": "C-06",
+      "name": "Idempotent writes and uncertain-write reconciliation",
+      "type": "correct",
+      "owner": "Claims Platform",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-REL-01"
+      ]
+    },
+    {
+      "id": "C-07",
+      "name": "PII minimization, encryption, and approved data boundary",
+      "type": "prevent",
+      "owner": "Data Protection",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-DATA-01"
+      ]
+    },
+    {
+      "id": "C-08",
+      "name": "Managed secrets, rotation, and workload identity",
+      "type": "prevent",
+      "owner": "AI Platform",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-IAM-02"
+      ]
+    },
+    {
+      "id": "C-09",
+      "name": "Complete immutable audit trail with fail-closed delivery",
+      "type": "detect",
+      "owner": "Security Operations",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-OBS-01"
+      ]
+    },
+    {
+      "id": "C-10",
+      "name": "Signed version manifest and controlled environment promotion",
+      "type": "prevent",
+      "owner": "Release Engineering",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-ENV-01"
+      ]
+    },
+    {
+      "id": "C-11",
+      "name": "Rate limits, timeouts, circuit breakers, and cost budgets",
+      "type": "prevent",
+      "owner": "Site Reliability Engineering",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-REL-02"
+      ]
+    },
+    {
+      "id": "C-12",
+      "name": "Feature flag, manual path, rollback, and incident runbook",
+      "type": "correct",
+      "owner": "Operations Lead",
+      "status": "implemented",
+      "evidence_ids": [
+        "E-REL-03",
+        "E-OPS-01"
+      ]
+    }
+  ],
+  "threats": [
+    {
+      "id": "T-01",
+      "category": "prompt_injection",
+      "scenario": "A claim attachment instructs the model to ignore policy rules, reveal hidden context, or invoke a protected action.",
+      "asset_ids": [
+        "A-01",
+        "A-03",
+        "A-04"
+      ],
+      "trust_boundary_ids": [
+        "B-01",
+        "B-03",
+        "B-04"
+      ],
+      "likelihood": "high",
+      "impact": "critical",
+      "inherent_risk": "critical",
+      "control_ids": [
+        "C-02",
+        "C-04",
+        "C-05",
+        "C-09"
+      ],
+      "verification_evidence_ids": [
+        "E-GRD-01",
+        "E-GRD-02",
+        "E-GRD-03",
+        "E-OBS-01"
+      ],
+      "owner": "AI Security Lead",
+      "residual_risk": "medium",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-02",
+      "category": "tool_abuse",
+      "scenario": "A user or compromised service attempts a non-allowlisted claim denial, payment, reserve change, or customer communication.",
+      "asset_ids": [
+        "A-04",
+        "A-05"
+      ],
+      "trust_boundary_ids": [
+        "B-01",
+        "B-04",
+        "B-05"
+      ],
+      "likelihood": "medium",
+      "impact": "critical",
+      "inherent_risk": "critical",
+      "control_ids": [
+        "C-01",
+        "C-04",
+        "C-05",
+        "C-06",
+        "C-09"
+      ],
+      "verification_evidence_ids": [
+        "E-IAM-01",
+        "E-GRD-02",
+        "E-GRD-03",
+        "E-REL-01",
+        "E-OBS-01"
+      ],
+      "owner": "Claims Platform Owner",
+      "residual_risk": "low",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-03",
+      "category": "data_exfiltration",
+      "scenario": "Claim PII crosses the approved boundary through prompts, logs, model output, or cross-tenant retrieval.",
+      "asset_ids": [
+        "A-01",
+        "A-05"
+      ],
+      "trust_boundary_ids": [
+        "B-01",
+        "B-03",
+        "B-05"
+      ],
+      "likelihood": "medium",
+      "impact": "critical",
+      "inherent_risk": "critical",
+      "control_ids": [
+        "C-01",
+        "C-07",
+        "C-09"
+      ],
+      "verification_evidence_ids": [
+        "E-IAM-01",
+        "E-DATA-01",
+        "E-OBS-01"
+      ],
+      "owner": "Data Protection Officer",
+      "residual_risk": "medium",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-04",
+      "category": "retrieval_integrity",
+      "scenario": "The assistant cites a stale, wrong-jurisdiction, poisoned, or unauthorized policy document.",
+      "asset_ids": [
+        "A-02",
+        "A-03"
+      ],
+      "trust_boundary_ids": [
+        "B-02"
+      ],
+      "likelihood": "high",
+      "impact": "high",
+      "inherent_risk": "high",
+      "control_ids": [
+        "C-03",
+        "C-09",
+        "C-10"
+      ],
+      "verification_evidence_ids": [
+        "E-DATA-02",
+        "E-OBS-01",
+        "E-ENV-01"
+      ],
+      "owner": "Policy Operations Lead",
+      "residual_risk": "medium",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-05",
+      "category": "identity_tenant_isolation",
+      "scenario": "An adjuster or service accesses a claim, policy, or action outside its tenant, role, or assigned authority.",
+      "asset_ids": [
+        "A-01",
+        "A-02",
+        "A-04"
+      ],
+      "trust_boundary_ids": [
+        "B-01",
+        "B-02",
+        "B-04"
+      ],
+      "likelihood": "medium",
+      "impact": "critical",
+      "inherent_risk": "critical",
+      "control_ids": [
+        "C-01",
+        "C-07",
+        "C-09"
+      ],
+      "verification_evidence_ids": [
+        "E-IAM-01",
+        "E-DATA-01",
+        "E-OBS-01"
+      ],
+      "owner": "Identity Engineering Lead",
+      "residual_risk": "low",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-06",
+      "category": "secrets",
+      "scenario": "A credential is committed, logged, exposed to the model, or reused beyond its intended workload.",
+      "asset_ids": [
+        "A-06"
+      ],
+      "trust_boundary_ids": [
+        "B-02",
+        "B-03",
+        "B-04",
+        "B-05"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "inherent_risk": "high",
+      "control_ids": [
+        "C-08",
+        "C-09",
+        "C-10"
+      ],
+      "verification_evidence_ids": [
+        "E-IAM-02",
+        "E-OBS-01",
+        "E-ENV-01"
+      ],
+      "owner": "AI Platform Lead",
+      "residual_risk": "low",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-07",
+      "category": "transaction_integrity",
+      "scenario": "A timeout, retry, or partial failure creates a duplicate action or leaves an uncertain claims-system write.",
+      "asset_ids": [
+        "A-04",
+        "A-05"
+      ],
+      "trust_boundary_ids": [
+        "B-04",
+        "B-05"
+      ],
+      "likelihood": "high",
+      "impact": "high",
+      "inherent_risk": "high",
+      "control_ids": [
+        "C-05",
+        "C-06",
+        "C-09",
+        "C-12"
+      ],
+      "verification_evidence_ids": [
+        "E-GRD-03",
+        "E-REL-01",
+        "E-OBS-01",
+        "E-REL-03"
+      ],
+      "owner": "Claims Platform Owner",
+      "residual_risk": "medium",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-08",
+      "category": "audit",
+      "scenario": "A protected recommendation, approval, version, or action result is missing from the audit record or can be altered.",
+      "asset_ids": [
+        "A-03",
+        "A-04",
+        "A-05"
+      ],
+      "trust_boundary_ids": [
+        "B-05"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "inherent_risk": "high",
+      "control_ids": [
+        "C-09",
+        "C-12"
+      ],
+      "verification_evidence_ids": [
+        "E-OBS-01",
+        "E-OPS-01"
+      ],
+      "owner": "Security Operations Lead",
+      "residual_risk": "low",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-09",
+      "category": "change_management",
+      "scenario": "An unapproved model, prompt, retrieval index, schema, or tool version reaches production without matching evaluation evidence.",
+      "asset_ids": [
+        "A-02",
+        "A-03",
+        "A-04",
+        "A-05"
+      ],
+      "trust_boundary_ids": [
+        "B-02",
+        "B-03",
+        "B-04"
+      ],
+      "likelihood": "medium",
+      "impact": "high",
+      "inherent_risk": "high",
+      "control_ids": [
+        "C-03",
+        "C-10",
+        "C-12"
+      ],
+      "verification_evidence_ids": [
+        "E-DATA-02",
+        "E-ENV-01",
+        "E-REL-03"
+      ],
+      "owner": "Release Engineering Lead",
+      "residual_risk": "low",
+      "disposition": "MITIGATE"
+    },
+    {
+      "id": "T-10",
+      "category": "denial_of_service",
+      "scenario": "Large documents, repeated retries, or abusive traffic exhaust latency, capacity, or model-cost budgets and block adjuster work.",
+      "asset_ids": [
+        "A-03",
+        "A-06"
+      ],
+      "trust_boundary_ids": [
+        "B-01",
+        "B-02",
+        "B-03"
+      ],
+      "likelihood": "high",
+      "impact": "medium",
+      "inherent_risk": "high",
+      "control_ids": [
+        "C-09",
+        "C-11",
+        "C-12"
+      ],
+      "verification_evidence_ids": [
+        "E-OBS-01",
+        "E-REL-02",
+        "E-REL-03"
+      ],
+      "owner": "Site Reliability Engineering Lead",
+      "residual_risk": "medium",
+      "disposition": "MITIGATE"
+    }
+  ],
+  "risk_policy": {
+    "production_blockers": [
+      "critical residual risk",
+      "high residual risk without approved exception",
+      "unowned threat",
+      "unverified blocking control"
+    ],
+    "allowed_residual_risk_for_pilot": [
+      "low",
+      "medium"
+    ],
+    "exception_requires": [
+      "named risk owner",
+      "business approval",
+      "security approval",
+      "expiration date",
+      "compensating control"
+    ]
+  }
+}

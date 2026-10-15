@@ -1,0 +1,9 @@
+item_id,capability,reuse_demand,standardization,strategic_fit,customer_coupling,security_variance,maintenance_burden,lifecycle_status,proposed_decision,owner,evidence
+P-01,Prompt-injection evaluation pack,5,5,5,1,2,2,active,PRODUCT,AI Quality Product Owner,Used by three regulated deployments with one versioned test contract
+P-02,Effective-policy retrieval pattern,5,4,5,2,3,2,active,PRODUCT,Knowledge Platform Product Owner,Repeated effective-date and jurisdiction need across four insurers
+P-03,Protected-action audit schema,5,5,5,1,2,2,active,PRODUCT,Security Product Owner,Shared identity evidence approval action and result contract
+P-04,Enterprise identity adapter framework,4,4,5,3,4,3,active,PLATFORM,Identity Platform Owner,Reusable framework with customer-specific provider configuration
+P-05,Claims decision workspace shell,4,3,4,4,3,3,active,PLATFORM,Claims Solution Platform Owner,Shared workflow shell with supported extension points
+P-06,Tenant claim-field mapping,3,3,3,4,3,2,active,CONFIGURATION,Implementation Configuration Owner,Declarative mapping schema avoids customer code branches
+P-07,Northstar legacy mainframe action adapter,1,2,2,5,5,5,active,CUSTOM_EXTENSION,Northstar Integration Owner,Customer funded and isolated with review date 2027-03-31
+P-08,Pilot spreadsheet export,1,1,1,4,3,4,retire,RETIRE,Claims Solution Owner,No production dependency and archive after pilot evidence export

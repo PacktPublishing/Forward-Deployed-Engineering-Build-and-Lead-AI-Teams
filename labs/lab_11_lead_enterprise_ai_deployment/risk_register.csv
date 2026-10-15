@@ -1,0 +1,10 @@
+risk_id,category,description,probability,impact,score,owner,response,trigger,contingency,status
+R-01,integration,Claims-system write API is not certified for the rollout window,4,5,20,Claims Platform Lead,MITIGATE,Certification slips beyond milestone M-04,Launch read-only assistance and defer protected writes,MITIGATED
+R-02,security,Cross-tenant authorization defect appears in preproduction,4,5,20,Security Lead,MITIGATE,Any negative authorization test succeeds,Stop promotion and repair tenant enforcement,MITIGATED
+R-03,data,Effective-date metadata is incomplete for a rollout jurisdiction,3,5,15,Claims Data Lead,MITIGATE,Policy coverage falls below 100 percent,Remove the jurisdiction from scope and repair metadata,MONITORED
+R-04,adoption,Training completion falls below 90 percent before a rollout wave,3,4,12,Claims Operations Lead,MITIGATE,Completion is below target three days before cutover,Limit the wave to trained adjusters and add office hours,MONITORED
+R-05,reliability,p95 latency exceeds 12 seconds under rollout load,3,4,12,Site Reliability Lead,MITIGATE,Two consecutive monitoring windows exceed the SLO,Disable the feature flag and continue manual handling,MITIGATED
+R-06,scope,An executive requests enterprise-wide rollout before wave evidence,3,4,12,Technical Deployment Lead,AVOID,Requested cohort exceeds the approved wave boundary,Require a new scope decision and readiness review,MONITORED
+R-07,operations,Primary or backup on-call coverage is missing during cutover,2,5,10,Operations Owner,MITIGATE,Any severity-one slot lacks both roles,Delay cutover or add approved coverage,MITIGATED
+R-08,product,Customer-specific adapter changes leak into shared platform code,2,4,8,Product Owner,AVOID,Shared-core pull request contains Northstar-only logic,Move logic to the isolated extension and review the contract,MONITORED
+

@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "customer_context": {
+    "organization": "Northstar Mutual",
+    "user": "Claims adjuster",
+    "business_owner": "VP of Claims Operations",
+    "current_workflow": "Adjusters manually inspect claim forms, policies, endorsements, photographs, and prior notes across multiple systems.",
+    "problem_statement": "Eligible property claims take an average of 18 minutes to assess because the evidence needed for routing decisions is distributed across multiple systems."
+  },
+  "decision": {
+    "user_decision": "Decide whether an eligible claim can be fast-tracked or requires manual review.",
+    "action_after_decision": "Route the claim to the appropriate queue and record the supporting rationale."
+  },
+  "scope": {
+    "in_scope": [
+      "Surface policy evidence relevant to the claim",
+      "Recommend fast-track or manual review",
+      "Record evidence supporting the recommendation",
+      "Escalate missing or conflicting evidence to manual review"
+    ],
+    "out_of_scope": [
+      "Deny claims autonomously",
+      "Issue customer payments",
+      "Change policy terms",
+      "Remove the adjuster's final decision authority"
+    ]
+  },
+  "baseline": {
+    "metric": "average_handling_time_minutes",
+    "current_value": 18,
+    "target_value": 11,
+    "unit": "minutes_per_claim",
+    "direction": "decrease",
+    "measurement_window": "30 days after pilot launch",
+    "minimum_pilot_sample_size": 200,
+    "weekly_volume": 1200
+  },
+  "lifecycle": {
+    "discover": {
+      "owner": "Forward Deployed Engineer and Claims Operations Lead",
+      "deliverable": "Observed workflow, bounded problem statement, and measurement baseline",
+      "evidence": "Twenty sampled claim journeys and confirmed handling-time data",
+      "exit_criterion": "The user, decision, action, friction, scope, baseline, and business owner are confirmed."
+    },
+    "design": {
+      "owner": "Forward Deployed Architect and Claims Operations Lead",
+      "deliverable": "Bounded AI-assisted claims workflow with human decision points",
+      "evidence": "Approved workflow showing recommendation, evidence citation, manual review, and prohibited actions",
+      "exit_criterion": "The customer approves system boundaries, human authority, success criteria, and guardrails."
+    },
+    "build": {
+      "owner": "AI Forward Deployed Engineer and Customer Integration Engineer",
+      "deliverable": "Smallest valuable evidence-to-recommendation slice",
+      "evidence": "Representative claims produce traceable recommendations without executing prohibited actions",
+      "exit_criterion": "The end-to-end slice passes functional checks and routes missing evidence to manual review."
+    },
+    "run": {
+      "owner": "Technical Deployment Lead and Claims Operations Manager",
+      "deliverable": "Controlled pilot with selected claims adjusters",
+      "evidence": "Usage, handling time, override, availability, and incorrect-routing telemetry",
+      "exit_criterion": "At least 200 eligible claims produce sufficient operational and quality evidence."
+    },
+    "impact": {
+      "owner": "VP of Claims Operations",
+      "deliverable": "Scale, repair, pause, or exit recommendation",
+      "evidence": "Pilot results compared with the handling-time target and incorrect-fast-track guardrail",
+      "exit_criterion": "Leadership records an evidence-based deployment decision and accountable next action."
+    }
+  },
+  "outcomes": {
+    "technical_output": "A claims-assistant workflow is deployed to the controlled pilot environment.",
+    "customer_outcome": "Adjusters receive relevant policy evidence and a traceable routing recommendation before making the final decision.",
+    "business_impact": "Average handling time for eligible claims decreases from 18 minutes to 11 minutes.",
+    "guardrail": {
+      "metric": "incorrect_fast_track_rate",
+      "maximum_value": 0.015,
+      "unit": "ratio"
+    }
+  },
+  "assumptions": [
+    "The 1,200 weekly claims are eligible for the bounded workflow.",
+    "The 18-minute baseline was measured consistently.",
+    "Policy and endorsement evidence is available in approved systems."
+  ],
+  "trade_offs": [
+    "Manual review protects claim quality but limits maximum automation.",
+    "Evidence citation may increase latency but improves trust and auditability."
+  ]
+}

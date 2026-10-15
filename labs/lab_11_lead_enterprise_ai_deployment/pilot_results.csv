@@ -1,0 +1,6 @@
+week,eligible_adjusters,active_adjusters,eligible_claims,assisted_claims,recommendations_shown,recommendations_accepted,average_handling_minutes,rework_rate_percent,quality_score_percent,citation_completeness_percent,p95_latency_seconds,model_cost_usd,unauthorized_protected_actions,audit_completeness_percent
+1,25,14,100,48,45,30,38,12.5,88.5,96.0,11.8,80,0,100
+2,25,18,110,70,65,51,34,10.5,91.0,97.0,11.4,105,0,100
+3,25,21,115,90,85,70,31,9.2,93.2,98.0,10.7,135,0,100
+4,25,22,120,105,100,82,29,8.5,94.5,99.0,10.2,165,0,100
+

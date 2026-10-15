@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="774ec586f19a2bb0a3e5416bf1dac644eedefcf3e75a2c23177c9d9fcbab090a">
+<title>Lab 10 — Design a Forward Deployed Organization and Staffing Model</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 10 — Design a Forward Deployed Organization and Staffing Model</h1>
+<h2>Goal</h2>
+<p>Design a forward deployed organization that can staff multiple customer engagements without hero culture, hidden specialist bottlenecks, or unclear decision rights. Model persistent capability groups, temporary deployment pods, portfolio demand, backup ownership, utilization guardrails, governance, career levels, and scaling triggers.</p>
+<p>Build the project independently in a new directory. The completed reference repository is a comparison aid, not the learner workspace.</p>
+<h2>What You'll Build or Produce</h2>
+<ul><li><code>organization_model.json</code> — topology, role capacity, rules, governance, decision rights, scaling triggers, anti-hero controls, and career levels.</li><li><code>engagement_portfolio.csv</code> — four prioritized engagements with phase, risk, ownership, and seven-role FTE demand.</li><li><code>staffing_model.py</code> — the executable capacity and coverage review.</li><li><code>staffing_plan.md</code> — the generated portfolio staffing recommendation.</li><li><code>.gitignore</code> — Git hygiene.</li></ul>
+<h2>Estimated Time</h2>
+<p>75–100 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This exercise runs locally with Python's standard library. It creates no external services or cost.</p>
+<h2>Completion Evidence</h2>
+<ul><li><code>python3 -m py_compile staffing_model.py</code> succeeds.</li><li><code>python3 staffing_model.py</code> prints <code>LAB 10 PASSED</code> and <code>PORTFOLIO_STAFFED_WITH_GUARDRAILS</code>.</li><li>Four engagements have priority, phase, risk, DRI, backup DRI, and role allocations.</li><li>Seven role pools stay below their target utilization.</li><li>Phase and high-risk coverage rules pass.</li><li>Five decision domains and at least five scaling and anti-hero controls exist.</li><li><code>staffing_plan.md</code> exposes capacity and specialist pressure.</li><li>Git is clean on <code>main</code>.</li></ul>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later</li><li>Git</li><li>A text editor</li><li>Familiarity with cross-functional teams, FTE capacity, delivery phases, and organizational decision rights</li><li>Awareness of the claims-assistant deployment plus other realistic concurrent portfolio demands.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This final lab scales the operating model across several customer engagements. It combines lessons from delivery, security, adoption, and productization to allocate scarce roles, protect backup ownership, expose bottlenecks, and trigger hiring or reprioritization. The result is an organization designed to repeat outcomes without hero culture.</p>
+<h2>Step 1 — Create Your Project</h2>
+<pre><code class="language-bash">mkdir lab_10_forward_deployed_organization_staffing_model
+cd lab_10_forward_deployed_organization_staffing_model</code></pre>
+<p>Create <code>.gitignore</code>:</p>
+<pre><code class="language-gitignore">__pycache__/
+*.py[cod]
+.DS_Store</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Only <code>.gitignore</code> exists in your learner-owned directory.</li><li><strong>Acceptable variation:</strong> Another directory name is acceptable.</li><li><strong>Failure indicator:</strong> You are editing the completed reference repository.</li><li><strong>Corrective action:</strong> Create a separate directory and continue there.</li></ul>
+<h2>Step 2 — Design the Organization Model</h2>
+<p>Create <code>organization_model.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;lab_id&quot;: &quot;lab_10&quot;,
+    &quot;organization&quot;: &quot;Northstar Forward Deployed AI Practice&quot;,
+    &quot;case_anchor&quot;: &quot;Enterprise AI Claims Assistant&quot;,
+    &quot;planning_horizon&quot;: &quot;Q4 2026 portfolio&quot;,
+    &quot;review_date&quot;: &quot;2026-08-16&quot;
+  },
+  &quot;operating_model&quot;: {
+    &quot;topology&quot;: &quot;Persistent capability groups staff temporary cross-functional deployment pods.&quot;,
+    &quot;deployment_pod&quot;: [
+      &quot;Forward Deployed Engineer&quot;,
+      &quot;AI Engineer&quot;,
+      &quot;Platform Engineer&quot;,
+      &quot;Product Partner&quot;,
+      &quot;Technical Deployment Lead&quot;
+    ],
+    &quot;shared_specialists&quot;: [
+      &quot;Forward Deployed Architect&quot;,
+      &quot;Security Engineer&quot;
+    ],
+    &quot;leadership_layers&quot;: [
+      {
+        &quot;layer&quot;: &quot;Engagement&quot;,
+        &quot;accountability&quot;: &quot;Customer outcome scope delivery and operational transition&quot;,
+        &quot;owner&quot;: &quot;Technical Deployment Lead&quot;
+      },
+      {
+        &quot;layer&quot;: &quot;Technical&quot;,
+        &quot;accountability&quot;: &quot;Architecture quality security and reusable engineering decisions&quot;,
+        &quot;owner&quot;: &quot;Principal FDE&quot;
+      },
+      {
+        &quot;layer&quot;: &quot;Portfolio&quot;,
+        &quot;accountability&quot;: &quot;Capacity prioritization specialist allocation and escalation&quot;,
+        &quot;owner&quot;: &quot;FDE Director&quot;
+      }
+    ]
+  },
+  &quot;roles&quot;: [
+    {
+      &quot;id&quot;: &quot;fde&quot;,
+      &quot;title&quot;: &quot;Forward Deployed Engineer&quot;,
+      &quot;available_fte&quot;: 8,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;End-to-end customer solution&quot;,
+        &quot;Integration and evidence&quot;,
+        &quot;Customer technical ownership&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;ai&quot;,
+      &quot;title&quot;: &quot;AI Engineer&quot;,
+      &quot;available_fte&quot;: 5,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;Models retrieval evaluation and guardrails&quot;,
+        &quot;AI quality evidence&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;architect&quot;,
+      &quot;title&quot;: &quot;Forward Deployed Architect&quot;,
+      &quot;available_fte&quot;: 3,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;Cross-system architecture&quot;,
+        &quot;Trade-offs and design governance&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;platform&quot;,
+      &quot;title&quot;: &quot;Platform Engineer&quot;,
+      &quot;available_fte&quot;: 4,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;Environments delivery reliability and observability&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;security&quot;,
+      &quot;title&quot;: &quot;Security Engineer&quot;,
+      &quot;available_fte&quot;: 3,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;Threat model access data protection and release approval&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;product&quot;,
+      &quot;title&quot;: &quot;Product Partner&quot;,
+      &quot;available_fte&quot;: 3,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;Discovery adoption value and product feedback&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;delivery&quot;,
+      &quot;title&quot;: &quot;Technical Deployment Lead&quot;,
+      &quot;available_fte&quot;: 3,
+      &quot;max_target_utilization_percent&quot;: 90,
+      &quot;accountabilities&quot;: [
+        &quot;Integrated plan decisions risks cutover and handoff&quot;
+      ]
+    }
+  ],
+  &quot;staffing_rules&quot;: [
+    &quot;Every engagement has a named DRI and a different backup DRI.&quot;,
+    &quot;Risk level 5 requires at least 0.5 architect FTE and 0.5 security FTE.&quot;,
+    &quot;Go-live requires at least 1.0 platform FTE and 0.5 delivery FTE.&quot;,
+    &quot;Discovery requires at least 1.0 FDE FTE and 0.5 product FTE.&quot;,
+    &quot;Pilot requires at least 1.0 AI FTE and 0.5 platform FTE.&quot;,
+    &quot;No role pool may exceed its target utilization.&quot;
+  ],
+  &quot;governance&quot;: [
+    {
+      &quot;cadence&quot;: &quot;Weekly portfolio staffing review&quot;,
+      &quot;owner&quot;: &quot;FDE Director&quot;,
+      &quot;decisions&quot;: [
+        &quot;Priority changes&quot;,
+        &quot;Specialist conflicts&quot;,
+        &quot;Hiring or contractor trigger&quot;
+      ]
+    },
+    {
+      &quot;cadence&quot;: &quot;Weekly architecture and security council&quot;,
+      &quot;owner&quot;: &quot;Principal FDE&quot;,
+      &quot;decisions&quot;: [
+        &quot;Design exceptions&quot;,
+        &quot;Security risk acceptance&quot;,
+        &quot;Reusable pattern approval&quot;
+      ]
+    },
+    {
+      &quot;cadence&quot;: &quot;Biweekly talent review&quot;,
+      &quot;owner&quot;: &quot;FDE Manager&quot;,
+      &quot;decisions&quot;: [
+        &quot;Coaching load&quot;,
+        &quot;Backup coverage&quot;,
+        &quot;Career evidence and rotations&quot;
+      ]
+    }
+  ],
+  &quot;decision_rights&quot;: [
+    {
+      &quot;decision&quot;: &quot;Engagement priority&quot;,
+      &quot;dri&quot;: &quot;FDE Director&quot;,
+      &quot;approver&quot;: &quot;Executive Portfolio Sponsor&quot;
+    },
+    {
+      &quot;decision&quot;: &quot;Technical standard&quot;,
+      &quot;dri&quot;: &quot;Principal FDE&quot;,
+      &quot;approver&quot;: &quot;Architecture Council&quot;
+    },
+    {
+      &quot;decision&quot;: &quot;Security exception&quot;,
+      &quot;dri&quot;: &quot;Security Lead&quot;,
+      &quot;approver&quot;: &quot;Chief Information Security Officer&quot;
+    },
+    {
+      &quot;decision&quot;: &quot;Staff reassignment&quot;,
+      &quot;dri&quot;: &quot;FDE Director&quot;,
+      &quot;approver&quot;: &quot;Affected Engagement Sponsors&quot;
+    },
+    {
+      &quot;decision&quot;: &quot;Hiring trigger&quot;,
+      &quot;dri&quot;: &quot;FDE Director&quot;,
+      &quot;approver&quot;: &quot;Business Unit Leader&quot;
+    }
+  ],
+  &quot;scaling_triggers&quot;: [
+    {
+      &quot;trigger&quot;: &quot;Any role exceeds 85 percent utilization for two planning cycles&quot;,
+      &quot;action&quot;: &quot;Open capacity plan and reduce uncommitted scope&quot;
+    },
+    {
+      &quot;trigger&quot;: &quot;A shared specialist becomes the sole qualified owner for two or more critical engagements&quot;,
+      &quot;action&quot;: &quot;Assign a shadow and create a dated capability transfer plan&quot;
+    },
+    {
+      &quot;trigger&quot;: &quot;Security or architecture review wait exceeds 10 business days&quot;,
+      &quot;action&quot;: &quot;Add reviewer capacity or narrow concurrent high-risk work&quot;
+    },
+    {
+      &quot;trigger&quot;: &quot;More than two engagements enter go-live or hypercare together&quot;,
+      &quot;action&quot;: &quot;Create a temporary command-center rotation and executive priority review&quot;
+    },
+    {
+      &quot;trigger&quot;: &quot;Reusable work exceeds 30 percent of delivery effort&quot;,
+      &quot;action&quot;: &quot;Fund a dedicated product or platform workstream&quot;
+    }
+  ],
+  &quot;anti_hero_controls&quot;: [
+    &quot;Primary and backup DRI on every engagement&quot;,
+    &quot;Decision and runbook artifacts stored in shared repositories&quot;,
+    &quot;Observed handoffs before role rotation&quot;,
+    &quot;Shared on-call and review rotations&quot;,
+    &quot;No critical approval dependent on one person&quot;
+  ],
+  &quot;career_levels&quot;: [
+    {
+      &quot;level&quot;: &quot;FDE&quot;,
+      &quot;evidence&quot;: &quot;Delivers a bounded workstream with support&quot;
+    },
+    {
+      &quot;level&quot;: &quot;Senior FDE&quot;,
+      &quot;evidence&quot;: &quot;Owns an engagement slice and customer decisions&quot;
+    },
+    {
+      &quot;level&quot;: &quot;Principal FDE&quot;,
+      &quot;evidence&quot;: &quot;Sets technical direction across engagements and develops specialists&quot;
+    },
+    {
+      &quot;level&quot;: &quot;FDE Manager&quot;,
+      &quot;evidence&quot;: &quot;Builds capability capacity and consistent delivery systems&quot;
+    }
+  ]
+}</code></pre>
+<p>The topology keeps reusable capability in persistent role groups while forming temporary customer pods. Decision rights, scaling triggers, backups, and shared artifacts prevent a single heroic person from becoming the operating model.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Seven role pools, engagement/technical/portfolio leadership, staffing rules, three governance cadences, five decisions, five scaling triggers, five anti-hero controls, and four career levels are present.</li><li><strong>Acceptable variation:</strong> Capacity may reflect another organization if role accountabilities and utilization limits remain explicit.</li><li><strong>Failure indicator:</strong> The model is only an org chart and says nothing about capacity, decisions, specialist allocation, or knowledge transfer.</li><li><strong>Corrective action:</strong> Add operating rules, measurable triggers, accountable decisions, and resilience controls.</li></ul>
+<h2>Step 3 — Create the Engagement Portfolio</h2>
+<p>Create <code>engagement_portfolio.csv</code>:</p>
+<pre><code class="language-csv">engagement_id,customer,phase,priority,complexity,risk,region,dri,backup_dri,fde_fte,ai_fte,architect_fte,platform_fte,security_fte,product_fte,delivery_fte
+E-01,Northstar Mutual Claims Assistant,go_live,1,5,5,US,Sam Rivera,Alex Morgan,2.0,1.0,0.5,1.0,0.5,0.5,0.5
+E-02,Summit Bank Knowledge Agent,design,2,5,5,US and EU,Nora Patel,Diego Lee,1.0,1.0,1.0,0.5,1.0,0.5,0.5
+E-03,Meridian Pharma Compliance Assistant,discovery,3,4,5,US and EU,Jamie Chen,Riley Brooks,1.0,0.5,0.5,0.0,0.5,0.5,0.5
+E-04,Harbor Retail Service Copilot,pilot,4,3,3,US,Taylor Singh,Casey Grant,2.0,1.5,0.5,1.0,0.5,0.5,0.5</code></pre>
+<p>Fractional FTE expresses planned capacity rather than named full-time assignment. Primary and backup DRIs preserve engagement continuity while role allocations reveal portfolio tradeoffs.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Four unique engagements cover discovery, design, pilot, and go-live with priorities 1–4.</li><li><strong>Acceptable variation:</strong> Add engagements using the same schema and phase rules.</li><li><strong>Failure indicator:</strong> An engagement has the same primary and backup, a high-risk engagement lacks architecture/security, or phase coverage is absent.</li><li><strong>Corrective action:</strong> Add qualified coverage, change scope or sequencing, or reduce concurrency.</li></ul>
+<h2>Step 4 — Build the Executable Staffing Review</h2>
+<p>Create <code>staffing_model.py</code>:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Validate a forward deployed organization and portfolio staffing model.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+MODEL_FILE = ROOT / &quot;organization_model.json&quot;
+PORTFOLIO_FILE = ROOT / &quot;engagement_portfolio.csv&quot;
+REPORT_FILE = ROOT / &quot;staffing_plan.md&quot;
+
+FTE_FIELDS = [
+    &quot;fde_fte&quot;, &quot;ai_fte&quot;, &quot;architect_fte&quot;, &quot;platform_fte&quot;,
+    &quot;security_fte&quot;, &quot;product_fte&quot;, &quot;delivery_fte&quot;,
+]
+
+
+def load_json(path: Path) -&gt; dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding=&quot;utf-8&quot;))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def load_portfolio(path: Path) -&gt; list[dict[str, str]]:
+    try:
+        with path.open(encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as handle:
+            return list(csv.DictReader(handle))
+    except OSError as exc:
+        raise ValueError(f&quot;Cannot load {path.name}: {exc}&quot;) from exc
+
+
+def validate(
+    model: dict[str, Any], rows: list[dict[str, str]]
+) -&gt; tuple[dict[str, float], dict[str, float]]:
+    errors: list[str] = []
+    required_sections = {
+        &quot;metadata&quot;, &quot;operating_model&quot;, &quot;roles&quot;, &quot;staffing_rules&quot;,
+        &quot;governance&quot;, &quot;decision_rights&quot;, &quot;scaling_triggers&quot;,
+        &quot;anti_hero_controls&quot;, &quot;career_levels&quot;,
+    }
+    missing = required_sections - set(model)
+    if missing:
+        errors.append(&quot;Missing organization sections: &quot; + &quot;, &quot;.join(sorted(missing)))
+
+    role_index = {item.get(&quot;id&quot;): item for item in model.get(&quot;roles&quot;, [])}
+    expected_role_ids = {field.removesuffix(&quot;_fte&quot;) for field in FTE_FIELDS}
+    if set(role_index) != expected_role_ids:
+        errors.append(&quot;Organization roles must match the seven staffing fields&quot;)
+    if len(role_index) != len(model.get(&quot;roles&quot;, [])):
+        errors.append(&quot;Role IDs must be unique&quot;)
+
+    expected_columns = {
+        &quot;engagement_id&quot;, &quot;customer&quot;, &quot;phase&quot;, &quot;priority&quot;, &quot;complexity&quot;, &quot;risk&quot;,
+        &quot;region&quot;, &quot;dri&quot;, &quot;backup_dri&quot;, *FTE_FIELDS,
+    }
+    if rows and set(rows[0]) != expected_columns:
+        errors.append(&quot;Engagement-portfolio columns do not match the required schema&quot;)
+    engagement_ids = [item.get(&quot;engagement_id&quot;) for item in rows]
+    priorities = [item.get(&quot;priority&quot;) for item in rows]
+    if not engagement_ids or len(engagement_ids) != len(set(engagement_ids)):
+        errors.append(&quot;Engagement IDs must be present and unique&quot;)
+    if len(priorities) != len(set(priorities)):
+        errors.append(&quot;Portfolio priorities must be unique&quot;)
+
+    demand = {role_id: 0.0 for role_id in expected_role_ids}
+    allowed_phases = {&quot;discovery&quot;, &quot;design&quot;, &quot;build&quot;, &quot;pilot&quot;, &quot;go_live&quot;, &quot;hypercare&quot;}
+    for item in rows:
+        try:
+            complexity = int(item[&quot;complexity&quot;])
+            risk = int(item[&quot;risk&quot;])
+            int(item[&quot;priority&quot;])
+            allocation = {field: float(item[field]) for field in FTE_FIELDS}
+        except (KeyError, TypeError, ValueError):
+            errors.append(f&quot;{item.get(&#x27;engagement_id&#x27;)} has invalid numeric values&quot;)
+            continue
+        if item.get(&quot;phase&quot;) not in allowed_phases:
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} has an unsupported phase&quot;)
+        if complexity not in range(1, 6) or risk not in range(1, 6):
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} complexity and risk must be 1 through 5&quot;)
+        if not item.get(&quot;dri&quot;) or not item.get(&quot;backup_dri&quot;) or item[&quot;dri&quot;] == item[&quot;backup_dri&quot;]:
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} needs different primary and backup DRIs&quot;)
+        if any(value &lt; 0 for value in allocation.values()):
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} has negative staffing&quot;)
+        for field, value in allocation.items():
+            demand[field.removesuffix(&quot;_fte&quot;)] += value
+        if risk == 5 and (allocation[&quot;architect_fte&quot;] &lt; 0.5 or allocation[&quot;security_fte&quot;] &lt; 0.5):
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} high risk lacks architecture or security coverage&quot;)
+        if item[&quot;phase&quot;] == &quot;go_live&quot; and (allocation[&quot;platform_fte&quot;] &lt; 1.0 or allocation[&quot;delivery_fte&quot;] &lt; 0.5):
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} go-live coverage is incomplete&quot;)
+        if item[&quot;phase&quot;] == &quot;discovery&quot; and (allocation[&quot;fde_fte&quot;] &lt; 1.0 or allocation[&quot;product_fte&quot;] &lt; 0.5):
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} discovery coverage is incomplete&quot;)
+        if item[&quot;phase&quot;] == &quot;pilot&quot; and (allocation[&quot;ai_fte&quot;] &lt; 1.0 or allocation[&quot;platform_fte&quot;] &lt; 0.5):
+            errors.append(f&quot;{item[&#x27;engagement_id&#x27;]} pilot coverage is incomplete&quot;)
+
+    utilization: dict[str, float] = {}
+    for role_id, role in role_index.items():
+        capacity = float(role.get(&quot;available_fte&quot;, 0))
+        target = float(role.get(&quot;max_target_utilization_percent&quot;, 0))
+        if capacity &lt;= 0 or not (0 &lt; target &lt;= 100):
+            errors.append(f&quot;{role_id} has invalid capacity or target&quot;)
+            continue
+        utilization[role_id] = round(100 * demand[role_id] / capacity, 2)
+        if utilization[role_id] &gt; target:
+            errors.append(
+                f&quot;{role[&#x27;title&#x27;]} utilization {utilization[role_id]:.1f}% &quot;
+                f&quot;exceeds target {target:.1f}%&quot;
+            )
+        if not role.get(&quot;accountabilities&quot;):
+            errors.append(f&quot;{role[&#x27;title&#x27;]} lacks accountabilities&quot;)
+
+    required_decisions = {
+        &quot;Engagement priority&quot;, &quot;Technical standard&quot;, &quot;Security exception&quot;,
+        &quot;Staff reassignment&quot;, &quot;Hiring trigger&quot;,
+    }
+    if {item.get(&quot;decision&quot;) for item in model.get(&quot;decision_rights&quot;, [])} != required_decisions:
+        errors.append(&quot;Organization decision rights are incomplete&quot;)
+    if len(model.get(&quot;scaling_triggers&quot;, [])) &lt; 5:
+        errors.append(&quot;At least five scaling triggers are required&quot;)
+    if len(model.get(&quot;anti_hero_controls&quot;, [])) &lt; 5:
+        errors.append(&quot;Anti-hero controls are incomplete&quot;)
+
+    if errors:
+        raise ValueError(&quot;\n&quot;.join(f&quot;- {error}&quot; for error in errors))
+    return demand, utilization
+
+
+def build_report(
+    model: dict[str, Any],
+    rows: list[dict[str, str]],
+    demand: dict[str, float],
+    utilization: dict[str, float],
+    decision: str,
+) -&gt; str:
+    role_index = {item[&quot;id&quot;]: item for item in model[&quot;roles&quot;]}
+    lines = [
+        &quot;# Forward Deployed Organization and Staffing Plan&quot;, &quot;&quot;,
+        f&quot;- **Decision:** {decision}&quot;,
+        f&quot;- **Planning horizon:** {model[&#x27;metadata&#x27;][&#x27;planning_horizon&#x27;]}&quot;,
+        f&quot;- **Topology:** {model[&#x27;operating_model&#x27;][&#x27;topology&#x27;]}&quot;, &quot;&quot;,
+        &quot;## Engagement Portfolio&quot;, &quot;&quot;,
+        &quot;| Priority | Engagement | Phase | DRI | Backup | Risk |&quot;,
+        &quot;| ---: | --- | --- | --- | --- | ---: |&quot;,
+    ]
+    for item in sorted(rows, key=lambda row: int(row[&quot;priority&quot;])):
+        lines.append(
+            f&quot;| {item[&#x27;priority&#x27;]} | {item[&#x27;customer&#x27;]} | {item[&#x27;phase&#x27;]} | &quot;
+            f&quot;{item[&#x27;dri&#x27;]} | {item[&#x27;backup_dri&#x27;]} | {item[&#x27;risk&#x27;]} |&quot;
+        )
+    lines.extend([&quot;&quot;, &quot;## Capacity by Role&quot;, &quot;&quot;, &quot;| Role | Demand FTE | Available FTE | Utilization | Target |&quot;, &quot;| --- | ---: | ---: | ---: | ---: |&quot;])
+    for role in model[&quot;roles&quot;]:
+        role_id = role[&quot;id&quot;]
+        lines.append(
+            f&quot;| {role[&#x27;title&#x27;]} | {demand[role_id]:.1f} | &quot;
+            f&quot;{float(role[&#x27;available_fte&#x27;]):.1f} | {utilization[role_id]:.1f}% | &quot;
+            f&quot;{float(role[&#x27;max_target_utilization_percent&#x27;]):.1f}% |&quot;
+        )
+    lines.extend([&quot;&quot;, &quot;## Scaling Triggers&quot;, &quot;&quot;])
+    for item in model[&quot;scaling_triggers&quot;]:
+        lines.append(f&quot;- **Trigger:** {item[&#x27;trigger&#x27;]} **Action:** {item[&#x27;action&#x27;]}&quot;)
+    lines.extend([&quot;&quot;, &quot;## Anti-Hero Controls&quot;, &quot;&quot;])
+    lines.extend(f&quot;- {item}&quot; for item in model[&quot;anti_hero_controls&quot;])
+    lines.extend([&quot;&quot;, &quot;## Governance&quot;, &quot;&quot;])
+    for item in model[&quot;governance&quot;]:
+        lines.append(f&quot;- {item[&#x27;cadence&#x27;]} — {item[&#x27;owner&#x27;]}: {&#x27;, &#x27;.join(item[&#x27;decisions&#x27;])}&quot;)
+    lines.append(&quot;&quot;)
+    return &quot;\n&quot;.join(lines)
+
+
+def main() -&gt; int:
+    try:
+        model = load_json(MODEL_FILE)
+        rows = load_portfolio(PORTFOLIO_FILE)
+        demand, utilization = validate(model, rows)
+        decision = &quot;PORTFOLIO_STAFFED_WITH_GUARDRAILS&quot;
+        REPORT_FILE.write_text(
+            build_report(model, rows, demand, utilization, decision),
+            encoding=&quot;utf-8&quot;,
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        print(f&quot;LAB 10 FAILED\n{exc}&quot;)
+        return 1
+
+    role_index = {item[&quot;id&quot;]: item for item in model[&quot;roles&quot;]}
+    peak_role = max(utilization, key=utilization.get)
+    print(&quot;LAB 10 PASSED&quot;)
+    print(f&quot;- Decision: {decision}&quot;)
+    print(f&quot;- Engagements staffed: {len(rows)}&quot;)
+    print(f&quot;- Role pools: {len(role_index)}&quot;)
+    print(f&quot;- Peak utilization: {role_index[peak_role][&#x27;title&#x27;]} {utilization[peak_role]:.1f}%&quot;)
+    print(&quot;- Overallocated roles: 0&quot;)
+    print(f&quot;- Report: {REPORT_FILE.name}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>The program validates organization completeness, portfolio schema, phase-specific staffing, high-risk specialist coverage, primary/backup ownership, decision rights, anti-hero controls, and role utilization before generating the plan.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Demand is summed across all engagements and compared with each role's available FTE and target utilization.</li><li><strong>Acceptable variation:</strong> Add a new role only when the JSON, CSV, validation, and guide all teach it.</li><li><strong>Failure indicator:</strong> Staffing is approved engagement by engagement while the total portfolio overallocates a shared specialist.</li><li><strong>Corrective action:</strong> Reprioritize, reduce scope, delay work, cross-train, or add capacity before approval.</li></ul>
+<h2>Step 5 — Run and Inspect the Staffing Model</h2>
+<pre><code class="language-bash">python3 -m py_compile staffing_model.py
+python3 staffing_model.py</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">LAB 10 PASSED
+- Decision: PORTFOLIO_STAFFED_WITH_GUARDRAILS
+- Engagements staffed: 4
+- Role pools: 7
+- Peak utilization: Forward Deployed Architect 83.3%
+- Overallocated roles: 0
+- Report: staffing_plan.md</code></pre>
+<p>Inspect the generated plan:</p>
+<pre><code class="language-bash">sed -n &#x27;1,260p&#x27; staffing_plan.md</code></pre>
+<p>On Windows PowerShell:</p>
+<pre><code class="language-powershell">Get-Content staffing_plan.md</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> All role pools remain below 90 percent; architecture and security pressure are visible instead of hidden.</li><li><strong>Acceptable variation:</strong> A real portfolio may correctly fail when demand exceeds capacity.</li><li><strong>Failure indicator:</strong> The script prints <code>LAB 10 FAILED</code>, an engagement lacks coverage, or a role exceeds its target.</li><li><strong>Corrective action:</strong> Apply the relevant scaling trigger or change portfolio priority and rerun.</li></ul>
+<h2>Step 6 — Conduct the Portfolio Staffing Review</h2>
+<p>Answer from the plan:</p>
+<ol><li>Which role becomes the first scaling constraint?</li><li>Which engagement should retain scarce security or architecture capacity?</li><li>What work can be standardized or productized to reduce future staffing demand?</li><li>Who owns the decision to reassign staff?</li><li>Which backup or capability-transfer action prevents a single-person dependency?</li></ol>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Each answer cites utilization, priority, risk, decision rights, or a scaling trigger.</li><li><strong>Acceptable variation:</strong> Recommend hiring, contracting, rotations, or scope reduction when evidence supports it.</li><li><strong>Failure indicator:</strong> Every engagement is treated as equally urgent or specialists are allocated by informal escalation.</li><li><strong>Corrective action:</strong> Use explicit priorities, decision rights, and portfolio-wide capacity evidence.</li></ul>
+<h2>Step 7 — Commit Your Evidence</h2>
+<pre><code class="language-bash">git init -b main
+git add .gitignore organization_model.json engagement_portfolio.csv staffing_model.py staffing_plan.md
+git commit -m &quot;Complete forward deployed organization and staffing model&quot;
+git status --short --branch</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>main</code> is clean.</li><li><strong>Acceptable variation:</strong> Another descriptive commit message is acceptable.</li><li><strong>Failure indicator:</strong> The generated plan is absent or caches are tracked.</li><li><strong>Corrective action:</strong> Rerun the staffing model, stage the intended five project files, and commit.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>Choose a capability-group and deployment-pod topology.</li><li>Define role capacity, accountabilities, and utilization guardrails.</li><li>Prioritize concurrent engagements by phase, complexity, and risk.</li><li>Allocate fractional FTE with primary and backup ownership.</li><li>Validate phase coverage and shared-specialist capacity across the portfolio.</li><li>Apply governance, decision rights, scaling triggers, and anti-hero controls.</li><li>Review career and capability investments as part of portfolio planning.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>Role mismatch</td><td>JSON roles and CSV FTE columns differ</td><td>Synchronize the seven documented roles</td></tr><tr><td>Duplicate priority</td><td>Two engagements compete without an explicit order</td><td>Assign unique portfolio priorities</td></tr><tr><td>Missing backup</td><td>DRI and backup are blank or identical</td><td>Assign a qualified different backup</td></tr><tr><td>High-risk coverage failure</td><td>Architecture or security is below 0.5 FTE</td><td>Add capacity narrow scope or delay</td></tr><tr><td>Phase coverage failure</td><td>Discovery pilot or go-live lacks required roles</td><td>Add the named role allocation</td></tr><tr><td>Overallocated role</td><td>Total demand exceeds target utilization</td><td>Reprioritize cross-train hire contract or reduce scope</td></tr><tr><td>Stale plan</td><td>Inputs changed</td><td>Rerun <code>python3 staffing_model.py</code></td></tr></tbody></table>
+<h2>Cleanup</h2>
+<pre><code class="language-bash">python3 -c &quot;import shutil; shutil.rmtree(&#x27;__pycache__&#x27;, ignore_errors=True)&quot;</code></pre>
+<p>Keep the four learner-built artifacts, <code>.gitignore</code>, and Git history.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I chose an operating topology.</li><li class="check-item"><span class="box">☐</span> I defined seven role pools and accountabilities.</li><li class="check-item"><span class="box">☐</span> I prioritized four concurrent engagements.</li><li class="check-item"><span class="box">☐</span> I assigned different primary and backup DRIs.</li><li class="check-item"><span class="box">☐</span> I applied phase and high-risk coverage rules.</li><li class="check-item"><span class="box">☐</span> I kept all role pools below target utilization.</li><li class="check-item"><span class="box">☐</span> I defined governance decisions scaling triggers and anti-hero controls.</li><li class="check-item"><span class="box">☐</span> I generated and reviewed <code>staffing_plan.md</code>.</li><li class="check-item"><span class="box">☐</span> I committed a clean repository.</li></ul>
+<h2>Reflection</h2>
+<ol><li>Which capacity constraint should trigger hiring rather than reprioritization?</li><li>What capability should be cross-trained first?</li><li>How would the topology change after the portfolio doubles?</li></ol>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

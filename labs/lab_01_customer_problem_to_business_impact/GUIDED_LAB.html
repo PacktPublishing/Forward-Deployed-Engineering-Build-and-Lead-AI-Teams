@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="guided-lab-source-sha256" content="51d56dfb11d1bc8995329cd1d3c6685221e615fca5714d05872bfa1af21c426a">
+<title>Lab 01 — Map a Customer Problem from Discovery to Business Impact</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: #f3f5f8; color: #172033; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.58; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #14213d; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.16); }
+.toolbar button { border: 0; border-radius: 6px; padding: 9px 16px; background: #2f80ed; color: white; font-weight: 700; cursor: pointer; }
+.article { box-sizing: border-box; width: min(980px, calc(100% - 32px)); margin: 28px auto; padding: 42px 52px; background: white; box-shadow: 0 6px 24px rgba(23,32,51,.1); }
+h1 { margin: 0 0 28px; color: #102a43; font-size: 2.1rem; line-height: 1.2; }
+h2 { margin: 36px 0 14px; padding-bottom: 7px; border-bottom: 2px solid #d9e2ec; color: #163a5f; font-size: 1.45rem; }
+h3 { margin: 26px 0 10px; color: #234e70; font-size: 1.16rem; }
+ul, ol { margin: 10px 0 18px; padding-left: 28px; }
+.check-item { list-style: none; margin-left: -22px; }
+.box { display: inline-block; width: 1.35em; font-weight: 700; }
+code { border-radius: 4px; padding: 1px 5px; background: #eef2f7; color: #7b1e3a; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .92em; }
+pre { overflow-x: auto; margin: 16px 0 22px; padding: 18px 20px; border-left: 4px solid #2f80ed; border-radius: 5px; background: #101827; color: #f5f7fa; line-height: 1.45; }
+pre code { padding: 0; background: transparent; color: inherit; white-space: pre; }
+table { width: 100%; margin: 16px 0 24px; border-collapse: collapse; font-size: .94rem; }
+th, td { border: 1px solid #bcccdc; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { background: #eaf2fb; color: #102a43; }
+tr:nth-child(even) td { background: #f8fafc; }
+blockquote { margin: 18px 0; padding: 12px 18px; border-left: 4px solid #829ab1; background: #f0f4f8; color: #334e68; }
+@media (max-width: 700px) { .article { width: 100%; margin: 0; padding: 28px 20px; box-shadow: none; } .toolbar { position: static; } }
+@media print { .toolbar { display: none; } body { background: white; } .article { width: 100%; margin: 0; padding: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="copyArticle()">Copy Article</button><small id="copy-status">Copies only the formatted learner guide below.</small></div>
+<article id="article" class="article">
+<h1>Lab 01 — Map a Customer Problem from Discovery to Business Impact</h1>
+<h2>Goal</h2>
+<p>Turn Northstar Mutual’s request for an AI claims assistant into a measurable Discover–Design–Build–Run–Impact map, then use pilot evidence to make a scale, repair, continue, or exit decision.</p>
+<h2>What You'll Build or Produce</h2>
+<p>In your own project directory, you will create:</p>
+<ul><li><code>customer_scenario.json</code> — the supplied customer evidence, targets, and constraints.</li><li><code>lifecycle_map.json</code> — your completed problem-to-impact map.</li><li><code>pilot_results.json</code> — the supplied pilot evidence used for the deployment decision.</li><li><code>run_lab.py</code> — the learner-built validator and pilot decision program.</li></ul>
+<p>The completed course repository contains the finished version of these same four project files. Use it only when you are stuck or comparing your result.</p>
+<h2>Estimated Time</h2>
+<p>35–50 minutes.</p>
+<h2>Cost Guardrails</h2>
+<p>This lab runs locally and costs $0. It uses no cloud resources, credentials, model APIs, or third-party packages.</p>
+<h2>Completion Evidence</h2>
+<p>You are finished when <code>run_lab.py</code> compiles, all three JSON files parse successfully, the lifecycle map preserves the customer’s baseline and guardrails, the pilot decision is <code>repair_and_retest</code>, and your own Git working tree is clean after committing.</p>
+<h2>Prerequisites</h2>
+<ul><li>Python 3.10 or later for JSON syntax checks and small verification commands.</li><li>Git, a terminal, and a text editor.</li><li>Basic JSON familiarity.</li></ul>
+<h2>Where This Lab Fits</h2>
+<p>This is the foundation for the Enterprise AI Claims Assistant case study. You will turn a feature request into a verified customer problem, a decision boundary, measurable outcomes, and an evidence-based pilot decision. Later labs reuse this problem-to-impact logic instead of treating deployment as the finish line.</p>
+<h2>Step 1 — Create Your Independent Project</h2>
+<p>Create a new directory. Do not build the exercise by editing the completed reference repository.</p>
+<pre><code class="language-bash">mkdir fde_lab_01
+cd fde_lab_01</code></pre>
+<p>Why this matters: your directory should contain the project you build from this guide; the course repository is only the completed comparison point.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Your terminal is inside an empty <code>fde_lab_01</code> directory.</li><li><strong>Acceptable variation:</strong> You may choose another directory name.</li><li><strong>Failure indicator:</strong> You are inside the completed <code>lab_01_customer_problem_to_business_impact</code> repository.</li><li><strong>Corrective action:</strong> Leave the reference repository and create a separate working directory.</li></ul>
+<h2>Step 2 — Record the Customer Evidence</h2>
+<p>Create <code>customer_scenario.json</code> with the supplied discovery evidence:</p>
+<pre><code class="language-json">{
+  &quot;organization&quot;: &quot;Northstar Mutual&quot;,
+  &quot;weekly_eligible_claims&quot;: 1200,
+  &quot;claims_adjusters&quot;: 48,
+  &quot;current_workflow&quot;: [
+    &quot;Open a new property claim&quot;,
+    &quot;Review the claim form&quot;,
+    &quot;Locate the applicable policy and endorsements&quot;,
+    &quot;Review photographs and prior notes&quot;,
+    &quot;Decide whether to fast-track or manually review the claim&quot;,
+    &quot;Record the rationale and route the claim&quot;
+  ],
+  &quot;observations&quot;: {
+    &quot;average_handling_time_minutes&quot;: 18,
+    &quot;incorrect_fast_track_rate&quot;: 0.012,
+    &quot;claims_completed_within_24_hours&quot;: 0.82,
+    &quot;primary_friction&quot;: &quot;Evidence is distributed across multiple systems&quot;
+  },
+  &quot;business_request&quot;: &quot;Build an AI claims assistant&quot;,
+  &quot;targets&quot;: {
+    &quot;average_handling_time_minutes&quot;: 11,
+    &quot;maximum_incorrect_fast_track_rate&quot;: 0.015,
+    &quot;measurement_window&quot;: &quot;30 days after pilot launch&quot;,
+    &quot;minimum_pilot_sample_size&quot;: 200
+  },
+  &quot;constraints&quot;: [
+    &quot;The adjuster retains the final routing decision&quot;,
+    &quot;The system cannot deny claims autonomously&quot;,
+    &quot;The system cannot issue payments&quot;,
+    &quot;Customer information must remain inside the approved environment&quot;,
+    &quot;Recommendations must cite supporting policy evidence&quot;,
+    &quot;Missing or conflicting evidence must trigger manual review&quot;
+  ]
+}</code></pre>
+<p>Why this matters: the requested feature is not the problem definition. This file preserves the verified workflow, baseline, target, quality guardrail, and prohibited actions.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The file identifies the 18-minute baseline, 11-minute target, 1.5% maximum incorrect fast-track rate, and adjuster authority.</li><li><strong>Acceptable variation:</strong> Formatting and indentation may differ; the evidence values must not.</li><li><strong>Failure indicator:</strong> The file describes only “build an AI claims assistant” or removes a protected boundary.</li><li><strong>Corrective action:</strong> Restore the scenario evidence exactly before designing the lifecycle map.</li></ul>
+<h2>Step 3 — Build the Lifecycle Map</h2>
+<p>Create <code>lifecycle_map.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;customer_context&quot;: {
+    &quot;organization&quot;: &quot;Northstar Mutual&quot;,
+    &quot;user&quot;: &quot;Claims adjuster&quot;,
+    &quot;business_owner&quot;: &quot;VP of Claims Operations&quot;,
+    &quot;current_workflow&quot;: &quot;Adjusters manually inspect claim forms, policies, endorsements, photographs, and prior notes across multiple systems.&quot;,
+    &quot;problem_statement&quot;: &quot;Eligible property claims take an average of 18 minutes to assess because the evidence needed for routing decisions is distributed across multiple systems.&quot;
+  },
+  &quot;decision&quot;: {
+    &quot;user_decision&quot;: &quot;Decide whether an eligible claim can be fast-tracked or requires manual review.&quot;,
+    &quot;action_after_decision&quot;: &quot;Route the claim to the appropriate queue and record the supporting rationale.&quot;
+  },
+  &quot;scope&quot;: {
+    &quot;in_scope&quot;: [
+      &quot;Surface policy evidence relevant to the claim&quot;,
+      &quot;Recommend fast-track or manual review&quot;,
+      &quot;Record evidence supporting the recommendation&quot;,
+      &quot;Escalate missing or conflicting evidence to manual review&quot;
+    ],
+    &quot;out_of_scope&quot;: [
+      &quot;Deny claims autonomously&quot;,
+      &quot;Issue customer payments&quot;,
+      &quot;Change policy terms&quot;,
+      &quot;Remove the adjuster&#x27;s final decision authority&quot;
+    ]
+  },
+  &quot;baseline&quot;: {
+    &quot;metric&quot;: &quot;average_handling_time_minutes&quot;,
+    &quot;current_value&quot;: 18,
+    &quot;target_value&quot;: 11,
+    &quot;unit&quot;: &quot;minutes_per_claim&quot;,
+    &quot;direction&quot;: &quot;decrease&quot;,
+    &quot;measurement_window&quot;: &quot;30 days after pilot launch&quot;,
+    &quot;minimum_pilot_sample_size&quot;: 200,
+    &quot;weekly_volume&quot;: 1200
+  },
+  &quot;lifecycle&quot;: {
+    &quot;discover&quot;: {
+      &quot;owner&quot;: &quot;Forward Deployed Engineer and Claims Operations Lead&quot;,
+      &quot;deliverable&quot;: &quot;Observed workflow, bounded problem statement, and measurement baseline&quot;,
+      &quot;evidence&quot;: &quot;Twenty sampled claim journeys and confirmed handling-time data&quot;,
+      &quot;exit_criterion&quot;: &quot;The user, decision, action, friction, scope, baseline, and business owner are confirmed.&quot;
+    },
+    &quot;design&quot;: {
+      &quot;owner&quot;: &quot;Forward Deployed Architect and Claims Operations Lead&quot;,
+      &quot;deliverable&quot;: &quot;Bounded AI-assisted claims workflow with human decision points&quot;,
+      &quot;evidence&quot;: &quot;Approved workflow showing recommendation, evidence citation, manual review, and prohibited actions&quot;,
+      &quot;exit_criterion&quot;: &quot;The customer approves system boundaries, human authority, success criteria, and guardrails.&quot;
+    },
+    &quot;build&quot;: {
+      &quot;owner&quot;: &quot;AI Forward Deployed Engineer and Customer Integration Engineer&quot;,
+      &quot;deliverable&quot;: &quot;Smallest valuable evidence-to-recommendation slice&quot;,
+      &quot;evidence&quot;: &quot;Representative claims produce traceable recommendations without executing prohibited actions&quot;,
+      &quot;exit_criterion&quot;: &quot;The end-to-end slice passes functional checks and routes missing evidence to manual review.&quot;
+    },
+    &quot;run&quot;: {
+      &quot;owner&quot;: &quot;Technical Deployment Lead and Claims Operations Manager&quot;,
+      &quot;deliverable&quot;: &quot;Controlled pilot with selected claims adjusters&quot;,
+      &quot;evidence&quot;: &quot;Usage, handling time, override, availability, and incorrect-routing telemetry&quot;,
+      &quot;exit_criterion&quot;: &quot;At least 200 eligible claims produce sufficient operational and quality evidence.&quot;
+    },
+    &quot;impact&quot;: {
+      &quot;owner&quot;: &quot;VP of Claims Operations&quot;,
+      &quot;deliverable&quot;: &quot;Scale, repair, pause, or exit recommendation&quot;,
+      &quot;evidence&quot;: &quot;Pilot results compared with the handling-time target and incorrect-fast-track guardrail&quot;,
+      &quot;exit_criterion&quot;: &quot;Leadership records an evidence-based deployment decision and accountable next action.&quot;
+    }
+  },
+  &quot;outcomes&quot;: {
+    &quot;technical_output&quot;: &quot;A claims-assistant workflow is deployed to the controlled pilot environment.&quot;,
+    &quot;customer_outcome&quot;: &quot;Adjusters receive relevant policy evidence and a traceable routing recommendation before making the final decision.&quot;,
+    &quot;business_impact&quot;: &quot;Average handling time for eligible claims decreases from 18 minutes to 11 minutes.&quot;,
+    &quot;guardrail&quot;: {
+      &quot;metric&quot;: &quot;incorrect_fast_track_rate&quot;,
+      &quot;maximum_value&quot;: 0.015,
+      &quot;unit&quot;: &quot;ratio&quot;
+    }
+  },
+  &quot;assumptions&quot;: [
+    &quot;The 1,200 weekly claims are eligible for the bounded workflow.&quot;,
+    &quot;The 18-minute baseline was measured consistently.&quot;,
+    &quot;Policy and endorsement evidence is available in approved systems.&quot;
+  ],
+  &quot;trade_offs&quot;: [
+    &quot;Manual review protects claim quality but limits maximum automation.&quot;,
+    &quot;Evidence citation may increase latency but improves trust and auditability.&quot;
+  ]
+}</code></pre>
+<p>Why this matters: the map connects the customer problem to owned deliverables, exit criteria, and measurable impact instead of treating deployment as the finish line.</p>
+<p>Review the five stages:</p>
+<table><thead><tr><th>Stage</th><th>Evidence question</th></tr></thead><tbody><tr><td>Discover</td><td>Are the user, decision, friction, scope, baseline, and owner confirmed?</td></tr><tr><td>Design</td><td>Are human authority, success criteria, and guardrails explicit?</td></tr><tr><td>Build</td><td>Is the smallest valuable end-to-end slice defined?</td></tr><tr><td>Run</td><td>Is the pilot bounded and instrumented?</td></tr><tr><td>Impact</td><td>Is the scale, repair, pause, or exit decision evidence-based?</td></tr></tbody></table>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Every stage has an owner, deliverable, evidence, and exit criterion; technical output, customer outcome, and business impact are distinct.</li><li><strong>Acceptable variation:</strong> You may improve wording while preserving the same evidence and authority boundaries.</li><li><strong>Failure indicator:</strong> A stage has no owner or exit criterion, or business impact is stated only as “deploy the assistant.”</li><li><strong>Corrective action:</strong> Tie each stage to a decision, accountable owner, observable evidence, and measurable exit.</li></ul>
+<h2>Step 4 — Add the Pilot Evidence</h2>
+<p>Create <code>pilot_results.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;pilot_name&quot;: &quot;Northstar Claims Assistant - Pilot 1&quot;,
+  &quot;sample_size&quot;: 320,
+  &quot;average_handling_time_minutes&quot;: 12.5,
+  &quot;incorrect_fast_track_rate&quot;: 0.024,
+  &quot;recommendation_acceptance_rate&quot;: 0.68,
+  &quot;availability&quot;: 0.994,
+  &quot;most_common_failure&quot;: &quot;Missing policy endorsements caused unsupported fast-track recommendations&quot;,
+  &quot;affected_claims&quot;: 14
+}</code></pre>
+<p>Why this matters: a lifecycle map becomes operational only when the team can compare observed pilot evidence with the target and guardrail.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> The pilot contains 320 claims, 12.5-minute handling time, and a 2.4% incorrect fast-track rate.</li><li><strong>Acceptable variation:</strong> None for supplied evidence; do not improve pilot results to make the decision easier.</li><li><strong>Failure indicator:</strong> The pilot data is missing, speculative, or changed to meet the target.</li><li><strong>Corrective action:</strong> Restore the supplied measurements.</li></ul>
+<h2>Step 5 — Build the Python Validator</h2>
+<p>Create <code>run_lab.py</code> with this complete source:</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+&quot;&quot;&quot;Run Lab 01: validate the customer-to-impact map and evaluate pilot evidence.&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parent
+STAGES = (&quot;discover&quot;, &quot;design&quot;, &quot;build&quot;, &quot;run&quot;, &quot;impact&quot;)
+
+
+def load_json(name: str) -&gt; dict[str, Any]:
+    return json.loads((ROOT / name).read_text(encoding=&quot;utf-8&quot;))
+
+
+def validate(data: dict[str, Any], scenario: dict[str, Any]) -&gt; list[str]:
+    errors: list[str] = []
+    required = (&quot;customer_context&quot;, &quot;decision&quot;, &quot;scope&quot;, &quot;baseline&quot;, &quot;lifecycle&quot;, &quot;outcomes&quot;)
+    for field in required:
+        if field not in data:
+            errors.append(f&quot;Missing section: {field}&quot;)
+
+    lifecycle = data.get(&quot;lifecycle&quot;, {})
+    for stage in STAGES:
+        details = lifecycle.get(stage, {})
+        for field in (&quot;owner&quot;, &quot;deliverable&quot;, &quot;evidence&quot;, &quot;exit_criterion&quot;):
+            if not details.get(field):
+                errors.append(f&quot;{stage}.{field} is required&quot;)
+
+    baseline = data.get(&quot;baseline&quot;, {})
+    current = baseline.get(&quot;current_value&quot;)
+    target = baseline.get(&quot;target_value&quot;)
+    if baseline.get(&quot;direction&quot;) == &quot;decrease&quot; and isinstance(current, (int, float)) and isinstance(target, (int, float)):
+        if target &gt;= current:
+            errors.append(&quot;Target must be lower than the current value&quot;)
+    expected_target = scenario.get(&quot;targets&quot;, {}).get(&quot;average_handling_time_minutes&quot;)
+    if target != expected_target:
+        errors.append(f&quot;Target must match the customer evidence: {expected_target}&quot;)
+
+    boundaries = &quot; &quot;.join(data.get(&quot;scope&quot;, {}).get(&quot;out_of_scope&quot;, [])).lower()
+    if &quot;deny claims&quot; not in boundaries or &quot;payments&quot; not in boundaries:
+        errors.append(&quot;Scope must prohibit autonomous denial and payment&quot;)
+
+    outcomes = data.get(&quot;outcomes&quot;, {})
+    values = [outcomes.get(key, &quot;&quot;) for key in (&quot;technical_output&quot;, &quot;customer_outcome&quot;, &quot;business_impact&quot;)]
+    if not all(values) or len({value.lower() for value in values}) != 3:
+        errors.append(&quot;Technical output, customer outcome, and business impact must be distinct&quot;)
+    return errors
+
+
+def evaluate(data: dict[str, Any], pilot: dict[str, Any]) -&gt; tuple[str, list[str]]:
+    baseline = data[&quot;baseline&quot;]
+    guardrail = data[&quot;outcomes&quot;][&quot;guardrail&quot;]
+    reasons: list[str] = []
+    if pilot[&quot;sample_size&quot;] &lt; baseline[&quot;minimum_pilot_sample_size&quot;]:
+        reasons.append(&quot;Pilot sample is too small&quot;)
+        return &quot;continue_pilot&quot;, reasons
+    if pilot[&quot;average_handling_time_minutes&quot;] &gt; baseline[&quot;target_value&quot;]:
+        reasons.append(&quot;Handling-time target was not met&quot;)
+    if pilot[&quot;incorrect_fast_track_rate&quot;] &gt; guardrail[&quot;maximum_value&quot;]:
+        reasons.append(&quot;Incorrect fast-track guardrail was breached&quot;)
+    return (&quot;scale&quot; if not reasons else &quot;repair_and_retest&quot;), reasons
+
+
+def main() -&gt; int:
+    scenario = load_json(&quot;customer_scenario.json&quot;)
+    lifecycle_map = load_json(&quot;lifecycle_map.json&quot;)
+    pilot = load_json(&quot;pilot_results.json&quot;)
+    errors = validate(lifecycle_map, scenario)
+    if errors:
+        print(f&quot;LAB 01 FAILED — {len(errors)} issue(s)&quot;)
+        for error in errors:
+            print(f&quot;- {error}&quot;)
+        return 1
+
+    decision, reasons = evaluate(lifecycle_map, pilot)
+    print(&quot;LAB 01 PASSED&quot;)
+    print(f&quot;- Customer problem: {lifecycle_map[&#x27;customer_context&#x27;][&#x27;problem_statement&#x27;]}&quot;)
+    print(f&quot;- Lifecycle stages: {&#x27;, &#x27;.join(STAGES)}&quot;)
+    print(f&quot;- Target: {lifecycle_map[&#x27;baseline&#x27;][&#x27;current_value&#x27;]} -&gt; {lifecycle_map[&#x27;baseline&#x27;][&#x27;target_value&#x27;]} minutes&quot;)
+    print(f&quot;- Pilot decision: {decision}&quot;)
+    for reason in reasons:
+        print(f&quot;  - {reason}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())</code></pre>
+<p>Why this matters: the program turns the lifecycle and pilot rules into repeatable evidence. It validates the map, protects the target and scope boundaries, and calculates the deployment decision.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> <code>run_lab.py</code> loads the three JSON files, validates all five stages, and evaluates the pilot.</li><li><strong>Acceptable variation:</strong> Comments and formatting may differ; validation behavior and output evidence must remain equivalent.</li><li><strong>Failure indicator:</strong> The program does not check the target, protected actions, lifecycle completeness, or pilot guardrail.</li><li><strong>Corrective action:</strong> Restore the complete source and confirm every referenced JSON filename matches your project.</li></ul>
+<h2>Step 6 — Compile and Run the Lab</h2>
+<pre><code class="language-bash">python3 -m py_compile run_lab.py
+python3 run_lab.py</code></pre>
+<p>Expected output begins with:</p>
+<pre><code class="language-text">LAB 01 PASSED</code></pre>
+<p>It must report five lifecycle stages, the 18-to-11-minute target, and <code>repair_and_retest</code>.</p>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Compilation succeeds and the program reports <code>LAB 01 PASSED</code> with <code>repair_and_retest</code>.</li><li><strong>Acceptable variation:</strong> Python may create an ignored <code>__pycache__</code> directory.</li><li><strong>Failure indicator:</strong> A syntax error, missing-file error, JSON error, or <code>LAB 01 FAILED</code> message appears.</li><li><strong>Corrective action:</strong> Repair the named code or data file and rerun both commands.</li></ul>
+<h2>Step 7 — Commit Your Completed Project</h2>
+<pre><code class="language-bash">printf &#x27;__pycache__/\n*.py[cod]\n.DS_Store\n&#x27; &gt; .gitignore
+git init -b main
+git add .gitignore run_lab.py customer_scenario.json lifecycle_map.json pilot_results.json
+git commit -m &quot;Complete customer problem-to-impact lab&quot;
+git status --short</code></pre>
+<h3>Verification checkpoint</h3>
+<ul><li><strong>Expected result:</strong> Git creates a commit and <code>git status --short</code> prints nothing.</li><li><strong>Acceptable variation:</strong> If <code>git init -b main</code> is unsupported, run <code>git init</code> followed by <code>git branch -M main</code>.</li><li><strong>Failure indicator:</strong> Caches, course-reference files, or unrelated files are staged.</li><li><strong>Corrective action:</strong> Remove transient files and stage only the code and data files created in this guide.</li></ul>
+<h2>Map the Completed Workflow</h2>
+<ol><li>Customer evidence establishes the real workflow, baseline, target, constraints, and owner.</li><li>The lifecycle map converts that evidence into owned Discover–Design–Build–Run–Impact gates.</li><li>Pilot results are compared with both the business target and quality guardrail.</li><li>Leadership chooses <code>repair_and_retest</code> because the pilot does not yet satisfy both.</li></ol>
+<h2>Troubleshooting Cheatsheet</h2>
+<table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Corrective action</th></tr></thead><tbody><tr><td>JSON line/column error</td><td>Missing comma, quote, brace, or bracket</td><td>Repair the location reported by <code>json.tool</code></td></tr><tr><td>Target assertion fails in the completed state</td><td>Baseline or target differs from supplied evidence</td><td>Restore 18 as current and 11 as target</td></tr><tr><td>Decision prints <code>scale</code></td><td>Pilot or guardrail values were changed</td><td>Restore the supplied pilot evidence and 1.5% guardrail</td></tr></tbody></table>
+<h2>Cleanup</h2>
+<p>Keep <code>run_lab.py</code>, <code>customer_scenario.json</code>, <code>lifecycle_map.json</code>, <code>pilot_results.json</code>, <code>.gitignore</code>, and your Git history. No additional cleanup is required after the project passes and the working tree is clean.</p>
+<h2>Completion Check</h2>
+<ul><li class="check-item"><span class="box">☐</span> I created the Python validator and three JSON files from this guide.</li><li class="check-item"><span class="box">☐</span> <code>run_lab.py</code> compiles and the completed project reports <code>LAB 01 PASSED</code>.</li><li class="check-item"><span class="box">☐</span> The map connects the problem to five owned lifecycle stages.</li><li class="check-item"><span class="box">☐</span> The adjuster retains final authority and prohibited actions remain excluded.</li><li class="check-item"><span class="box">☐</span> The pilot decision is <code>repair_and_retest</code>.</li><li class="check-item"><span class="box">☐</span> My own Git working tree is clean.</li></ul>
+<h2>Reflection</h2>
+<p>Why would scaling a faster pilot still be irresponsible when the incorrect fast-track rate exceeds the agreed guardrail?</p>
+</article>
+<script>
+function selectAndCopy(article) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(article);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+}
+async function copyArticle() {
+  const article = document.getElementById('article');
+  const status = document.getElementById('copy-status');
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([article.innerHTML], {type: 'text/html'}),
+        'text/plain': new Blob([article.innerText], {type: 'text/plain'})
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      selectAndCopy(article);
+    }
+    status.textContent = 'Copied. Paste into the Udemy Article editor.';
+  } catch (error) {
+    selectAndCopy(article);
+    status.textContent = 'Copied with browser fallback. Paste into Udemy.';
+  }
+}
+</script>
+</body>
+</html>

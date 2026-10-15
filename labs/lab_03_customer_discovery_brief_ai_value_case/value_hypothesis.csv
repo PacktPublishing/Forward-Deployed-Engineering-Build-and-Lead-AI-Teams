@@ -1,0 +1,6 @@
+metric_id,metric_name,baseline,target,direction,unit,source,owner,decision_use
+median_intake_to_assignment_hours,Median intake-to-assignment time,18,6,lower,hours,Claims platform,Elena Ruiz,Scale gate
+intake_rework_rate_percent,Intake rework rate,22,10,lower,percent,Quality review,Marcus Lee,Scale gate
+citation_completeness_percent,Citation completeness,71,95,higher,percent,Audit log,Dana Brooks,Scale gate
+human_approval_rate_percent,Human approval for protected actions,100,100,equal,percent,Claims platform,Elena Ruiz,Safety stop
+weekly_active_adjusters_percent,Weekly active adjusters,0,75,higher,percent,Usage telemetry,Marcus Lee,Adoption review

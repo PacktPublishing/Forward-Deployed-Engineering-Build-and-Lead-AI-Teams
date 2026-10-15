@@ -1,0 +1,9 @@
+risk_id,category,description,probability,impact,score,owner,response,trigger,contingency,status
+R-01,dependency,Claims-system write API misses the cutover window,4,5,20,Claims Platform Lead,MITIGATE,API certification slips beyond M-03,Launch read-only assistance and defer protected writes,MITIGATED
+R-02,security,Cross-tenant authorization defect appears in staging,4,4,16,Security Lead,MITIGATE,Any negative authorization test succeeds,Hold promotion and repair tenant enforcement,MITIGATED
+R-03,data,Policy metadata is incomplete for a pilot jurisdiction,3,5,15,Claims Data Lead,MITIGATE,Coverage falls below 100 percent for pilot policies,Remove affected jurisdiction from cohort and repair metadata,MONITORED
+R-04,adoption,Adjuster training completion falls below 90 percent,3,4,12,Claims Operations Lead,MITIGATE,Completion below target three days before cutover,Reduce cohort to trained adjusters and add office hours,MONITORED
+R-05,reliability,p95 latency exceeds 12 seconds in staging load test,3,4,12,Site Reliability Lead,MITIGATE,Two consecutive windows exceed the SLO,Tune retrieval limit concurrency and timeouts,MITIGATED
+R-06,scope,Executive sponsor requests enterprise rollout before pilot evidence,3,4,12,Technical Deployment Lead,AVOID,Request exceeds cohort volume or duration boundary,Require a new scope decision and release review,MONITORED
+R-07,operations,On-call coverage is incomplete for the first weekend,2,5,10,Operations Owner,MITIGATE,Any severity-one slot lacks primary and backup,Delay go-live or add approved coverage,MITIGATED
+R-08,vendor,Managed model endpoint has a regional service disruption,2,4,8,AI Platform Lead,TRANSFER,Provider health alert or circuit breaker opens,Disable AI assistance and continue manual claims handling,MONITORED
